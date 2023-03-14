@@ -1,0 +1,12 @@
+const { sharAll, sharGlobal } = require(`./shar.js`);
+const { chan_config } = require(`./config.js`);
+const { modFilt } = require(`./log_filter.js`);
+const { help, хелп, помощь, команды, commands, newinfo, nio, profile, pr, time, шар, report, репорт, prefix, ping, } = require(`./help.js`);
+const { all, category } = require(`./chans.js`);
+const { allOrderPath } = require(`./orders/patch.js`);
+exports.shar = { sharAll, sharGlobal };
+exports.chan_config = { chan_config };
+exports.modFilt = { modFilt };
+exports.helplist = { help, хелп, помощь, команды, commands, newinfo, nio, profile, pr, time, шар, report, репорт, prefix, ping };
+exports.chans = { all, category };
+exports.orders = { allOrderPath };
