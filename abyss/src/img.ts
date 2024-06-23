@@ -8,7 +8,7 @@ class Profile {
     size: `20px`,
     font: `Arial`
   };
-  /** Для более подробной инфы - гляди на основную sharp функцию ;D (просто добавь скобки)*/
+  /** Для более подробной инфы - гляди на основную sharp функцию ;D (просто добавь скобки) */
   _sharp = sharp;
 
   constructor() {
@@ -102,6 +102,7 @@ class Profile {
 
   #drawBGOneImage(args: DrawBGTypeAllOne): Profile {
     const ctx = this.ctx;
+    //Хм... голова не варит что-то придумать на счёт этого метода
     return this;
   }
   
@@ -332,10 +333,6 @@ class Profile {
   ctx.font = `Arial 25px`;
   ctx.fillStyle = `black`;
 
-  /**
-   * @param {string | number} num
-   * @returns {string}
-   */
   function numberClip (num: string | number): string {
     if (typeof num != `string`) num = `${num}`;
 
@@ -344,10 +341,6 @@ class Profile {
     return numLength >= 5 ? `${num.slice(0, 4)}k` : numLength >= 11 ? `${num.slice(0, 4)}kk` : numLength >= 16 ? `${num.slice(0, 4)}kk+` : num;
   }
 
-  /**
-   * @param {number} s
-   * @returns {{ hours: number, minutes: number, seconds: number }}
-   */
   function parseSecond (s: number): { hours: number; minutes: number; seconds: number; } {
     const minutes = Math.floor(s / 60);
     const hours = Math.floor(minutes / 60);
@@ -358,10 +351,6 @@ class Profile {
     };
   }
 
-  /**
-   * @param {number} time
-   * @returns {string}
-   */
   function timeFormatter(time: number): string {
     if (typeof time != `number` || time < 0) throw new TypeError(`Входное значение в timeFormatter не является положительным числом!`);
 
@@ -442,6 +431,7 @@ class Profile {
           }
 
           cacheWord = testLine;
+
           /**
            * @param {string} cache входящий текст для изменений 
            * @param {number} [elseWidth] дополнительное значение, что будет участвовать в цикле 
@@ -540,11 +530,6 @@ class Profile {
 
   function drawTexts(args: DrawTextOptions[], options: DrawTextsOption): void;
   function drawTexts(args: DrawTextOptions[]): void
-  /**
-   * @param {DrawTextOptions[]} args
-   * @param {DrawTextsOption} [option]
-   * @returns {void}
-   */
   function drawTexts(args: DrawTextOptions[], option?: DrawTextsOption): void {
     let index = 0;
     /** @type {object} */
