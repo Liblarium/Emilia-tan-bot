@@ -119,13 +119,13 @@ class Profile {
   const fonts = {
     size: `20px`,
     font: `Arial`
-  };
+  }; 
 
-  const bg = await sharp(`./bg.png`).resize(1000, 200, { fit: `cover` }).toBuffer();
-  const badge = await sharp(`./avatar.png`).toBuffer();
-  const bottombg = await sharp(`./tenshi.png`).resize(1000, 1447, { fit: `cover` }).toBuffer();
-  const avatar = await sharp(`./kogasa.png`).resize(160, 160, { fit: `cover` }).toBuffer();
-  const guildIconImg = await sharp(`./tenshi.png`).resize(80, 115, { fit: `cover` }).toBuffer();
+  const bg = await sharp(`./abyss/images/bg.png`).resize(1000, 200, { fit: `cover` }).toBuffer();
+  const badge = await sharp(`./abyss/images/avatar.png`).toBuffer();
+  const bottombg = await sharp(`./abyss/images/tenshi.png`).resize(1000, 1447, { fit: `cover` }).toBuffer();
+  const avatar = await sharp(`./abyss/images/kogasa.png`).resize(160, 160, { fit: `cover` }).toBuffer();
+  const guildIconImg = await sharp(`./abyss/images/tenshi.png`).resize(80, 115, { fit: `cover` }).toBuffer();
 
   const _drawRoundedRect = ({ x, y, w, h, r }: { x: number, y: number, w: number, h: number, r: number }) => {
     ctx.beginPath();
@@ -589,7 +589,7 @@ class Profile {
 
   const res = canvas.toBuffer(`image/png`);
 
-  await sharp(res).toFile(`res.png`);
+  await sharp(res).toFile(`./abyss/res.png`);
 
 })();
 

@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "run-abyss": "tsc-watch --onSuccess \"node ./abyss/dist/img.js\""
+    "abyss-run": "tsc-watch --project abyss/tsconfig.json --onSuccess \"node ./abyss/dist/img.js\""
   },
   "author": "RanHolly (Miia)",
   "license": "MIT",
