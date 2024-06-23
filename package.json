@@ -17,8 +17,8 @@
     "@types/react": "^18.3.0",
     "discord.js": "^14.14.1",
     "es6-shim": "^0.35.8",
-    "mongodb": "^5.8.0",
-    "mongoose": "^8.3.1",
+    "mongodb": "6.3.0",
+    "mongoose": "^8.4.3",
     "mysql2": "^3.9.4",
     "pg": "^8.11.5",
     "react": "^18.3.0",
@@ -39,5 +39,10 @@
     "eslint-plugin-use-decorator": "^0.2.0",
     "tsc-watch": "^6.2.0",
     "typescript": "^5.4.5"
+  },
+  "overrides": {
+    "typeorm": {
+      "mongodb": "6.3.0"
+    }
   }
 }
