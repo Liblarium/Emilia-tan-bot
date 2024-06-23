@@ -1,0 +1,7 @@
+node_modules/
+serJs/
+target/
+Logs/
+.*/
+.*
+canvas/

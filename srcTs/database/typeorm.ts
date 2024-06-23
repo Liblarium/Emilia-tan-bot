@@ -1,0 +1,24 @@
+import "reflect-metadata";
+import { DataSource } from "typeorm";
+import { Log } from "../log";
+import { schemas } from "./schemas";
+
+export class ConnectionInfo extends DataSource {
+  constructor() {
+    super({
+      type: `postgres`,
+      host: "localhost",
+      port: 5432,
+      username: `${process.env.DB_USER}`,
+      password: `${process.env.DB_PASS}`,
+      database: `${process.env.DB_NAME}`,
+      synchronize: true, // синхронизация данных по указаной схеме. Кроме монго
+      logging: false, // логи от typeorm
+      entities: schemas,
+      subscribers: [],
+      migrations: [],
+    });
+
+    this.initialize().then(() => new Log({ text: `i work`, type: `info`, categories: [`global`, `pgsql`] })).catch((e) => new Log({ text: e, type: `error`, categories: [ `pgsql`, `global`] }));
+  }
+}

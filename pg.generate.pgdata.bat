@@ -1,0 +1,1 @@
+initdb -D pgdata -E UTF8 -A scram-sha-256 --locale en_US.UTF-8 -U ran -W

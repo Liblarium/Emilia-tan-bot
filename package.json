@@ -1,28 +1,43 @@
 {
   "name": "emilia-tan-bot",
-  "version": "10.0.0",
+  "private": true,
+  "version": "7.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "srcJs/client/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "run-abyss": "tsc-watch --onSuccess \"node ./abyss/dist/img.js\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "RanHolly (Miia)",
+  "license": "MIT",
   "dependencies": {
-    "@discordjs/voice": "^0.14.0",
-    "canvas": "^2.11.0",
-    "date-and-time": "^2.4.2",
-    "discord": "github:discordjs/voice",
-    "discord.js": "^14.7.1",
-    "dotenv": "^16.0.3",
-    "moment": "^2.29.4",
-    "moment-duration-format": "^2.3.2",
-    "mongobd": "^0.0.1-security.0",
-    "mongoose": "^7.0.0",
-    "mysql2": "^3.1.2",
-    "pg": "^8.9.0",
-    "postgres": "^3.3.3",
-    "typeorm": "^0.3.12"
+    "@napi-rs/canvas": "^0.1.51",
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/react": "^18.3.0",
+    "discord.js": "^14.14.1",
+    "es6-shim": "^0.35.8",
+    "mongodb": "^5.8.0",
+    "mongoose": "^8.3.1",
+    "mysql2": "^3.9.4",
+    "pg": "^8.11.5",
+    "react": "^18.3.0",
+    "reflect-metadata": "^0.2.2",
+    "satori": "^0.10.13",
+    "sharp": "^0.33.4",
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.56.9",
+    "@types/node": "^20.12.7",
+    "@typescript-eslint/eslint-plugin": "^7.7.0",
+    "@typescript-eslint/parser": "^7.7.0",
+    "@typescript-eslint/types": "^7.7.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsdoc": "^48.2.3",
+    "eslint-plugin-use-decorator": "^0.2.0",
+    "tsc-watch": "^6.2.0",
+    "typescript": "^5.4.5"
   }
 }

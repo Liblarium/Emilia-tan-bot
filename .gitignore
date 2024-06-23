@@ -1,0 +1,10 @@
+/node_modules
+/node_target
+/logs
+/srcJS
+/abyss/dist
+/target
+/pgdata
+.env
+tsconfig copy.json
+package-lock.json
