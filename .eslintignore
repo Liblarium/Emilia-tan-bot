@@ -2,6 +2,7 @@ node_modules/
 serJs/
 target/
 Logs/
+abyss/
 .*/
 .*
 canvas/
