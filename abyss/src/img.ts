@@ -66,22 +66,7 @@ class Profile {
     //в случае наличия градиента - оно будет переопределено на градиент
     if (!gradient && color?.fill) ctx.fillStyle = color.fill;
     if (!gradient && color?.stroke) ctx.strokeStyle = color.stroke;
-    if (gradient !== undefined) {
-      if (!gradient.colorType) gradient.colorType = `fill`;
-      if (!gradient.type) gradient.type = `linear`;
-      if (gradient.colors.length < 1 || !Array.isArray(gradient.colors)) throw new TypeError(`Profile.drawBG[BGColor]: Where color's in gradient? gradient.color is empty!`);
-
-      let gradients: CanvasGradient = ctx.createLinearGradient(0, 0, 0, 0);
-      const { linear, radial, colorType } = gradient;
-
-      if (gradient.type === `linear` && linear) gradients = ctx.createLinearGradient(linear.x0, linear.y0, linear.x1, linear.y1);
-      if (gradient.type === `radial` && radial) gradients = ctx.createRadialGradient(radial.x0, radial.y0, radial.r0, radial.x1, radial.y1, radial.r1);
-
-      gradient.colors.forEach(grad => gradients.addColorStop(grad.offset, grad.color));
-
-      if (colorType === `fill` || colorType === `both`) ctx.fillStyle = gradients;
-      if (colorType === `stroke` || colorType === `both`) ctx.strokeStyle = gradients;
-    }
+    if (gradient !== undefined) this.#setGradient(gradient);
 
     if (globalAlpha !== undefined) ctx.globalAlpha = globalAlpha;
 
@@ -100,17 +85,58 @@ class Profile {
     return this;
   }
 
-  #drawBGOneImage({ x, y, image, imagePosition = `baner`,  draw = `image`, drawType = `fill`, width, height, blurOptions, strokeLineWidth, globalAlpha, isClip, rotation, shadow, scale, translate }: DrawBGTypeAllOne): Profile {
+  #drawBGOneImage({ x, y, image, imagePosition = `baner`,  draw = `image`, isStroke = false, width = this.canvas.width, height, blur, strokeLineWidth, globalAlpha, isClip, rotation, shadow, scale, translate, strokeColor, gradient }: DrawBGTypeAllOne): Profile {
     const ctx = this.ctx;
+    const canvas = this.canvas;
+
+    if (draw !== `image`) throw new TypeError(`Profile.#drawBGOneImage: Why draw a "${draw}"? This draw is not "image"!`);
 
     ctx.save();
+
+    const templateType: TemplateType = {
+      baner: { x: 0, y: 0, width: canvas.width, height: 200 },
+      full: { x: 0, y: 0, width: canvas.width, height: canvas.height },
+      bottom: { x: 0, y: 200, width: canvas.width, height: 500 },
+    };
+    const position = templateType[imagePosition];
+
+    ctx.rect(position.x, position.y, position.width, position.height);
+    ctx.clip();
+
+    if (isClip) {
+      ctx.save();
+      ctx.clip();
+    }
+
     ctx.beginPath();
 
-    //19:33 [24.06]... голова не варит. Ладно. Завтра потыкаю код с другого моника
+    if (scale) ctx.scale(scale.x, scale.y);
+    if (translate) ctx.translate(translate.x, translate.y);
+    if (rotation) ctx.rotate(rotation);
 
-    if (isClip) ctx.clip();
+    if (shadow) {
+      ctx.shadowColor = shadow.color;
+      ctx.shadowBlur = shadow.blur ?? 0;
+      ctx.shadowOffsetX = shadow.x;
+      ctx.shadowOffsetY = shadow.y;
+    }
+
+    if (globalAlpha !== undefined) ctx.globalAlpha = globalAlpha;
+
+    if (strokeLineWidth !== undefined) ctx.lineWidth = strokeLineWidth;
+    if (strokeColor !== undefined && !gradient) ctx.strokeStyle = strokeColor;
+    if (gradient !== undefined) this.#setGradient(gradient);
+    
+    if (blur !== undefined) ctx.filter = `blur(${blur}px)`;
+    
+    ctx.drawImage(image, width, height ?? position.height, x, y);
+
+    if (isStroke) ctx.stroke();
 
     ctx.closePath();
+
+    if (isClip) ctx.restore();
+
     ctx.restore();
 
     return this;
@@ -119,6 +145,26 @@ class Profile {
   #drawBGTwoImage(args: DrawBGTypeFull): Profile { 
     const ctx = this.ctx;
     return this;
+  }
+
+  #setGradient(gradient: GradientOptions) {
+    const ctx = this.ctx;
+
+    if (!gradient.colorType) gradient.colorType = `fill`;
+      if (!gradient.type) gradient.type = `linear`;
+      if (gradient.colors.length < 1 || !Array.isArray(gradient.colors)) throw new TypeError(`Profile.#setGradient: Where color's in gradient? gradient.color is empty!`);
+
+      let gradients: CanvasGradient = ctx.createLinearGradient(0, 0, 0, 0);
+      const { linear, radial, colorType } = gradient;
+
+      if (gradient.type === `linear` && linear !== undefined) gradients = ctx.createLinearGradient(linear.x0, linear.y0, linear.x1, linear.y1);
+      else if (gradient.type === `radial` && radial !== undefined) gradients = ctx.createRadialGradient(radial.x0, radial.y0, radial.r0, radial.x1, radial.y1, radial.r1);
+      else throw new TypeError(`Profile.#setGradient: Invalid gradient type or missing parameters!`);
+
+      gradient.colors.forEach(grad => gradients.addColorStop(grad.offset, grad.color));
+
+      if (colorType === `fill` || colorType === `both`) ctx.fillStyle = gradients;
+      if (colorType === `stroke` || colorType === `both`) ctx.strokeStyle = gradients;
   }
 }
 
@@ -635,18 +681,17 @@ interface DrawBGTypeFull {
 interface DrawBGTypeAllOne {
   image: Image;
   imagePosition?: DrawBGPosition;
-  typeDraw: DrawBGType;
   draw: "image";
   x: number;
   y: number;
   width?: number;
   height?: number;
-  blurOptions?: BlurOptions;
-  drawType?: TypeDrawImageOrColor;
+  blur?: number;
+  isStroke?: boolean;
   strokeLineWidth?: number;
+  strokeColor?: string;
+  gradient?: GradientOptions;
   globalAlpha?: number;
-  arcOptions?: ArcType;
-  rectOptions?: RectType;
   isClip?: boolean;
   rotation?: number;
   shadow?: ShadowOptions & X_And_Y;
@@ -804,6 +849,12 @@ interface UpdateDynamicDrawText {
   
 interface UpdateDynamicDrawImages {
   update: Partial<DrawImageOptions>;
+}
+
+interface TemplateType {
+  baner: { x: number, y: number, width: number, height: number };
+  full: { x: number, y: number, width: number, height: number };
+  bottom: { x: number, y: number, width: number, height: number };
 }
 
 type CanvasColorOptions = string | CanvasGradient | CanvasPattern;
