@@ -6,5 +6,6 @@
 /target
 /pgdata
 .env
+/.vs
 tsconfig copy.json
 package-lock.json
