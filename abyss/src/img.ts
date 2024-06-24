@@ -95,14 +95,24 @@ class Profile {
     }
 
     ctx.closePath();
-    if (isClip) ctx.restore();
+    ctx.restore();
     
     return this;
   }
 
-  #drawBGOneImage(args: DrawBGTypeAllOne): Profile {
+  #drawBGOneImage({ x, y, image, imagePosition = `baner`,  draw = `image`, drawType = `fill`, width, height, blurOptions, strokeLineWidth, globalAlpha, isClip, rotation, shadow, scale, translate }: DrawBGTypeAllOne): Profile {
     const ctx = this.ctx;
-    //Хм... голова не варит что-то придумать на счёт этого метода
+
+    ctx.save();
+    ctx.beginPath();
+
+    //19:33 [24.06]... голова не варит. Ладно. Завтра потыкаю код с другого моника
+
+    if (isClip) ctx.clip();
+
+    ctx.closePath();
+    ctx.restore();
+
     return this;
   }
   
@@ -624,7 +634,8 @@ interface DrawBGTypeFull {
 
 interface DrawBGTypeAllOne {
   image: Image;
-  type: DrawBGTypeDraw;
+  imagePosition?: DrawBGPosition;
+  typeDraw: DrawBGType;
   draw: "image";
   x: number;
   y: number;
@@ -634,6 +645,23 @@ interface DrawBGTypeAllOne {
   drawType?: TypeDrawImageOrColor;
   strokeLineWidth?: number;
   globalAlpha?: number;
+  arcOptions?: ArcType;
+  rectOptions?: RectType;
+  isClip?: boolean;
+  rotation?: number;
+  shadow?: ShadowOptions & X_And_Y;
+  scale?: X_And_Y;
+  translate?: X_And_Y;
+}
+
+interface ShadowOptions {
+  color: string;
+  blur?: number;
+}
+
+interface X_And_Y {
+  x: number;
+  y: number;
 }
 
 interface ColorOptions {
@@ -790,7 +818,7 @@ type DrawTextsOption = DrawTextsBase & StaticOptions;
 
 type DrawExpBarOptions = DrawExpBarBase & ExpBarOptions;
 
-type DrawBGTypeDraw = "baner" | "full" | "bottom";
+type DrawBGPosition = "baner" | "full" | "bottom";
 
 type DrawType = "image" | "color";
 
