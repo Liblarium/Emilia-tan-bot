@@ -2,7 +2,7 @@ node_modules/
 serJs/
 target/
 Logs/
-abyss/
+#abyss/ # пока уберу это с игнора
 .*/
 .*
 canvas/
