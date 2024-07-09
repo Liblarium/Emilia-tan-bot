@@ -67,7 +67,6 @@ class Profile {
   drawAvatar(options: DrawImageAvatarOptions): Profile;
   drawAvatar({ avatar, xp, avatarBorder, avatarPosition, blurOptions, lineBorder }: DrawColorAvatarOptions | DrawImageAvatarOptions): Profile {
     const ctx = this.ctx;
-    const canvas = this.canvas;
 
     //фон аватарки
     ctx.save();
@@ -101,15 +100,19 @@ class Profile {
     const endAngle = Math.PI * 2 * (xp.now / xp.max) - Math.PI / 2;
  
     ctx.beginPath();
-    ctx.arc(150, 200, 91.5, startAngle, endAngle, false);
+    ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, (avatarPosition.radius ?? 86.5) + avatarLineWidh, startAngle, endAngle, false);
     
+    if (blurOptions?.xp !== undefined) ctx.filter = `blur(${blurOptions.xp ?? 0}px)`;
+
     setStyle(xp.color, `stroke`, `lightgreen`);  
     ctx.lineWidth = xp.lineWidth ?? 7.5;
     ctx.globalAlpha = xp.globalAlpha ?? 0.8;
     ctx.stroke();
     ctx.globalAlpha = 1;
     ctx.closePath();
-    
+
+    ctx.filter = `blur(${blurOptions?.border !== undefined && blurOptions.border?.out !== undefined ? blurOptions.border?.out : 0}px)`;
+
     //внешняя обводка
     ctx.beginPath();
     ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, avatarPosition.radius ?? 98, 0, Math.PI * 2);
@@ -117,7 +120,9 @@ class Profile {
     ctx.lineWidth = avatarLineWidh;
     ctx.stroke();
     ctx.closePath();
-    
+
+    ctx.filter = `blur(${blurOptions?.border !== undefined && blurOptions.border.in !== undefined ? blurOptions.border.in : 0}px)`;
+
     //внутришняя рамка аватарки
     ctx.beginPath();
     ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, (avatarPosition.radius ?? 98) - (avatarLineWidh + (xp.lineWidth ?? 8)),  0, Math.PI * 2); //82.4
@@ -126,11 +131,14 @@ class Profile {
     ctx.stroke();
     ctx.closePath();
     
+    if (blurOptions?.border !== undefined) ctx.filter = `blur(0px)`;
+    
     //аватарка
     ctx.save();
     ctx.beginPath();
     ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, avatarPosition.image?.radius ?? 82, 0, Math.PI * 2);
-  
+    if (blurOptions?.avatar !== undefined) ctx.filter = `blur(${blurOptions.avatar ?? 0}px)`;
+
     if (avatar instanceof Image) { 
       ctx.clip();  
       ctx.drawImage(avatar, avatarPosition.image?.x ?? 70, avatarPosition.image?.y ?? 120);
@@ -308,7 +316,6 @@ class Profile {
 
   #setGradient(gradient: GradientOptions) {
     const ctx = this.ctx;
-    console.log()
     if (!gradient.colorType) gradient.colorType = `fill`;
     if (!gradient.type) gradient.type = `linear`;
     if (gradient.colors.length < 1 || !Array.isArray(gradient.colors)) throw new TypeError(`Profile.#setGradient: Where color's in gradient? gradient.color is empty!`);
@@ -828,7 +835,7 @@ const someTest: () => Promise<void> = async () => {
   test
     .drawBG({ images: [bgImg, bbg], draw: `image`, positions: [{ x: 0 }, { x: 0, width: 1000, height: 1447, y: 5, blurOptions: { bottom: 1.1 } }] })
     .drawInline()
-    .drawAvatar({ avatar: avImg, xp: { now: 50, max: 150 }, avatarPosition: { x: 150, y: 200, image: { x: 68, y: 118, radius: 82 } }, lineBorder: { blurOption: { top: 0.8, bottom: 1.1 } } });
+    .drawAvatar({ avatar: avImg, xp: { now: 50, max: 150 }, avatarPosition: { x: 150, y: 200, image: { x: 68, y: 118, radius: 82 } }, lineBorder: { blurOption: { top: 0.8, bottom: 1.1 } }, blurOptions: { avatar: 1.1 } });
 
   sharp(test.render()).toFile(`./abyss/res.png`);
 };
@@ -890,9 +897,11 @@ interface BorderOptions {
 
 interface AvatarBlurOptions {
   avatar?: number;
-  border?: number;
+  border?: { 
+    out?: number;
+    in?: number;
+  }
   xp?: number;
-  line?: number;
 }
 
 interface TextFormatterOptions {
