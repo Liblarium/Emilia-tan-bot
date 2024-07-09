@@ -10,4 +10,5 @@
 tsconfig copy.json
 package-lock.json
 /abyss/src/*.tests.ts
-/abyss/src/res1.png
+/abyss/res1.png
+/abyss/res.png
