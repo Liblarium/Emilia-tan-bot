@@ -4,7 +4,6 @@ import sharp from "sharp";
 /* eslint-disable jsdoc/require-jsdoc, jsdoc/require-param */ //пока оно мне тут мешает)
 
 const imagePath = `./abyss/images`;
-let i = 0;
 
 class Profile {
   canvas: Canvas;
@@ -30,9 +29,9 @@ class Profile {
     const canvas = this.canvas;
 
     const isObject = typeof option === `object` && `draw` in option;
-    const isDrawBGColor = isObject && option.draw === `color` && !(`image` in option) && !(`imagePosition` in option);
-    const isDrawBGOneImage = isObject && option.draw === `image` && `image` in option && (`imagePosition` in option ? `imagePosition` in option : (option.imagePosition = `banner`, true)) && !(`image1` in option) && !(`image2` in option) && option.image instanceof Image;
-    const isDrawBGTwoImage = isObject && option.draw === `image` && `image1` in option && `image2` in option && !(`image` in option);
+    const isDrawBGColor = isObject && option.draw === `color` && !(`image` in option) && !(`imagePosition` in option) && !(`images` in option);
+    const isDrawBGOneImage = isObject && option.draw === `image` && `image` in option && (`imagePosition` in option ? `imagePosition` in option : (option.imagePosition = `banner`, true)) && !(`images` in option) && option.image instanceof Image;
+    const isDrawBGTwoImage = isObject && option.draw === `image` && `images` in option && !(`image` in option);
 
     if (!option) (ctx.fillStyle = `#313338`, ctx.fillRect(0, 0, canvas.width, canvas.height));
     else if (isDrawBGColor !== false) this.#drawBGColor(option);
@@ -101,7 +100,6 @@ class Profile {
     const ctx = this.ctx;
     const canvas = this.canvas;
     
-
     if (draw !== `image`) throw new TypeError(`Profile.drawBG[drawBGOneImage()]: Why draw a "${draw}"? This draw is not "image"!`);
 
     ctx.save();
@@ -122,29 +120,14 @@ class Profile {
       ctx.clip();
     }
   
-    if (scale) ctx.scale(scale.x, scale.y);
-    if (translate) ctx.translate(translate.x, translate.y);
-    if (rotation) ctx.rotate(rotation);
-  
-    if (shadow) {
-      ctx.shadowColor = shadow.color;
-      ctx.shadowBlur = shadow.blur ?? 0;
-      ctx.shadowOffsetX = shadow.x;
-      ctx.shadowOffsetY = shadow.y;
-    }
-      
-    if (globalAlpha !== undefined) ctx.globalAlpha = globalAlpha;
-  
-    if (strokeLineWidth !== undefined) ctx.lineWidth = strokeLineWidth;
-    if (strokeColor !== undefined && !gradient) ctx.strokeStyle = strokeColor;
-    if (gradient !== undefined) this.#setGradient(gradient);
-        
-    if (blurOptions !== undefined && blurOptions.full !== undefined) ctx.filter = `blur(${blurOptions.full}px)`;
-    else if (blurOptions !== undefined && imagePosition !== `full` && (blurOptions.banner !== undefined || blurOptions.bottom !== undefined)) ctx.filter = `blur(${blurOptions[imagePosition]}px)`;
+    this.#applyBGImageTransformations({ scale, translate, rotation, shadow, globalAlpha, strokeLineWidth, strokeColor, gradient, blurOptions, imagePosition });
 
-    if ((imagePosition === "banner" || imagePosition === "bottom") && (!blurOptions || blurOptions !== undefined && (blurOptions.full !== undefined || blurOptions.full === undefined))) ctx.drawImage(image, x, y ?? position.y, width, height ?? position.height), console.log(`draw Image: ${i++}, `, image.height, image.width, position);
+    height ??= position.height;
+    y ??= position.y;
+
+    if ((imagePosition === "banner" || imagePosition === "bottom") && (!blurOptions || blurOptions !== undefined && (blurOptions.full !== undefined || blurOptions.full === undefined))) ctx.drawImage(image, x, y, width, height);
     else if (imagePosition === "full" && (!blurOptions || blurOptions !== undefined && blurOptions.full === undefined)) [`banner`, `bottom`].forEach((val) => {
-      this.#drawImage({ temType: val as PDImagePosition, templateType, blurOptions, imagePosition, image, dx: x, dy: y ?? position.y, dw: width, dh: height ?? position.height });
+      this.#drawImage({ temType: val as PDImagePosition, templateType, blurOptions, imagePosition, image, dx: x, dy: y, dw: width, dh: height });
     });
     else throw new TypeError(`Profile.#drawBGOneImage: imagePosition (${imagePosition}) not a "banner", "bottom" or "full"!`);
 
@@ -160,8 +143,11 @@ class Profile {
     return this;
   }
   
-  #drawBGTwoImage(args: DrawBGTypeFull): Profile { 
-    const ctx = this.ctx;
+  #drawBGTwoImage({ images, draw, positions }: DrawBGTypeFull): Profile { 
+    if (draw !== `image`) throw new TypeError(`Profile.drawBG[drawBGTwoImage()]: Why draw a "${draw}"? This draw is not "image"!`);
+
+    [`banner`, `bottom`].forEach((val, i) => this.#drawBGOneImage({ draw, image: images[i], imagePosition: val as "banner" | "bottom", ...positions[i] }));
+
     return this;
   }
 
@@ -189,6 +175,30 @@ class Profile {
     ctx.restore();
   }
   
+  #applyBGImageTransformations({ scale, translate, rotation, shadow, globalAlpha, strokeLineWidth, strokeColor, gradient, blurOptions, imagePosition }: ApplyBGImageTransformationsOptions): void {
+    const ctx = this.ctx;
+
+    if (scale) ctx.scale(scale.x, scale.y);
+    if (translate) ctx.translate(translate.x, translate.y);
+    if (rotation) ctx.rotate(rotation);
+  
+    if (shadow) {
+      ctx.shadowColor = shadow.color;
+      ctx.shadowBlur = shadow.blur ?? 0;
+      ctx.shadowOffsetX = shadow.x;
+      ctx.shadowOffsetY = shadow.y;
+    }
+      
+    if (globalAlpha !== undefined) ctx.globalAlpha = globalAlpha;
+  
+    if (strokeLineWidth !== undefined) ctx.lineWidth = strokeLineWidth;
+    if (strokeColor !== undefined && !gradient) ctx.strokeStyle = strokeColor;
+    if (gradient !== undefined) this.#setGradient(gradient);
+        
+    if (blurOptions !== undefined && blurOptions.full !== undefined) ctx.filter = `blur(${blurOptions.full}px)`;
+    else if (blurOptions !== undefined && imagePosition !== `full` && (blurOptions.banner !== undefined || blurOptions.bottom !== undefined)) ctx.filter = `blur(${blurOptions[imagePosition]}px)`;
+  }
+
   #setGradient(gradient: GradientOptions) {
     const ctx = this.ctx;
 
@@ -240,7 +250,9 @@ const main: () => Promise<void>  = async () => {
   const avatar = await sharp(`${imagePath}/kogasa.png`).resize(160, 160, { fit: `cover` }).toBuffer();
   const guildIconImg = await sharp(`${imagePath}/tenshi.png`).resize(80, 115, { fit: `cover` }).toBuffer();
 
-  const _drawRoundedRect = ({ x, y, w, h, r }: { x: number, y: number, w: number, h: number, r: number }) => {
+  type DrawRoundedRectType = { x: number, y: number, w: number, h: number, r: number };
+
+  const _drawRoundedRect = ({ x, y, w, h, r }: DrawRoundedRectType) => {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
     ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -707,9 +719,9 @@ const someTest: () => Promise<void> = async () => {
 
   const test = new Profile();
   test
-    .drawBG({ image: bgImg, draw: `image`, x: 0, imagePosition: `banner` })
-    .drawBG({ image: bbg, width: 1000, height: 1447, draw: `image`, x: 0, y: 5, imagePosition: `bottom`, blurOptions: { bottom: 1.1 } })
+    .drawBG({ images: [bgImg, bbg], draw: `image`, positions: [{ x: 0 }, {x: 0, width: 1000, height: 1447, y: 5, blurOptions: { bottom: 1.1 } }] })
     .drawInline();
+
   sharp(test.render()).toFile(`./abyss/res.png`);
 };
 
@@ -739,41 +751,26 @@ interface DrawBGDrawTypeColor {
 }
 
 interface DrawBGTypeFull {
-  image1: Image;
-  image2: Image;
+  images: ArrayLimited<Image, 2>;
   draw: "image";
-  x: {
-    img1: number;
-    img2?: number;
-  }
-  y: {
-    img1: number;
-    img2?: number;
-  }
-  width?: {
-    img1?: number;
-    img2?: number;
-  };
-  height?: {
-    img1?: number;
-    img2?: number;
-  }
-  blurOptions: {
-    img1?: BlurOptions;
-    img2?: BlurOptions;
-  };
-  drawType: {
-    img1?: TypeDrawImageOrColor;
-    img2?: TypeDrawImageOrColor;
-  }
-  strokeLineWidth: {
-    img1?: number;
-    img2?: number;
-  }
-  globalAlpha: {
-    img1?: number;
-    img2?: number;
-  }
+  positions: ArrayLimited<{
+    x: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    blurOptions?: BlurOptions;
+    drawType?: TypeDrawImageOrColor;
+    strokeLineWidth?: number;
+    globalAlpha?: number;
+    isStroke?: boolean;
+    strokeColor?: string;
+    gradient?: GradientOptions;
+    isClip?: boolean;
+    rotation?: number;
+    shadow?: ShadowOptions & X_And_Y;
+    scale?: X_And_Y;
+    translate?: X_And_Y;
+  }, 1 | 2>;
 }
 
 interface DrawBGTypeAllOne {
@@ -795,6 +792,19 @@ interface DrawBGTypeAllOne {
   shadow?: ShadowOptions & X_And_Y;
   scale?: X_And_Y;
   translate?: X_And_Y;
+}
+
+interface ApplyBGImageTransformationsOptions {
+  scale?: X_And_Y;
+  translate?: X_And_Y; 
+  rotation?: number;
+  shadow?: ShadowOptions & X_And_Y;
+  globalAlpha?: number;
+  strokeLineWidth?: number;
+  strokeColor?: string;
+  gradient?: GradientOptions;
+  blurOptions?: BlurOptions;
+  imagePosition: DrawBGPosition;
 }
 
 interface ShadowOptions {
@@ -989,3 +999,5 @@ type TypeDrawImageOrColor = "fill" | "stroke";
 type RenderType = "image/png" | "image/jpeg";
 
 type DrawOption = DrawBGDrawTypeColor | DrawBGTypeFull | DrawBGTypeAllOne;
+
+type ArrayLimited<T, K extends number> = [T, ...T[]] & { length: K };
