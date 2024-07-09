@@ -44,21 +44,128 @@ class Profile {
     return this;
   }
 
-  //Пока без изменений высоты
-  drawInline(color?: string, lineWidth?: number): Profile {
+  //Пока без изменений высоты. Просто отрисовка как есть. Чуть позже модифицирую это
+  drawInline(color?: string, lineWidth?: number, setBlur?: number): Profile {
     const ctx = this.ctx;
 
     if (color) ctx.strokeStyle = color;
-
+    
     ctx.save();
     ctx.beginPath();
-    ctx.filter = `blur(1.1px)`;
+    ctx.filter = `blur(${setBlur ?? 1.1}px)`;
     ctx.moveTo(0, 200);
     ctx.lineTo(1000, 200);
     ctx.lineWidth = lineWidth ?? 2;
     ctx.stroke();
     ctx.closePath();
     ctx.restore();
+
+    return this;
+  }
+
+  drawAvatar(options: DrawColorAvatarOptions): Profile;
+  drawAvatar(options: DrawImageAvatarOptions): Profile;
+  drawAvatar({ avatar, xp, avatarBorder, avatarPosition, blurOptions, lineBorder }: DrawColorAvatarOptions | DrawImageAvatarOptions): Profile {
+    const ctx = this.ctx;
+    const canvas = this.canvas;
+
+    //фон аватарки
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, (avatarPosition.radius ?? 98), 0, Math.PI * 2);
+    
+    const avatarBorderColor = avatarBorder?.color;
+    const avatarBorderBackground = avatarBorder?.backgroundColor;
+
+    const setStyle = (args: string | GradientOptions | undefined, types: "fill" | "stroke", defaultColor: string) => {
+      if (typeof args === `string`) ctx[`${types}Style`] = args; //`#124124`;
+      else if (avatarBorder !== undefined && args !== undefined && `type` in args) {
+        if (args.colorType !== types) throw new TypeError(`Profile.drawAvatar: Sorry, but "${args.colorType} in "avatarBorder.color.colorType" not supported. Please use "${types}" instead.`);
+        
+        this.#setGradient(args);
+      } else ctx[`${types}Style`] = defaultColor; 
+    }
+
+    setStyle(avatarBorderColor, `fill`, `#123123`);
+    
+    const avatarLineWidh = avatarBorder?.lineWidth ?? 5;
+    
+    ctx.fill();
+    ctx.closePath();
+    ctx.restore();
+
+    // Опыт
+    const startAngle = -Math.PI / 2;
+    //const xp = 70;//77.5;
+    //const xpMax = 155;
+    const endAngle = Math.PI * 2 * (xp.now / xp.max) - Math.PI / 2;
+ 
+    ctx.beginPath();
+    ctx.arc(150, 200, 91.5, startAngle, endAngle, false);
+    
+    setStyle(xp.color, `stroke`, `lightgreen`);  
+    ctx.lineWidth = xp.lineWidth ?? 7.5;
+    ctx.globalAlpha = xp.globalAlpha ?? 0.8;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.closePath();
+    
+    //внешняя обводка
+    ctx.beginPath();
+    ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, avatarPosition.radius ?? 98, 0, Math.PI * 2);
+    setStyle(avatarBorderBackground, `stroke`, `#124124`);
+    ctx.lineWidth = avatarLineWidh;
+    ctx.stroke();
+    ctx.closePath();
+    
+    //внутришняя рамка аватарки
+    ctx.beginPath();
+    ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, (avatarPosition.radius ?? 98) - (avatarLineWidh + (xp.lineWidth ?? 8)),  0, Math.PI * 2); //82.4
+    setStyle(avatarBorderBackground, `stroke`, `#124124`);
+    ctx.lineWidth = avatarLineWidh;
+    ctx.stroke();
+    ctx.closePath();
+    
+    //аватарка
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, avatarPosition.image?.radius ?? 82, 0, Math.PI * 2);
+  
+    if (avatar instanceof Image) { 
+      ctx.clip();  
+      ctx.drawImage(avatar, avatarPosition.image?.x ?? 70, avatarPosition.image?.y ?? 120);
+    } else if (typeof avatar === `string`) {
+      ctx.fillStyle = avatar;
+      ctx.fill();
+    } else if (avatar !== undefined && `type` in avatar) this.#setGradient(avatar);
+    
+    ctx.closePath();
+    ctx.restore();
+    
+    const lineBorderBlur = lineBorder?.blurOption;
+
+    //Блок обводки (аватарка) вокруг всех
+    if (lineBorder?.off !== undefined && lineBorder.off !== true) {
+      setStyle(lineBorder?.color, `stroke`, `black`);
+      ctx.lineWidth = lineBorder?.lineWidth ?? 2;
+      ctx.globalAlpha = lineBorder?.globalAplha ?? 1;
+
+      if (lineBorderBlur?.both !== undefined || lineBorderBlur?.top !== undefined) ctx.filter = `blur(${(lineBorderBlur.both ?? lineBorderBlur.top) ?? 0.8}px)`;
+      
+      ctx.beginPath();
+      ctx.arc(lineBorder?.x ?? 150, lineBorder?.y ?? 200, lineBorder?.radius ?? 101, 0, Math.PI, true);
+      ctx.stroke();
+      ctx.closePath();
+
+      if (lineBorderBlur?.both === undefined && lineBorderBlur?.bottom !== undefined) ctx.filter = `blur(${lineBorderBlur.bottom ?? 1.1}px)`;
+      
+      ctx.beginPath();
+      ctx.arc(lineBorder?.x ?? 150, lineBorder?.y ?? 200, lineBorder?.radius ?? 101, 0, Math.PI, false);
+      ctx.stroke();
+      ctx.closePath();
+      ctx.filter = `blur(0px)`;
+      ctx.globalAlpha = 1;
+    }
 
     return this;
   }
@@ -201,7 +308,7 @@ class Profile {
 
   #setGradient(gradient: GradientOptions) {
     const ctx = this.ctx;
-
+    console.log()
     if (!gradient.colorType) gradient.colorType = `fill`;
     if (!gradient.type) gradient.type = `linear`;
     if (gradient.colors.length < 1 || !Array.isArray(gradient.colors)) throw new TypeError(`Profile.#setGradient: Where color's in gradient? gradient.color is empty!`);
@@ -708,7 +815,7 @@ const someTest: () => Promise<void> = async () => {
   const badge = await sharp(`${imagePath}/avatar.png`).toBuffer();
   const bottombg = await sharp(`${imagePath}/tenshi.png`).resize(1000, 1447, { fit: `cover` }).toBuffer();
   const bottomCopybg = await sharp(`${imagePath}/tenshi.png`).resize(1000, 1447, { fit: `cover` }).toBuffer();
-  const avatar = await sharp(`${imagePath}/kogasa.png`).resize(160, 160, { fit: `cover` }).toBuffer();
+  const avatar = await sharp(`${imagePath}/kogasa.png`).resize(164, 164, { fit: `cover` }).toBuffer();
   const guildIconImg = await sharp(`${imagePath}/tenshi.png`).resize(80, 115, { fit: `cover` }).toBuffer();
 
   const icon = await loadImage(badge);
@@ -719,13 +826,74 @@ const someTest: () => Promise<void> = async () => {
 
   const test = new Profile();
   test
-    .drawBG({ images: [bgImg, bbg], draw: `image`, positions: [{ x: 0 }, {x: 0, width: 1000, height: 1447, y: 5, blurOptions: { bottom: 1.1 } }] })
-    .drawInline();
+    .drawBG({ images: [bgImg, bbg], draw: `image`, positions: [{ x: 0 }, { x: 0, width: 1000, height: 1447, y: 5, blurOptions: { bottom: 1.1 } }] })
+    .drawInline()
+    .drawAvatar({ avatar: avImg, xp: { now: 50, max: 150 }, avatarPosition: { x: 150, y: 200, image: { x: 68, y: 118, radius: 82 } }, lineBorder: { blurOption: { top: 0.8, bottom: 1.1 } } });
 
   sharp(test.render()).toFile(`./abyss/res.png`);
 };
 
 someTest();
+
+interface DrawImageAvatarOptions extends DrawAvatarOptions { 
+  avatar: Image; 
+}
+
+interface DrawColorAvatarOptions extends DrawAvatarOptions { 
+  avatar: string | GradientOptions; 
+}
+
+interface DrawAvatarOptions {
+  xp: XPOptions;
+  avatarPosition: AvatarPositionOptions;
+  avatarBorder?: BorderOptions & { backgroundColor?: string | GradientOptions, inRadius?: number, outRadius?: number };
+  blurOptions?: AvatarBlurOptions;
+  lineBorder?: LineBorderOptions;
+}
+
+interface LineBorderOptions extends BorderOptions, Partial<X_And_Y> {
+  off?: boolean;
+  blurOption?: { 
+    both?: number, 
+    top?: number, 
+    bottom?: number; 
+  };
+  globalAplha?: number;
+  radius?: number;
+}
+
+interface XPOptions {
+  now: number;
+  max: number;
+  color?: string | GradientOptions;
+  lineWidth?: number;
+  globalAlpha?: number;
+  position?: X_And_Y & { radius?: number; };
+}
+
+interface Dimensions {
+  width?: number;
+  height?: number;
+}
+
+interface AvatarPositionOptions extends X_And_Y {
+  image?: X_And_Y & { radius?: number; };
+  radius?: number;
+  width?: number;
+  height?: number;
+}
+
+interface BorderOptions {
+  color?: string | GradientOptions;
+  lineWidth?: number;
+}
+
+interface AvatarBlurOptions {
+  avatar?: number;
+  border?: number;
+  xp?: number;
+  line?: number;
+}
 
 interface TextFormatterOptions {
   text: string; 
@@ -756,8 +924,6 @@ interface DrawBGTypeFull {
   positions: ArrayLimited<{
     x: number;
     y?: number;
-    width?: number;
-    height?: number;
     blurOptions?: BlurOptions;
     drawType?: TypeDrawImageOrColor;
     strokeLineWidth?: number;
@@ -770,17 +936,15 @@ interface DrawBGTypeFull {
     shadow?: ShadowOptions & X_And_Y;
     scale?: X_And_Y;
     translate?: X_And_Y;
-  }, 1 | 2>;
+  } & Dimensions, 1 | 2>;
 }
 
-interface DrawBGTypeAllOne {
+interface DrawBGTypeAllOne extends Dimensions {
   image: Image;
   imagePosition?: DrawBGPosition;
   draw: "image";
   x: number;
   y?: number;
-  width?: number;
-  height?: number;
   blurOptions?: BlurOptions;
   isStroke?: boolean;
   strokeLineWidth?: number;
