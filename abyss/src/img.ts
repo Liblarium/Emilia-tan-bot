@@ -153,7 +153,7 @@ class Profile {
     const lineBorderBlur = lineBorder?.blurOption;
 
     //Блок обводки (аватарка) вокруг всех
-    if (lineBorder?.off !== undefined && lineBorder.off !== true) {
+    if (lineBorder?.off !== true) {
       setStyle(lineBorder?.color, `stroke`, `black`);
       ctx.lineWidth = lineBorder?.lineWidth ?? 2;
       ctx.globalAlpha = lineBorder?.globalAplha ?? 1;
@@ -176,6 +176,97 @@ class Profile {
     }
 
     return this;
+  }
+
+  
+  drawBlocks(options: DrawBlocksOptions): Profile;
+  drawBlocks(options: DrawBlocksOptions[]): Profile;
+  drawBlocks(options: DrawBlocksOptions | DrawBlocksOptions[] ): Profile { 
+
+    if (Array.isArray(options) && options.length > 0) {
+      options.forEach((val: DrawBlocksOptions) => this.#drawBlock(val));
+
+    } else if (typeof options === `object` && !Array.isArray(options)) this.#drawBlock(options);
+    else throw new TypeError(`Profile.drawBlocks: Why options is not array or object? Options type: ${typeof options} (${options?.toString()})`);
+  
+    return this;
+  }
+
+  drawTemplateBlocks(options: TemplateBlocksOptions[]): Profile;
+  drawTemplateBlocks(options: TemplateBlocksOptions): Profile;
+  drawTemplateBlocks(options: TemplateBlocksOptions | TemplateBlocksOptions[]): Profile {
+    const templateBlock: {[key: string]: DrawRoundedRectOptions} = {
+      username: { x: 290, y: 210, w: 380, h: 50, r: 11 },
+      level: { x: 750, y: 255, w: 200, h: 40, r: 11 },
+      title: { x: 290, y: 285, w: 380, h: 45, r: 11 },
+      bio: { x: 20, y: 370, w: 710, h: 310, r: 11 },
+      bioFull: { x: 20, y: 370, w: 960, h: 310, r: 11 },
+      badge: { x: 940, y: 208, w: 40, h: 34, r: 11 },
+      guild: { x: 750, y: 370, w: 230, h: 310, r: 11 }
+    };
+
+    const templateOptions: {[key: string]: BaseDrawBlocksOptions} = {
+      username: { globalAlpha: 0.5, color: "black" },
+      level: { globalAlpha: 0.5, color: "black" },
+      title: { color: `#b89e14`, globalAlpha: 0.8 },
+      bio: { color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 },
+      bioFull: { color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 },
+      badge: { color: `#091711`, globalAlpha: 0.7 },
+      guild: { drawType: `both`, globalAlpha: { fill: 0.5 }, color: { fill: `white`, stroke: `#124124` } }
+    };
+
+    const applyTemplate = (option: TemplateBlocksOptions) => {
+      const templateType = option.templateType;
+      const defaultBlock = templateBlock[templateType];
+      const defaultOptions = templateOptions[templateType];
+
+      const mergedOptions: DrawBlocksOptions = {
+        ...defaultBlock,
+        ...defaultOptions,
+        ...option
+      };
+
+      this.#drawBlock(mergedOptions);
+    };
+    
+    if (Array.isArray(options) && options.length > 0) {
+      options.forEach((val) => applyTemplate(val));
+    } else if (!Array.isArray(options) && typeof options === `object`) applyTemplate(options);
+    
+    return this;
+  }
+
+  #drawBlock(args: DrawBlocksOptions): void {
+    const ctx = this.ctx;
+    this.drawRoundedRect({ x: args.x, y: args.y, w: args.w, h: args.h, r: args.r });
+    const { color, drawType = `fill`, blurOptions, globalAlpha } = args;
+      
+    if (typeof color !== `string` && color !== undefined && `colors` in color) this.#setGradient(color);
+    else if (color !== undefined && (typeof color === `string` || (`fill` in color || `stroke` in color))) {
+      const colors = {
+        fill: typeof color === `string` ? color : color?.fill,
+        stroke: typeof color === `string` ? color : color?.stroke
+      }
+
+      if ((drawType === `fill` || drawType === `both`) && colors.fill !== undefined) ctx.fillStyle = colors.fill;
+      if ((drawType === `stroke` || drawType === `both`) && colors.stroke !== undefined) ctx.strokeStyle = colors.stroke;
+    }
+      
+    if (args.strokeLineWidth) ctx.lineWidth = args.strokeLineWidth;
+
+    if (typeof globalAlpha === `number`) ctx.globalAlpha = globalAlpha;
+
+    ctx.filter = `blur(${blurOptions !== undefined && `fill` in blurOptions ? blurOptions.fill : 0}px)`;
+    
+    if (typeof globalAlpha === `object` && globalAlpha?.fill !== undefined) ctx.globalAlpha = globalAlpha.fill;
+    if (drawType === `fill` || drawType === `both`) ctx.fill();
+      
+    ctx.filter = `blur(${blurOptions !== undefined && `stroke` in blurOptions ? blurOptions.stroke : 0}px)`;
+    ctx.globalAlpha = typeof globalAlpha === `object` && globalAlpha?.stroke !== undefined ? globalAlpha.stroke : 1;
+    
+    if (drawType === `stroke` || drawType === `both`) ctx.stroke(); 
+
+    ctx.globalAlpha = 1;
   }
 
   #drawBGColor({ x, y, color, gradient, typeDraw = `rect`, drawType = `fill`, drawPriority = `fill`, isClip = false, globalAlpha, strokeLineWidth, arcOptions = { radius1: 50, startAngle: Math.PI, endAngle: Math.PI * 2, counterclockwise: false }, rectOptions = { width: this.canvas.width, height: this.canvas.height } }: DrawBGDrawTypeColor): Profile {
@@ -242,7 +333,7 @@ class Profile {
 
     if ((imagePosition === "banner" || imagePosition === "bottom") && (!blurOptions || blurOptions !== undefined && (blurOptions.full !== undefined || blurOptions.full === undefined))) ctx.drawImage(image, x, y, width, height);
     else if (imagePosition === "full" && (!blurOptions || blurOptions !== undefined && blurOptions.full === undefined)) [`banner`, `bottom`].forEach((val) => {
-      this.#drawImage({ temType: val as PDImagePosition, templateType, blurOptions, imagePosition, image, dx: x, dy: y, dw: width, dh: height });
+      this.#drawImage({ temType: val as PDImagePosition, templateType, blurOptions, image, dx: x, dy: y, dw: width, dh: height });
     });
     else throw new TypeError(`Profile.#drawBGOneImage: imagePosition (${imagePosition}) not a "banner", "bottom" or "full"!`);
 
@@ -271,7 +362,7 @@ class Profile {
    * 
    * This method (**`#drawImage`**) is for drawing an image using `blur` (if you used **`BlurOptions`**). But since we want to draw only part of the image in blur (if the image covers the entire profile area), we will draw only this part of the image with blur (if you specified this), without adjusting it on top of the unblurred image.
    */
-  #drawImage({ temType, templateType, blurOptions, imagePosition, image, dx, dy, dw, dh }: PrivateDrawImageOptions) {
+  #drawImage({ temType, templateType, blurOptions, image, dx, dy, dw, dh }: PrivateDrawImageOptions) {
     const ctx = this.ctx;
     const templatePosition = templateType[temType];
 
@@ -331,6 +422,29 @@ class Profile {
 
     if (colorType === `fill` || colorType === `both`) ctx.fillStyle = gradients;
     if (colorType === `stroke` || colorType === `both`) ctx.strokeStyle = gradients;
+  }
+
+  /**
+   * @param {object} options Параметры для отрисовки скруглённого квадрата
+   * @param {number} options.x координаты x
+   * @param {number} options.y координаты y
+   * @param {number} options.w ширина
+   * @param {number} options.h высота
+   * @param {number} options.r радиус скругления
+   * @returns {Profile}
+   */
+  drawRoundedRect({ x, y, w, h, r }: DrawRoundedRectOptions): Profile {
+    const ctx = this.ctx;
+
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    
+    return this;
   }
 
   /** 
@@ -835,12 +949,41 @@ const someTest: () => Promise<void> = async () => {
   test
     .drawBG({ images: [bgImg, bbg], draw: `image`, positions: [{ x: 0 }, { x: 0, width: 1000, height: 1447, y: 5, blurOptions: { bottom: 1.1 } }] })
     .drawInline()
-    .drawAvatar({ avatar: avImg, xp: { now: 50, max: 150 }, avatarPosition: { x: 150, y: 200, image: { x: 68, y: 118, radius: 82 } }, lineBorder: { blurOption: { top: 0.8, bottom: 1.1 } }, blurOptions: { avatar: 1.1 } });
+    .drawAvatar({ avatar: avImg, xp: { now: 50, max: 150 }, avatarPosition: { x: 150, y: 200, image: { x: 68, y: 118, radius: 82 } }, lineBorder: { blurOption: { top: 0.8, bottom: 1.1 } } })
+    /*.drawTemplateBlocks([{ templateType: `username` }, { templateType: `title` }, { templateType: `bio` }, { templateType: `guild` }, { templateType: `level` }, { templateType: `badge` }])*/
+    .drawBlocks([{ 
+      x: 290, y: 210, w: 380, h: 50, r: 11, globalAlpha: 0.5, color: "black" }, 
+    { x: 290, y: 285, w: 380, h: 45, r: 11, color: `#b89e14`, globalAlpha: 0.8 }, 
+    { x: 20, y: 370, w: 960, h: 310, r: 11, color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 },  //x: 20;, w: 710
+    /*{ x: 750, y: 370, w: 230, h: 310, r: 11, drawType: `both`, globalAlpha: { fill: 0.5 }, color: { fill: `white`, stroke: `#124124` } }, */
+    { x: 750, y: 255, w: 200, h: 40, r: 11, globalAlpha: 0.5, color: "black" }, 
+    { x: 940, y: 208, w: 40, h: 34, r: 11, color: `#091711`, globalAlpha: 0.7 }]);
 
+  //full = x: 780, w: 200, one = w: 40, x: 940 - координаты под "значки"
   sharp(test.render()).toFile(`./abyss/res.png`);
 };
 
 someTest();
+
+interface TemplateBlocksOptions extends BaseDrawBlocksOptions {
+  templateType: "username" | "title" | "bio" | "bioFull" | "guild" | "badge" | "level";
+}
+
+interface BaseDrawBlocksOptions {
+  color?: string | ColorDrawType | GradientOptions; 
+  globalAlpha?: number | ColorDrawType<number>;
+  drawType?: TypeDrawImageOrColor | "both";
+  strokeLineWidth?: number; 
+  blurOptions?: ColorDrawType<number>;
+}
+
+interface DrawRoundedRectOptions { 
+  x: number; 
+  y: number; 
+  w: number; 
+  h: number; 
+  r: number; 
+}
 
 interface DrawImageAvatarOptions extends DrawAvatarOptions { 
   avatar: Image; 
@@ -860,7 +1003,7 @@ interface DrawAvatarOptions {
 
 interface LineBorderOptions extends BorderOptions, Partial<X_And_Y> {
   off?: boolean;
-  blurOption?: { 
+  blurOption?: {
     both?: number, 
     top?: number, 
     bottom?: number; 
@@ -1137,7 +1280,6 @@ interface PrivateDrawImageOptions {
   temType: PDImagePosition;
   templateType: TemplateType;
   blurOptions?: BlurOptions;
-  imagePosition: DrawBGPosition;
   image: Image; 
   dx: number; 
   dy: number; 
@@ -1169,8 +1311,14 @@ type DrawBGType = "rect" | "arc";
 
 type TypeDrawImageOrColor = "fill" | "stroke";
 
+type StringNumber = string | number;
+
+type ColorDrawType<T extends StringNumber = string, K extends StringNumber = T> = { fill?: T; stroke?: K;}
+
 type RenderType = "image/png" | "image/jpeg";
 
 type DrawOption = DrawBGDrawTypeColor | DrawBGTypeFull | DrawBGTypeAllOne;
+
+type DrawBlocksOptions = BaseDrawBlocksOptions & DrawRoundedRectOptions;
 
 type ArrayLimited<T, K extends number> = [T, ...T[]] & { length: K };
