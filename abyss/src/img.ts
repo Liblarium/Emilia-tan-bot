@@ -192,54 +192,88 @@ class Profile {
     return this;
   }
 
-  drawTemplateBlocks(options: TemplateBlocksOptions[]): Profile;
-  drawTemplateBlocks(options: TemplateBlocksOptions): Profile;
-  drawTemplateBlocks(options: TemplateBlocksOptions | TemplateBlocksOptions[]): Profile {
+  drawTemplateBlock(options: TemplateBlocksOptions): Profile {
+    const defaultBioY = 370;
+    const defaultR = 11;
     const templateBlock: {[key: string]: DrawRoundedRectOptions} = {
-      username: { x: 290, y: 210, w: 380, h: 50, r: 11 },
-      level: { x: 750, y: 255, w: 200, h: 40, r: 11 },
-      title: { x: 290, y: 285, w: 380, h: 45, r: 11 },
-      bio: { x: 20, y: 370, w: 710, h: 310, r: 11 },
-      bioFull: { x: 20, y: 370, w: 960, h: 310, r: 11 },
-      badge: { x: 940, y: 208, w: 40, h: 34, r: 11 },
-      guild: { x: 750, y: 370, w: 230, h: 310, r: 11 }
+      username: { x: 290, y: 210, w: 380, h: 50, r: defaultR },
+      level: { x: 750, y: 255, w: 200, h: 40, r: defaultR },
+      title: { x: 290, y: 285, w: 380, h: 45, r: defaultR },
+      bio: { x: 20, y: defaultBioY, w: 710, h: 310, r: defaultR },
+      bioFull: { x: 20, y: defaultBioY, w: 960, h: 310, r: defaultR },
+      bioCenter: { x: 0, y: defaultBioY, w: 600, h: 310, r: defaultR },
+      badge: { x: 940, y: 208, w: 40, h: 34, r: defaultR },
+      guild: { x: 750, y: 370, w: 230, h: 310, r: defaultR }
     };
+    
+    const defaultBioOptions: BaseDrawBlocksOptions = { color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 };
 
-    const templateOptions: {[key: string]: BaseDrawBlocksOptions} = {
+    const templateOptions: {[key: string]: BaseDrawBlocksOptions & { x_position?: XTemplatePosition }} = {
       username: { globalAlpha: 0.5, color: "black" },
       level: { globalAlpha: 0.5, color: "black" },
       title: { color: `#b89e14`, globalAlpha: 0.8 },
-      bio: { color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 },
-      bioFull: { color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 },
+      bio: defaultBioOptions,
+      bioFull: defaultBioOptions,
+      bioCenter: { x_position: `center`, ...defaultBioOptions},
       badge: { color: `#091711`, globalAlpha: 0.7 },
       guild: { drawType: `both`, globalAlpha: { fill: 0.5 }, color: { fill: `white`, stroke: `#124124` } }
     };
+    const templateNames: string[] = [];
+    const templates: TemplateBlocksOptions[] = Object.entries(options)
+      .map(([key, value], i) => ({ name: key, priority: value?.priority ?? i, ...value }))
+      .sort((a, b) => a.priority - b.priority)
+      .map((v, i) => {
+        const n: {[key: string]: object} = {};
+        const name = v.name;
+        templateNames.push(name);
+        
+        n[name] = v;
 
-    const applyTemplate = (option: TemplateBlocksOptions) => {
-      const templateType = option.templateType;
+        return n;
+      });
+    
+    const applyTemplate = (option: TemplateBlocksOptions, templateType: string) => {
       const defaultBlock = templateBlock[templateType];
       const defaultOptions = templateOptions[templateType];
+      const opt = option[templateType];
 
       const mergedOptions: DrawBlocksOptions = {
         ...defaultBlock,
         ...defaultOptions,
-        ...option
+        ...opt
       };
 
       this.#drawBlock(mergedOptions);
     };
-    
-    if (Array.isArray(options) && options.length > 0) {
-      options.forEach((val) => applyTemplate(val));
-    } else if (!Array.isArray(options) && typeof options === `object`) applyTemplate(options);
-    
+   
+    templates.forEach((val, i) => applyTemplate(val, templateNames[i]) );
+    templateNames.length = 0;
+
     return this;
   }
 
+
   #drawBlock(args: DrawBlocksOptions): void {
     const ctx = this.ctx;
-    this.drawRoundedRect({ x: args.x, y: args.y, w: args.w, h: args.h, r: args.r });
-    const { color, drawType = `fill`, blurOptions, globalAlpha } = args;
+    const { width } = this.canvas;
+
+    ctx.save();
+    const { w, h, r, x, y, x_position, color, drawType = `fill`, blurOptions, globalAlpha, strokeLineWidth } = args;
+
+    if (x_position !== undefined && [`center`, `right`, `left`].includes(x_position)) {
+      const strokeWidth = strokeLineWidth && strokeLineWidth !== 0 ? strokeLineWidth / 2 : 0;
+      const template: {[key: string]: number} = {
+        left: strokeWidth,
+        center: (width - w) / 2,
+        right: width - w - strokeWidth,
+      };
+
+      ctx.translate(template[x_position], 0);
+    }
+
+    ctx.beginPath();
+
+    this.drawRoundedRect({ x, y, w, h, r });
       
     if (typeof color !== `string` && color !== undefined && `colors` in color) this.#setGradient(color);
     else if (color !== undefined && (typeof color === `string` || (`fill` in color || `stroke` in color))) {
@@ -251,8 +285,8 @@ class Profile {
       if ((drawType === `fill` || drawType === `both`) && colors.fill !== undefined) ctx.fillStyle = colors.fill;
       if ((drawType === `stroke` || drawType === `both`) && colors.stroke !== undefined) ctx.strokeStyle = colors.stroke;
     }
-      
-    if (args.strokeLineWidth) ctx.lineWidth = args.strokeLineWidth;
+
+    if (strokeLineWidth) ctx.lineWidth = strokeLineWidth;
 
     if (typeof globalAlpha === `number`) ctx.globalAlpha = globalAlpha;
 
@@ -266,7 +300,8 @@ class Profile {
     
     if (drawType === `stroke` || drawType === `both`) ctx.stroke(); 
 
-    ctx.globalAlpha = 1;
+    ctx.closePath();
+    ctx.restore();
   }
 
   #drawBGColor({ x, y, color, gradient, typeDraw = `rect`, drawType = `fill`, drawPriority = `fill`, isClip = false, globalAlpha, strokeLineWidth, arcOptions = { radius1: 50, startAngle: Math.PI, endAngle: Math.PI * 2, counterclockwise: false }, rectOptions = { width: this.canvas.width, height: this.canvas.height } }: DrawBGDrawTypeColor): Profile {
@@ -954,10 +989,12 @@ const someTest: () => Promise<void> = async () => {
     .drawBlocks([{ 
       x: 290, y: 210, w: 380, h: 50, r: 11, globalAlpha: 0.5, color: "black" }, 
     { x: 290, y: 285, w: 380, h: 45, r: 11, color: `#b89e14`, globalAlpha: 0.8 }, 
-    { x: 20, y: 370, w: 960, h: 310, r: 11, color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 },  //x: 20;, w: 710
-    /*{ x: 750, y: 370, w: 230, h: 310, r: 11, drawType: `both`, globalAlpha: { fill: 0.5 }, color: { fill: `white`, stroke: `#124124` } }, */
+    { x: 0, y: 370, w: 600, h: 310, r: 11, x_position: `center`, color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 },  //x: 20, y: 370, w: 710, h: 310
+    /*{ x: 750, y: 370, w: 230, h: 310, r: 11, drawType: `both`, globalAlpha: { fill: 0.5 }, color: { fill: `white`, stroke: `#124124` } }, */ //710, full = w: 960
     { x: 750, y: 255, w: 200, h: 40, r: 11, globalAlpha: 0.5, color: "black" }, 
-    { x: 940, y: 208, w: 40, h: 34, r: 11, color: `#091711`, globalAlpha: 0.7 }]);
+    { x: 260, y: 160, w: 150, h: 34, r: 11, color: `grey`, globalAlpha: 0.7 }])
+    // x: 940, y: 208, w: 40, h: 34, r: 11, color: `#091711`, globalAlpha: 0.7
+    .drawTemplateBlock({ username: { color: `black` } });
 
   //full = x: 780, w: 200, one = w: 40, x: 940 - координаты под "значки"
   sharp(test.render()).toFile(`./abyss/res.png`);
@@ -965,8 +1002,20 @@ const someTest: () => Promise<void> = async () => {
 
 someTest();
 
-interface TemplateBlocksOptions extends BaseDrawBlocksOptions {
-  templateType: "username" | "title" | "bio" | "bioFull" | "guild" | "badge" | "level";
+interface TemplateBlocksOptions {
+  username?: TemplateBlock; 
+  title?: TemplateBlock; 
+  bio?: TemplateBlock;
+  bioFull?: TemplateBlock;
+  bioCenter?: TemplateBlock; 
+  guild?: TemplateBlock; 
+  badge?: TemplateBlock;
+  level?: TemplateBlock;
+  [key: string]: TemplateBlock | undefined;
+}
+
+interface TemplateBlock extends BaseDrawBlocksOptions {
+  priority?: 1 | 2 | 3 | 4 | 5 | 6;
 }
 
 interface BaseDrawBlocksOptions {
@@ -975,6 +1024,7 @@ interface BaseDrawBlocksOptions {
   drawType?: TypeDrawImageOrColor | "both";
   strokeLineWidth?: number; 
   blurOptions?: ColorDrawType<number>;
+  name?: string;
 }
 
 interface DrawRoundedRectOptions { 
@@ -1287,7 +1337,16 @@ interface PrivateDrawImageOptions {
   dh?: number;
 }
 
-type TemplatePositionType = { x: number, y: number, width: number, height: number };
+interface DrawBlocksOptions extends BaseDrawBlocksOptions, DrawRoundedRectOptions {
+  x_position?: XTemplatePosition;
+}
+
+interface TemplatePositionType { 
+  x: number; 
+  y: number;
+  width: number;
+  height: number; 
+}
 
 type CanvasColorOptions = string | CanvasGradient | CanvasPattern;
 
@@ -1300,6 +1359,8 @@ type DrawImagesOptions = DrawImagesBase & StaticOptions;
 type DrawTextsOption = DrawTextsBase & StaticOptions;
 
 type DrawExpBarOptions = DrawExpBarBase & ExpBarOptions;
+
+type XTemplatePosition = "right" | "center" | "left";
 
 type DrawBGPosition = "banner" | "full" | "bottom";
 
@@ -1318,7 +1379,5 @@ type ColorDrawType<T extends StringNumber = string, K extends StringNumber = T> 
 type RenderType = "image/png" | "image/jpeg";
 
 type DrawOption = DrawBGDrawTypeColor | DrawBGTypeFull | DrawBGTypeAllOne;
-
-type DrawBlocksOptions = BaseDrawBlocksOptions & DrawRoundedRectOptions;
 
 type ArrayLimited<T, K extends number> = [T, ...T[]] & { length: K };
