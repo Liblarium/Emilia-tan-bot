@@ -12,7 +12,11 @@ class Profile {
     size: `20px`,
     font: `Arial`
   };
-  /** Для более подробной инфы - гляди на основную sharp функцию ;D (просто добавь скобки) */
+  /** 
+   * Для более подробной инфы - гляди на основную sharp функцию ;D (просто добавь скобки) 
+   * 
+   * Или на саму документацию библиотеки `sharp.js` (это библиотека для работы с изображениями)
+   */
   _sharp = sharp;
 
   constructor() {
@@ -47,14 +51,14 @@ class Profile {
   //Пока без изменений высоты. Просто отрисовка как есть. Чуть позже модифицирую это
   drawInline(color?: string, lineWidth?: number, setBlur?: number): Profile {
     const ctx = this.ctx;
-
+    
     if (color) ctx.strokeStyle = color;
     
     ctx.save();
     ctx.beginPath();
     ctx.filter = `blur(${setBlur ?? 1.1}px)`;
     ctx.moveTo(0, 200);
-    ctx.lineTo(1000, 200);
+    ctx.lineTo(this.canvas.width, 200);
     ctx.lineWidth = lineWidth ?? 2;
     ctx.stroke();
     ctx.closePath();
@@ -95,8 +99,6 @@ class Profile {
 
     // Опыт
     const startAngle = -Math.PI / 2;
-    //const xp = 70;//77.5;
-    //const xpMax = 155;
     const endAngle = Math.PI * 2 * (xp.now / xp.max) - Math.PI / 2;
  
     ctx.beginPath();
@@ -178,7 +180,6 @@ class Profile {
     return this;
   }
 
-  
   drawBlocks(options: DrawBlocksOptions): Profile;
   drawBlocks(options: DrawBlocksOptions[]): Profile;
   drawBlocks(options: DrawBlocksOptions | DrawBlocksOptions[] ): Profile { 
@@ -196,26 +197,36 @@ class Profile {
     const defaultBioY = 370;
     const defaultR = 11;
     const templateBlock: {[key: string]: DrawRoundedRectOptions} = {
-      username: { x: 290, y: 210, w: 380, h: 50, r: defaultR },
-      level: { x: 750, y: 255, w: 200, h: 40, r: defaultR },
-      title: { x: 290, y: 285, w: 380, h: 45, r: defaultR },
+      username: { x: 290, y: 140, w: 380, h: 50, r: defaultR },
+      level: { x: -30, y: 234, w: 200, h: 40, r: defaultR },
+      title: { x: 290, y: 230, w: 380, h: 45, r: defaultR },
       bio: { x: 20, y: defaultBioY, w: 710, h: 310, r: defaultR },
       bioFull: { x: 20, y: defaultBioY, w: 960, h: 310, r: defaultR },
       bioCenter: { x: 0, y: defaultBioY, w: 600, h: 310, r: defaultR },
-      badge: { x: 940, y: 208, w: 40, h: 34, r: defaultR },
+      badge: { x: -20, y: 155, w: 40, h: 34, r: defaultR },
       guild: { x: 750, y: 370, w: 230, h: 310, r: defaultR }
     };
-    
-    const defaultBioOptions: BaseDrawBlocksOptions = { color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 };
+
+    const defaultBioOptions: BaseDrawBlocksOptions = { 
+      color: { 
+        fill: `white`, 
+        stroke: `#124124` 
+      }, 
+      globalAlpha: { 
+        fill: 0.5 
+      }, 
+      drawType: `both`, 
+      strokeLineWidth: 5 
+    };
 
     const templateOptions: {[key: string]: BaseDrawBlocksOptions & { x_position?: XTemplatePosition }} = {
-      username: { globalAlpha: 0.5, color: "black" },
-      level: { globalAlpha: 0.5, color: "black" },
-      title: { color: `#b89e14`, globalAlpha: 0.8 },
+      username: { globalAlpha: 0.5, color: "black", drawType: `both`, strokeLineWidth: 2 },
+      level: { globalAlpha: 0.5, color: "black", x_position: `right`, drawType: "both", strokeLineWidth: 2 },
+      title: { color: { fill: `#b89e14`, stroke: `orange`}, globalAlpha: { fill: 0.8, stroke: 0.5 }, drawType: `both`, strokeLineWidth: 2 },
       bio: defaultBioOptions,
       bioFull: defaultBioOptions,
       bioCenter: { x_position: `center`, ...defaultBioOptions},
-      badge: { color: `#091711`, globalAlpha: 0.7 },
+      badge: { x_position: `right`, color: { fill: `#091711`, stroke: `black` }, globalAlpha: { fill: 0.7, stroke: 0.5 }, drawType: "both", strokeLineWidth: 2 },
       guild: { drawType: `both`, globalAlpha: { fill: 0.5 }, color: { fill: `white`, stroke: `#124124` } }
     };
     const templateNames: string[] = [];
@@ -252,6 +263,330 @@ class Profile {
     return this;
   }
 
+  async drawText({ x1, x2 = 0, y, text, textDirect = `normal`, dynamicOptions, fontOptions, clipNumber = false, timeFormat = false, x_translate }: DrawTextOptions): Promise<Profile> {
+    const ctx = this.ctx;
+
+    if (clipNumber) text = this.numberClip(text);
+    if (timeFormat) text = this.timeFormatter(Number(text));
+  
+    const iText: string = `${text}`;
+    const dynamic: boolean = dynamicOptions?.dynamic || false;
+    const isClip: boolean = dynamicOptions?.isClip || false;
+    const linesNext: number = dynamicOptions?.lines ?? 1;
+    const lineSpacing: number = dynamicOptions?.lineSpacing ?? 0;
+    const dynamicCorrector: number = dynamicOptions?.dynamicCorrector ?? 0;
+    const leftText: boolean = textDirect === `left`;
+    const centerText: boolean = textDirect === `center`;
+    const maxWidth: number = x2 > 0 ? x2 - x1 : x1;
+    const ellipsisWidth: number = ctx.measureText(`...`).width;
+    const dashWidth: number = ctx.measureText(`-`).width;
+    const words: string[] = iText.split(` `);
+    const lines: string[] = [``]; //массив строк
+    const textMetrics = ctx.measureText(iText);
+    const textWidth: number = textMetrics.width;
+    const textHeight: number = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
+    const isStartEmpty: RegExp = /^\s/;
+    let truncatedText: string = iText;
+    let currentLineIndex: number = 0;
+    let cacheWord: string = ``;
+    let beforeNewLine: string = ``;
+    let startNum: number = 0;
+    let x: number = x1;
+  
+    if (fontOptions) this.setFontStyle(fontOptions);
+    if (dynamic || isClip) {
+      if (isClip) {
+        for (const word of words) {
+          const testLine = lines[currentLineIndex] + (lines[currentLineIndex] ? ' ' : '') + word;
+            
+          if (currentLineIndex > linesNext) break;
+          if (ctx.measureText(testLine).width < maxWidth) {
+            const newLineIndex = word.indexOf(`\n`);
+  
+            if (newLineIndex === -1) {
+              lines[currentLineIndex] = testLine;
+            } else {
+              const beforeNewLine = testLine.slice(0, (testLine.length - word.length) + newLineIndex);
+              const afterNewLine = word.slice(newLineIndex + 1);
+                
+              lines[currentLineIndex++] = beforeNewLine;
+                
+              if (currentLineIndex <= linesNext) lines[currentLineIndex] = afterNewLine;
+            }
+            continue;
+          }
+  
+          cacheWord = testLine;
+            
+          cacheWord = this.#whileClip(cacheWord, maxWidth, currentLineIndex < linesNext ? dashWidth : (dynamic && currentLineIndex === linesNext ? (ellipsisWidth + dynamicCorrector): 0));
+          const cacheWordNewIndex = cacheWord.indexOf(`\n`);
+            
+          if (cacheWordNewIndex !== -1) cacheWord = cacheWord.slice(0, cacheWordNewIndex);
+  
+          const tLClip = testLine.slice(cacheWord.length + (cacheWordNewIndex === -1 ? 0 : 1));
+          const testLineClip = tLClip.startsWith(`-`) ? tLClip.slice(1) : tLClip;
+          const textFormated = this.#textFormater({ text: testLineClip, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
+          lines[currentLineIndex] = textFormated.endsWith(`--`) ? textFormated.slice(0, -1) : textFormated;
+          let cacheLine = isStartEmpty.test(testLineClip) ? testLineClip.slice(1) : testLineClip;
+            
+          ++currentLineIndex;
+            
+          if (currentLineIndex <= linesNext) {
+            lines[currentLineIndex] = ``;
+
+            if (testLineClip.length >= cacheWord.length) {
+              const lineCache = [];
+              cacheWord = cacheLine;
+              const nextLineNum = lines[0].length + 5;
+
+              for (let i = 0; i <= cacheWord.length; i++) {
+                if (lineCache.length + currentLineIndex >= linesNext + 1) break;
+  
+                const sliceNum = nextLineNum * (i + 1);
+                let clipedWord = `${beforeNewLine ?? ``}${cacheLine.slice(startNum, sliceNum)}`;
+                startNum = sliceNum;
+                const newClipWordIndex = clipedWord.indexOf(`\n`);
+                  
+                if (newClipWordIndex !== -1) {
+                  beforeNewLine = clipedWord;
+                  clipedWord = clipedWord.slice(0, newClipWordIndex);
+                  beforeNewLine = beforeNewLine.slice(newClipWordIndex + 1);
+                } else beforeNewLine = ``;
+                  
+                lineCache.push(clipedWord);
+                cacheWord = cacheWord.slice(clipedWord.length);
+              }
+                
+              cacheWord = ``;
+              cacheLine = ``;
+  
+              for (const line of lineCache) {
+                cacheWord = this.#whileClip(line, maxWidth, currentLineIndex <= linesNext ? dashWidth : (dynamic && currentLineIndex === linesNext ? (ellipsisWidth + dynamicCorrector): 0));
+
+                const textFormated = this.#textFormater({ text: line, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
+
+                lines[currentLineIndex] = (textFormated.endsWith(`-`) && lineCache[lineCache.length - 1] == line || textFormated.endsWith(`--`)) ? textFormated.slice(0, -1) : textFormated;
+                ++currentLineIndex;
+              }
+  
+            } else lines[currentLineIndex] = testLineClip;
+          }  
+        }
+      }
+      
+      ctx.save();
+
+      if (x_translate !== undefined) ctx.translate(x_translate, 0);
+
+      if (textWidth > maxWidth && !isClip) {
+        while (ctx.measureText(truncatedText).width + (ellipsisWidth + dynamicCorrector) > maxWidth) {
+          if (truncatedText.length == 0) throw new TypeError(`Бесконечный while!`);
+              
+          truncatedText = truncatedText.slice(0, -1);
+        }
+  
+        truncatedText = truncatedText === text ? text : `${truncatedText}...`;
+      }
+    }
+  
+    if (leftText) ctx.textAlign = `right`;
+    if (centerText) (ctx.textAlign = `center`), x = (x1 + x2) / 2;
+    if (isClip) lines.forEach((line, i) => ctx.fillText(line, x, y + i * (textHeight + lineSpacing))), lines.length = 0;
+    else ctx.fillText(truncatedText, x, y);
+    if (leftText || centerText) ctx.textAlign = `start`;
+    
+    ctx.restore();
+
+    return this;
+  }
+  
+  drawTexts(args: DrawTextOptions[], options: DrawTextsOption): Profile;
+  drawTexts(args: DrawTextOptions[]): Profile;
+  drawTexts(args: DrawTextOptions[], option?: DrawTextsOption): Profile {
+    let index: number = 0;
+    let cache: Partial<DrawTextOptions>;
+
+    args.forEach(async (data, i) => {
+      if (option) {
+        const dynamic = option?.dynamicOptions;
+        const forDynamic = dynamic ? dynamic[index] : option;
+        const start = forDynamic?.start ?? 0;
+        const end = forDynamic?.end ?? args.length - 1;
+        const update = forDynamic?.update ?? {};
+        const isCache = dynamic ? dynamic[index]?.cache || false : false;
+  
+        if (!cache) cache = update;
+        if (isCache) cache = { ...cache, ...update };
+        if (i >= start && i <= end) data = { ...data, ...cache };
+        if (i === end && dynamic) index++;
+      }
+  
+      await this.drawText(data);
+    });
+
+    return this;
+  }
+
+  drawTemplateText(args: TemplateTextOptions): Profile {
+    const text = ``;
+    const iconShift = 40;
+    const defaultBio = { dynamicOptions: { dynamic: true,  dynamicCorrector: 1, isClip: true,  lineSpacing: 12, lines: 10 }, fontOptions: { size: 25 } };
+    const templateText: TemplateTextOptions = {
+      username: { x1: 294, x2: 670, y: 178, dynamicOptions: { dynamic: true }, fontOptions: { color: `white`, size: 35 }, text },
+      level: { x1: 772, x2: 970, y: 258, textDirect: `center`, dynamicOptions: { dynamic: true, dynamicCorrector: -2, lines: 0 }, fontOptions: { size: 15, color: `white` }, text },
+      title: { x1: 294, x2: 668, y: 260, textDirect: `center`, dynamicOptions: { dynamic: true, lines: 0, dynamicCorrector: -11 }, fontOptions: { color: `black`, size: 27 }, text },
+      bio: { x1: 30, x2: 710, y: 400, text, ...defaultBio },
+      bioFull: { x1: 30, x2: 970, y: 400, text, ...defaultBio },
+      bioCenter: { x1: 210, x2: 787, y: 400, text, ...defaultBio },
+      guild: {
+        guildName: { x1: 762.5, x2: 970, y: 400, dynamicOptions: { dynamic: true, isClip: true, lines: 1, lineSpacing: 9 }, fontOptions: { size: 25 }, text, iconShift },
+        guildType: { x1: 763, x2: 965, y: 480, dynamicOptions: { dynamic: true }, fontOptions: { size: 20 }, text, iconShift }, 
+        members: { x1: 763, x2: 965, y: 535, dynamicOptions: { dynamic: true }, fontOptions: { size: 20 }, text, iconShift },
+        perms: { x1: 763, x2: 965, y: 590, dynamicOptions: { dynamic: true }, fontOptions: { size: 20 }, text, iconShift },
+        guildIcon: args?.guild?.guildIcon || false
+      }
+    };
+
+    const templateNames: string[] = [];
+    const templates: TemplateTextOptions[] = Object
+      .entries(args)
+      .map(([key, value], i) => ({ name: key, priority: (value as TemplateText)?.priority ?? i, ...value }))
+      .sort((a, b) => a.priority - b.priority)
+      .map((v, i) => {
+        const n: {[key: string]: any} = {};
+        const name = v.name;
+        templateNames.push(name);
+        
+        n[name] = v;
+
+        return n;
+      });
+    
+    const applyTemplate = (option: TemplateTextOptions, templateType: string) => {
+      const defaultBlock = templateText[templateType];
+      const opt = option[templateType];
+
+      if (templateType === `guild`) {
+        if (defaultBlock === undefined) throw new TypeError(`Profile.drawTemplateText().applyTemplate: why guild (in args) object undefined?`);
+
+        const res: IconGuildTextShift[] = [];
+        
+        Object
+          .entries(defaultBlock)
+          .forEach(([key, value]: [string, IconGuildTextShift]) => {
+            if (key === `guildIcon`) return;
+
+            const opts = (opt as {[key: string]: IconGuildTextShift})[key];
+            const guild = opt !== undefined && `guildIcon` in opt ? opt : undefined;
+            const item = {
+              ...value,
+              ...opts
+            };
+            
+            if (guild?.guildIcon === true) item.y = (item.y ?? 0) + (item.iconShift ?? 0);
+
+            res.push(item);
+          });
+
+        res.forEach(item => this.drawText(item as DrawTextOptions));
+      } else {
+        const mergedOptions = {
+          ...defaultBlock,
+          ...opt
+        };
+
+        this.drawText(mergedOptions as DrawTextOptions);
+      }
+
+    };
+   
+    templates.forEach((val, i) => applyTemplate(val, templateNames[i]) );
+    templateNames.length = 0;
+
+    return this;
+  }
+
+  setFontStyle ({ size, font, color, type = 1 }: SetFontStyleOptions) {
+    const ctx = this.ctx;
+    const fonts = this.fonts;
+
+    if (typeof size === `number`) size = `${size}px`;
+    if (size) fonts.size = size;
+    if (font) fonts.font = font;
+    if (size || font) ctx.font = `${size ?? fonts.size} ${font ?? fonts.font}`;
+    if (color) {
+      if (type === 1 || type === 3) ctx.fillStyle = color;
+      if (type === 2 || type === 3) ctx.strokeStyle = color;
+    }
+  }
+
+  numberClip (num: StringNumber): string {
+    if (typeof num != `string`) num = `${num}`;
+
+    const numLength = num.length;
+
+    return numLength >= 5 ? `${num.slice(0, 4)}k` : numLength >= 11 ? `${num.slice(0, 4)}kk` : numLength >= 16 ? `${num.slice(0, 4)}kk+` : num;
+  }
+
+  parseSecond (s: number): { hours: number; minutes: number; seconds: number; } {
+    const minutes = Math.floor(s / 60);
+    const hours = Math.floor(minutes / 60);
+    return {
+      hours,
+      minutes: minutes - (hours * 60),
+      seconds: s % 60,
+    };
+  }
+
+  timeFormatter(time: number): string {
+    if (typeof time != `number` || time < 0) throw new TypeError(`Profile.timeFormatter: Входное значение в timeFormatter не является положительным числом!`);
+
+    const parser = this.parseSecond(time);
+    const isHour = parser.hours > 0;
+    const isMinute = parser.minutes > 0;
+
+    return isHour
+      ? parser.hours >= 10
+        ? `${this.numberClip(parser.hours)} ч`
+        : `${parser.hours} ч ${parser.minutes} м`
+      : isMinute
+        ? `${parser.minutes} м ${parser.seconds} с`
+        : `${parser.seconds} с`;
+  }
+
+  /**
+  * @param {string} cache входящий текст для изменений 
+  * @param {number} maxWidth макстимальная ширина
+  * @param {number} [elseWidth] дополнительное значение, что будет участвовать в цикле 
+  * @returns {string}
+  */
+  #whileClip (cache: string, maxWidth: number, elseWidth?: number ): string {
+    let cached: string = cache;
+    
+    while(this.ctx.measureText(cached).width + (elseWidth ?? 0) > maxWidth) {
+      if (cached.length === 0) throw new TypeError(`infinite while`);
+
+      cached = cached.slice(0, -1);
+    }
+
+    return cached;
+  }
+
+  /** 
+  * @param {object} options параметры
+  * @param {string} options.text  входящий текст
+  * @param {string} options.cache кеш-переменная
+  * @param {number} options.curInd текущий индекс
+  * @param {number} options.linesNext следующий индекс
+  * @param {boolean} options.dynamic динамический ли текст
+  * @returns {string}
+  */
+  #textFormater ({ text, cache, curInd, linesNext, dynamic = false }: TextFormatterOptions): string {
+    const isStartEmpty = /^\s/;
+    const isEndEmpty = /\s$/;
+    
+    return curInd < linesNext ? ((isStartEmpty.test(text) || isEndEmpty.test(cache)) ? cache : `${cache}-`) : dynamic && curInd === linesNext ? (isEndEmpty.test(cache) ? `${cache.slice(0, -1)}...` : `${cache}...`) : cache; 
+  }
 
   #drawBlock(args: DrawBlocksOptions): void {
     const ctx = this.ctx;
@@ -296,7 +631,7 @@ class Profile {
     if (drawType === `fill` || drawType === `both`) ctx.fill();
       
     ctx.filter = `blur(${blurOptions !== undefined && `stroke` in blurOptions ? blurOptions.stroke : 0}px)`;
-    ctx.globalAlpha = typeof globalAlpha === `object` && globalAlpha?.stroke !== undefined ? globalAlpha.stroke : 1;
+    ctx.globalAlpha = typeof globalAlpha === `object` && globalAlpha?.stroke !== undefined ? globalAlpha.stroke : typeof globalAlpha === `number` ? globalAlpha : 1;
     
     if (drawType === `stroke` || drawType === `both`) ctx.stroke(); 
 
@@ -851,7 +1186,7 @@ const main: () => Promise<void>  = async () => {
 
           const tLClip = testLine.slice(cacheWord.length + (cacheWordNewIndex === -1 ? 0 : 1));
           const testLineClip = tLClip.startsWith(`-`) ? tLClip.slice(1) : tLClip;
-          const textFormated = textFormater({ text: testLineClip, cache: cacheWord, curInd: currentLineIndex });
+          const textFormated = textFormater({ text: testLineClip, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
           lines[currentLineIndex] = textFormated.endsWith(`--`) ? textFormated.slice(0, -1) : textFormated;
           let cacheLine = isStartEmpty.test(testLineClip) ? testLineClip.slice(1) : testLineClip;
           
@@ -886,7 +1221,7 @@ const main: () => Promise<void>  = async () => {
 
               for (const line of lineCache) {
                 cacheWord = whileClip(line, currentLineIndex <= linesNext ? dashWidth : (dynamic && currentLineIndex === linesNext ? (ellipsisWidth + dynamicCorrector): 0));
-                const textFormated = textFormater({ text: line, cache: cacheWord, curInd: currentLineIndex });
+                const textFormated = textFormater({ text: line, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
                 lines[currentLineIndex] = (textFormated.endsWith(`-`) && lineCache[lineCache.length - 1] == line || textFormated.endsWith(`--`)) ? textFormated.slice(0, -1) : textFormated;
                 ++currentLineIndex;
               }
@@ -987,20 +1322,66 @@ const someTest: () => Promise<void> = async () => {
     .drawAvatar({ avatar: avImg, xp: { now: 50, max: 150 }, avatarPosition: { x: 150, y: 200, image: { x: 68, y: 118, radius: 82 } }, lineBorder: { blurOption: { top: 0.8, bottom: 1.1 } } })
     /*.drawTemplateBlocks([{ templateType: `username` }, { templateType: `title` }, { templateType: `bio` }, { templateType: `guild` }, { templateType: `level` }, { templateType: `badge` }])*/
     .drawBlocks([{ 
-      x: 290, y: 210, w: 380, h: 50, r: 11, globalAlpha: 0.5, color: "black" }, 
-    { x: 290, y: 285, w: 380, h: 45, r: 11, color: `#b89e14`, globalAlpha: 0.8 }, 
+      x: 290, y: 140, w: 380, h: 50, r: 11, globalAlpha: 0.5, color: "black", drawType: `both`, strokeLineWidth: 2 }, 
+    { x: 290, y: 230, w: 380, h: 45, r: 11, color: { fill: `#b89e14`, stroke: `orange`}, globalAlpha: { fill: 0.8, stroke: 0.5 }, drawType: `both`, strokeLineWidth: 2 },  
     { x: 0, y: 370, w: 600, h: 310, r: 11, x_position: `center`, color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 },  //x: 20, y: 370, w: 710, h: 310
     /*{ x: 750, y: 370, w: 230, h: 310, r: 11, drawType: `both`, globalAlpha: { fill: 0.5 }, color: { fill: `white`, stroke: `#124124` } }, */ //710, full = w: 960
-    { x: 750, y: 255, w: 200, h: 40, r: 11, globalAlpha: 0.5, color: "black" }, 
-    { x: 260, y: 160, w: 150, h: 34, r: 11, color: `grey`, globalAlpha: 0.7 }])
-    // x: 940, y: 208, w: 40, h: 34, r: 11, color: `#091711`, globalAlpha: 0.7
-    .drawTemplateBlock({ username: { color: `black` } });
+    { x: -30, y: 234, w: 200, h: 40, r: 11, globalAlpha: 0.5, color: "black", x_position: `right`, drawType: "both", strokeLineWidth: 2 }, 
+    { x: -20, y: 155, w: 40, h: 34, r: 11, x_position: `right`, color: { fill: `#091711`, stroke: `black` }, globalAlpha: { fill: 0.7, stroke: 0.5 }, drawType: "both", strokeLineWidth: 2 }])
+    .drawTexts([
+      //Bio текст. x1: 30, x2: 710, full = x2: 970,
+      { text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1`, x1: 210, x2: 787, y: 400, dynamicOptions: { dynamic: true,  dynamicCorrector: 1, isClip: true,  lineSpacing: 17, lines: 10 }, fontOptions: { size: 25 } }, 
+      //Никнейм
+      { text: `Ran`, x1: 294, x2: 670, y: 178, dynamicOptions: { dynamic: true }, fontOptions: { color: `white`, size: 35 } },
+      //титул
+      { text: `Developer`, x1: 294, x2: 668, y: 260, textDirect: `center`, dynamicOptions: { dynamic: true, lines: 0, dynamicCorrector: -11 }, fontOptions: { color: `black`, size: 27 } },
+      //имя гильдии. С авой - y: 440, без авы - y: 400
+      /*{ text: `Имя гильдии/клана очень-и-очень большое`, x1: 762.5, x2: 970, y: 440, dynamicOptions: { dynamic: true, isClip: true, lines: 1 }, fontOptions: { size: 25 } },
+      //тип гильдии. С авой - y: 520, без авы: y: 480 
+      { text: `Тип: гильдия`, x1: 763, x2: 965, y: 520, dynamicOptions: { dynamic: true }, fontOptions: { size: 20 } },
+      //количество участников. С авой - y: 575, без авы - y: 535
+      { text: `Участники: 100/100`, x1: 763, x2: 965, y: 575, dynamicOptions: { dynamic: true }, fontOptions: { size: 20 } },
+      //должность. С авой - y: 630, без авы - y: 590
+      { text: `Позиция: Участник`, x1: 763, x2: 965, y: 630, dynamicOptions: { dynamic: true }, fontOptions: { size: 20 } },*/
+      //уровень
+      { text: `Сфера Полубога`, x1: 772, x2: 970, y: 258, textDirect: `center`, dynamicOptions: { dynamic: true, dynamicCorrector: -2, lines: 0 }, fontOptions: { size: 15, color: `white` } },
+    ])
+    .drawTemplateText({ bioCenter: { text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1` } })
 
   //full = x: 780, w: 200, one = w: 40, x: 940 - координаты под "значки"
   sharp(test.render()).toFile(`./abyss/res.png`);
 };
 
 someTest();
+
+interface TemplateTextOptions {
+  username?: TemplateText; 
+  title?: TemplateText; 
+  bio?: TemplateText;
+  bioFull?: TemplateText;
+  bioCenter?: TemplateText; 
+  guild?: GuildTemplateTextOptions; 
+  level?: TemplateText;
+  [key: string]: TemplateText | GuildTemplateTextOptions | undefined;
+}
+
+interface GuildTemplateTextOptions {
+  guildName: IconGuildTextShift; //имя гильдии
+  guildType: IconGuildTextShift; //тип гильдии
+  members: IconGuildTextShift; //текст для гильдии
+  perms: IconGuildTextShift; //это позиция в гильдии
+  guildIcon?: boolean; //есть ли аватарка. От этого зависит расположение текста
+  [key: string]: IconGuildTextShift | boolean | undefined;
+}
+
+/** 
+ * На сколько нужно "отступить" `y` в случае наличия аватарки. 
+ * 
+ * Например - у нас есть `y: 400`. Дабы оно не мешало аватарке мы укажем `iconShift: 40`. В результате `y = 440`.
+ */
+interface IconGuildTextShift extends TemplateText {
+  iconShift?: number; //на сколько "съехать"
+}
 
 interface TemplateBlocksOptions {
   username?: TemplateBlock; 
@@ -1014,7 +1395,7 @@ interface TemplateBlocksOptions {
   [key: string]: TemplateBlock | undefined;
 }
 
-interface TemplateBlock extends BaseDrawBlocksOptions {
+interface PriorityOption {
   priority?: 1 | 2 | 3 | 4 | 5 | 6;
 }
 
@@ -1101,6 +1482,8 @@ interface TextFormatterOptions {
   text: string; 
   cache: string; 
   curInd: number; 
+  linesNext: number;
+  dynamic: boolean;
 }
 
 interface DrawBGDrawTypeColor {
@@ -1215,10 +1598,14 @@ interface SetFontStyleOptions {
   type?: 1 | 2 | 3;
 }
 
-interface DrawTextOptions {
+interface DrawTextOptions extends TextBase {
   x1: number;
   x2?: number;
   y: number;
+  x_translate?: number;
+}
+
+interface TextBase {
   text: string | number;
   textDirect?: "normal" | "center" | "left";
   fontOptions?: SetFontStyleOptions;
@@ -1276,13 +1663,6 @@ interface RadialGradientOptions {
   x1: number;
   y1: number;
   r1: number;
-}
-
-interface DrawExpBarBase {
-  x: number;
-  y: number;
-  radiusX: number;
-  radiusY: number;
 }
 
 interface ExpBarOptions {
@@ -1348,6 +1728,10 @@ interface TemplatePositionType {
   height: number; 
 }
 
+type TemplateText = TextBase & Partial<DrawTextOptions> & PriorityOption;
+
+type TemplateBlock = BaseDrawBlocksOptions & PriorityOption;
+
 type CanvasColorOptions = string | CanvasGradient | CanvasPattern;
 
 type DynamicOptionDrawsText = DynamicOptions & UpdateDynamicDrawText;
@@ -1358,15 +1742,11 @@ type DrawImagesOptions = DrawImagesBase & StaticOptions;
 
 type DrawTextsOption = DrawTextsBase & StaticOptions;
 
-type DrawExpBarOptions = DrawExpBarBase & ExpBarOptions;
-
 type XTemplatePosition = "right" | "center" | "left";
 
 type DrawBGPosition = "banner" | "full" | "bottom";
 
 type PDImagePosition = Exclude<DrawBGPosition, "full">
-
-type DrawType = "image" | "color";
 
 type DrawBGType = "rect" | "arc";
 
