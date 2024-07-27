@@ -158,7 +158,7 @@ class Profile {
     if (lineBorder?.off !== true) {
       setStyle(lineBorder?.color, `stroke`, `black`);
       ctx.lineWidth = lineBorder?.lineWidth ?? 2;
-      ctx.globalAlpha = lineBorder?.globalAplha ?? 1;
+      ctx.globalAlpha = lineBorder?.globalAlpha ?? 1;
 
       if (lineBorderBlur?.both !== undefined || lineBorderBlur?.top !== undefined) ctx.filter = `blur(${(lineBorderBlur.both ?? lineBorderBlur.top) ?? 0.8}px)`;
       
@@ -178,6 +178,112 @@ class Profile {
     }
 
     return this;
+  }
+
+  drawGuildIcon(options: DrawGuildIconOptions): Profile {
+    const ctx = this.ctx;
+    const { x1, x2, y1, y2, r, borderLineWidth = 5, borderColor = `#124124`, icon, globalAlpha, offBorder = false, w, h } = options;
+    const isImage = icon instanceof Image;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x1, y1, r, 0, Math.PI * 2);
+    ctx.clip();
+
+    ctx.globalAlpha = globalAlpha ? typeof globalAlpha === `number` ? globalAlpha : `icon` in globalAlpha ? globalAlpha.icon ?? 1 : 1 : 1;
+
+    if (isImage) {
+      ctx.drawImage(icon, x2, y2, w, h);
+    } else {
+      if (typeof icon === `string`) ctx.fillStyle = icon;
+      else this.#setGradient(icon);
+    
+      ctx.fill();
+    }    
+    ctx.closePath();
+    ctx.restore();
+    ctx.beginPath();
+    ctx.lineWidth = borderLineWidth;
+    
+    if (typeof globalAlpha !== `number` && globalAlpha !== undefined && `border` in globalAlpha) ctx.globalAlpha = globalAlpha.border ?? 1;
+
+    if (typeof borderColor === `string`) ctx.strokeStyle = borderColor;
+    else if (borderColor !== undefined) this.#setGradient(borderColor);
+
+    if (offBorder !== true) {
+      ctx.arc(x1, y1, r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    ctx.closePath();
+    
+    return this;
+  }
+
+  drawBadge(args: DrawBadgeOptions, options: DrawBadgeOptinalOptions): Profile;
+  drawBadge(args: DrawBadgeOptions[], options: DrawBadgeOptinalOptions): Profile;
+  drawBadge(args: DrawBadgeOptions | DrawBadgeOptions[], options: DrawBadgeOptinalOptions): Profile {
+    if (Array.isArray(args) && args.length > 0) {
+      //let lastX = x;
+      if (args.length === 1) {
+        this.#badgeDraw(args[0], options);
+        return this;
+      }
+
+      const sortBadges = args.sort((a, b) => (a?.priority ?? 1) - (b?.priority ?? 0));
+      const badges: typeof sortBadges = [];
+
+      let x = 0;
+      let y = 0;
+      for (let i = 0; i < args.length; i++) {
+        delete sortBadges[i].priority;
+        const bg = sortBadges[i];
+        const prewBG = sortBadges[i - 1];
+        console.log(sortBadges[i], sortBadges[i - 1]);
+        if (i === 0) {
+          x = bg.x ?? 0;
+          y = bg.y ?? 0;
+
+          badges.push({ x, y, ...bg});
+
+          continue;
+        }
+
+        x += (prewBG.x ?? 0) - (bg.space ?? 10) - (bg.w ?? 20) - (bg.x ?? 0);
+        y = (prewBG.y ?? 0) + (bg.y ?? 0);
+        console.log(prewBG.x, prewBG.y);
+        const result = { x, y };
+        badges.push({ ...bg, ...result });
+      }
+
+      badges.forEach((val, i) => this.#badgeDraw(val, options, i, badges.length, badges));
+    } else if (!Array.isArray(args)) this.#badgeDraw(args, options);
+    
+
+    return this;
+  }
+
+  #badgeDraw(args: DrawBadgeOptions, options: DrawBadgeOptinalOptions, ind: number = 0, length: number = 0, arr?: DrawBadgeOptions[]) {
+    const ctx = this.ctx;
+    const { x, y, bgR = 11, bgH = 34, bgW = 28, bgColor = `#10271d`, offStroke = false, bgLineWidth = 2, globalAlpha = { fill: 0.8, stroke: 0.7 }, blur, bgFill = `full` } = options; 
+    const { w = 20, h = 20, badge, space = 9 } = args;
+    const BGw = ind === 0 && bgFill === `full` && length > 0 ? arr !== undefined && arr.length > 0 ? Math.abs(arr[length - 1].x ?? bgW) + bgW : bgW : bgW;
+    const BGx = bgFill === `unique` && arr !== undefined ? (arr[ind].x ?? x) - BGw + space : x; 
+    
+    if (ind === 0 && bgFill === `full` || bgFill === `unique`) this.drawBlocks({ x: BGx, y, w: BGw, h: bgH, r: bgR, color: bgColor, strokeLineWidth: bgLineWidth, drawType: offStroke ? "fill" : "both", globalAlpha, blurOptions: blur, x_position: `right` });
+
+    ctx.save();
+    ctx.beginPath();
+
+    ctx.translate(955, 160);
+    
+    if (args.blur !== undefined) ctx.filter = `blur(${args.blur}px)`;
+    if (args.globalAlpha !== undefined) ctx.globalAlpha = args.globalAlpha; 
+    
+    ctx.drawImage(badge, args.x ?? 0, args.y ?? 0, w, h);
+    ctx.closePath();
+    ctx.restore();
+    
   }
 
   drawBlocks(options: DrawBlocksOptions): Profile;
@@ -227,7 +333,7 @@ class Profile {
       bioFull: defaultBioOptions,
       bioCenter: { x_position: `center`, ...defaultBioOptions},
       badge: { x_position: `right`, color: { fill: `#091711`, stroke: `black` }, globalAlpha: { fill: 0.7, stroke: 0.5 }, drawType: "both", strokeLineWidth: 2 },
-      guild: { drawType: `both`, globalAlpha: { fill: 0.5 }, color: { fill: `white`, stroke: `#124124` } }
+      guild: { drawType: `both`, globalAlpha: { fill: 0.5 }, color: { fill: `white`, stroke: `#124124` }, strokeLineWidth: 5 },
     };
     const templateNames: string[] = [];
     const templates: TemplateBlocksOptions[] = Object.entries(options)
@@ -430,7 +536,7 @@ class Profile {
   drawTemplateText(args: TemplateTextOptions): Profile {
     const text = ``;
     const iconShift = 40;
-    const defaultBio = { dynamicOptions: { dynamic: true,  dynamicCorrector: 1, isClip: true,  lineSpacing: 12, lines: 10 }, fontOptions: { size: 25 } };
+    const defaultBio = { dynamicOptions: { dynamic: true,  dynamicCorrector: 1, isClip: true,  lineSpacing: 12, lines: 10 }, fontOptions: { size: 25, color: `black` } };
     const templateText: TemplateTextOptions = {
       username: { x1: 294, x2: 670, y: 178, dynamicOptions: { dynamic: true }, fontOptions: { color: `white`, size: 35 }, text },
       level: { x1: 772, x2: 970, y: 258, textDirect: `center`, dynamicOptions: { dynamic: true, dynamicCorrector: -2, lines: 0 }, fontOptions: { size: 15, color: `white` }, text },
@@ -439,7 +545,7 @@ class Profile {
       bioFull: { x1: 30, x2: 970, y: 400, text, ...defaultBio },
       bioCenter: { x1: 210, x2: 787, y: 400, text, ...defaultBio },
       guild: {
-        guildName: { x1: 762.5, x2: 970, y: 400, dynamicOptions: { dynamic: true, isClip: true, lines: 1, lineSpacing: 9 }, fontOptions: { size: 25 }, text, iconShift },
+        guildName: { x1: 762.5, x2: 970, y: 400, dynamicOptions: { dynamic: true, isClip: true, lines: 1, lineSpacing: 2 }, fontOptions: { size: 25 }, text, iconShift },
         guildType: { x1: 763, x2: 965, y: 480, dynamicOptions: { dynamic: true }, fontOptions: { size: 20 }, text, iconShift }, 
         members: { x1: 763, x2: 965, y: 535, dynamicOptions: { dynamic: true }, fontOptions: { size: 20 }, text, iconShift },
         perms: { x1: 763, x2: 965, y: 590, dynamicOptions: { dynamic: true }, fontOptions: { size: 20 }, text, iconShift },
@@ -625,12 +731,12 @@ class Profile {
 
     if (typeof globalAlpha === `number`) ctx.globalAlpha = globalAlpha;
 
-    ctx.filter = `blur(${blurOptions !== undefined && `fill` in blurOptions ? blurOptions.fill : 0}px)`;
+    ctx.filter = `blur(${typeof blurOptions === `object` && `fill` in blurOptions ? blurOptions.fill : typeof blurOptions === `number` ? blurOptions : 0}px)`;
     
     if (typeof globalAlpha === `object` && globalAlpha?.fill !== undefined) ctx.globalAlpha = globalAlpha.fill;
     if (drawType === `fill` || drawType === `both`) ctx.fill();
       
-    ctx.filter = `blur(${blurOptions !== undefined && `stroke` in blurOptions ? blurOptions.stroke : 0}px)`;
+    ctx.filter = `blur(${typeof blurOptions === `object` && `stroke` in blurOptions ? blurOptions.stroke : typeof blurOptions === `number` ? blurOptions : 0}px)`;
     ctx.globalAlpha = typeof globalAlpha === `object` && globalAlpha?.stroke !== undefined ? globalAlpha.stroke : typeof globalAlpha === `number` ? globalAlpha : 1;
     
     if (drawType === `stroke` || drawType === `both`) ctx.stroke(); 
@@ -1324,13 +1430,12 @@ const someTest: () => Promise<void> = async () => {
     .drawBlocks([{ 
       x: 290, y: 140, w: 380, h: 50, r: 11, globalAlpha: 0.5, color: "black", drawType: `both`, strokeLineWidth: 2 }, 
     { x: 290, y: 230, w: 380, h: 45, r: 11, color: { fill: `#b89e14`, stroke: `orange`}, globalAlpha: { fill: 0.8, stroke: 0.5 }, drawType: `both`, strokeLineWidth: 2 },  
-    { x: 0, y: 370, w: 600, h: 310, r: 11, x_position: `center`, color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 },  //x: 20, y: 370, w: 710, h: 310
+    /*{ x: 0, y: 370, w: 600, h: 310, r: 11, x_position: `center`, color: { fill: `white`, stroke: `#124124` }, globalAlpha: { fill: 0.5 }, drawType: `both`, strokeLineWidth: 5 },*/  //x: 20, y: 370, w: 710, h: 310
     /*{ x: 750, y: 370, w: 230, h: 310, r: 11, drawType: `both`, globalAlpha: { fill: 0.5 }, color: { fill: `white`, stroke: `#124124` } }, */ //710, full = w: 960
     { x: -30, y: 234, w: 200, h: 40, r: 11, globalAlpha: 0.5, color: "black", x_position: `right`, drawType: "both", strokeLineWidth: 2 }, 
-    { x: -20, y: 155, w: 40, h: 34, r: 11, x_position: `right`, color: { fill: `#091711`, stroke: `black` }, globalAlpha: { fill: 0.7, stroke: 0.5 }, drawType: "both", strokeLineWidth: 2 }])
+    /*{ x: -20, y: 155, w: 40, h: 34, r: 11, x_position: `right`, color: { fill: `#091711`, stroke: `black` }, globalAlpha: { fill: 0.7, stroke: 0.5 }, drawType: "both", strokeLineWidth: 2 }*/])
     .drawTexts([
       //Bio текст. x1: 30, x2: 710, full = x2: 970,
-      { text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1`, x1: 210, x2: 787, y: 400, dynamicOptions: { dynamic: true,  dynamicCorrector: 1, isClip: true,  lineSpacing: 17, lines: 10 }, fontOptions: { size: 25 } }, 
       //Никнейм
       { text: `Ran`, x1: 294, x2: 670, y: 178, dynamicOptions: { dynamic: true }, fontOptions: { color: `white`, size: 35 } },
       //титул
@@ -1346,13 +1451,75 @@ const someTest: () => Promise<void> = async () => {
       //уровень
       { text: `Сфера Полубога`, x1: 772, x2: 970, y: 258, textDirect: `center`, dynamicOptions: { dynamic: true, dynamicCorrector: -2, lines: 0 }, fontOptions: { size: 15, color: `white` } },
     ])
-    .drawTemplateText({ bioCenter: { text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1` } })
+    .drawTemplateBlock({
+      bio: {},
+      guild: {}
+    })
+    .drawGuildIcon({ x1: 775, y1: 370, r: 40, x2: 735, y2: 330, w: 80, h: 80, icon: guildIcon })
+    /**
+     *  ctx.arc(775, 370, 40, 0, Math.PI * 2);
+        ctx.fillStyle = `grey`;
+        //ctx.fill();
+        ctx.clip();
+        ctx.drawImage(guildIcon, 735, 330, 80, 80);
+     */
+    .drawTemplateText({ 
+      bio: { 
+        text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1` 
+      },
+      guild: {
+        guildName: { text: `Имя гильдии/клана очень-и-очень большое` },
+        guildType: { text: `Тип: гильдия` },
+        members: { text: `Участники: 100/100` },
+        perms: { text: `Позиция: Участник` },
+        guildIcon: true
+      }
+    })
+    .drawBadge( [{ badge: icon }, { badge: icon }, { badge: icon }, { badge: icon }, { badge: icon }], { x: -20, y: 155 })
 
   //full = x: 780, w: 200, one = w: 40, x: 940 - координаты под "значки"
   sharp(test.render()).toFile(`./abyss/res.png`);
 };
 
 someTest();
+
+interface DrawBadgeOptinalOptions extends X_And_Y  {
+  bgColor?: StringOrGradient | FillOrStrokeOption<string>;
+  bgW?: number; //ширина блока для значков
+  bgH?: number; //высота блока для значков
+  bgR?: number; //скругление углов
+  bgLineWidth?: number;
+  offStroke?: boolean;
+  globalAlpha?: number | FillOrStrokeOption;
+  blur?: number | FillOrStrokeOption;
+  bgFill?: "full" | "unique" | "none"; //влияет только при наличии массива
+}
+
+interface DrawBadgeOptions extends Partial<X_And_Y> {
+  space?: number; //отступ между значками
+  badge: Image; //то, что будет загружаться
+  w?: number; //ширина значка. w + space = отступ между значками
+  h?: number; //высота значка. Если не указано, то h = w
+  globalAlpha?: number; //прозрачность. Не знаю - надо или нет. Но пусть будет
+  blur?: number; //размытие. Так-же не знаю. Потом увижу
+  priority?: number; //как размещать их. 0 - выший приоритет. Если нет - будет по их расположению в массиве. Если это не массив - оно не будет иметь влияния. Просто не стакайте их на одном месте хд
+}
+
+interface DrawGuildIconOptions {
+  x1: number;
+  x2: number;
+  y1: number;
+  y2: number;
+  w: number;
+  h: number;
+  r: number;
+  borderLineWidth?: number;
+  borderColor?: StringOrGradient;
+  icon: Image | StringOrGradient;
+  globalAlpha?: number | BorderOrIcon;
+  blurOptions?: number | BorderOrIcon;
+  offBorder?: boolean;
+}
 
 interface TemplateTextOptions {
   username?: TemplateText; 
@@ -1400,11 +1567,11 @@ interface PriorityOption {
 }
 
 interface BaseDrawBlocksOptions {
-  color?: string | ColorDrawType | GradientOptions; 
-  globalAlpha?: number | ColorDrawType<number>;
+  color?: string | FillOrStrokeOption<string> | GradientOptions; 
+  globalAlpha?: number | FillOrStrokeOption;
   drawType?: TypeDrawImageOrColor | "both";
   strokeLineWidth?: number; 
-  blurOptions?: ColorDrawType<number>;
+  blurOptions?: number | FillOrStrokeOption;
   name?: string;
 }
 
@@ -1439,7 +1606,7 @@ interface LineBorderOptions extends BorderOptions, Partial<X_And_Y> {
     top?: number, 
     bottom?: number; 
   };
-  globalAplha?: number;
+  globalAlpha?: number;
   radius?: number;
 }
 
@@ -1488,7 +1655,7 @@ interface TextFormatterOptions {
 
 interface DrawBGDrawTypeColor {
   draw: "color";
-  color?: ColorOptions;
+  color?: FillOrStrokeOption<string>;
   gradient?: GradientOptions;
   typeDraw?: DrawBGType;
   drawPriority?: TypeDrawImageOrColor;
@@ -1566,11 +1733,6 @@ interface X_And_Y {
   y: number;
 }
 
-interface ColorOptions {
-  fill?: string;
-  stroke?: string;
-}
-
 interface BlurOptions {
   banner?: number;
   bottom?: number;
@@ -1622,20 +1784,6 @@ interface DrawDynamicOptions {
   lineSpacing?: number;
 }
 
-interface DrawImageOptions {
-  image?: Image;
-  x1?: number;
-  y1?: number;
-  x2?: number;
-  y2?: number;
-  radiusX?: number;
-  radiusY?: number;
-  radiusA?: number;
-  isScale?: boolean;
-  type?: "bg" | "xpBar" | "avatar";
-  otherOptions?: ExpBarOptions;
-}
-
 interface GradientOptions {
   type?: "linear" | "radial";
   colorType?: TypeDrawImageOrColor | "both";
@@ -1665,19 +1813,8 @@ interface RadialGradientOptions {
   r1: number;
 }
 
-interface ExpBarOptions {
-  xp: number;
-  xpMax: number;
-  lineWidth?: number;
-  color?: CanvasColorOptions;
-}
-
 interface DrawTextsBase {
   dynamicOptions?: DynamicOptionDrawsText[];
-}
-
-interface DrawImagesBase {
-  dynamicOptions?: DynamicOptionsDrawImages[];
 }
 
 interface StaticOptions {
@@ -1694,10 +1831,6 @@ interface DynamicOptions {
 
 interface UpdateDynamicDrawText {
   update: Partial<DrawTextOptions>;
-}
-  
-interface UpdateDynamicDrawImages {
-  update: Partial<DrawImageOptions>;
 }
 
 interface TemplateType {
@@ -1728,6 +1861,12 @@ interface TemplatePositionType {
   height: number; 
 }
 
+type FillOrStrokeOption<T = number, K = T> = { fill?: T; stroke?: K };
+
+type BorderOrIcon<T = number, K = T> = { border?: T; icon?: K; };
+
+type StringOrGradient = string | GradientOptions;
+
 type TemplateText = TextBase & Partial<DrawTextOptions> & PriorityOption;
 
 type TemplateBlock = BaseDrawBlocksOptions & PriorityOption;
@@ -1735,10 +1874,6 @@ type TemplateBlock = BaseDrawBlocksOptions & PriorityOption;
 type CanvasColorOptions = string | CanvasGradient | CanvasPattern;
 
 type DynamicOptionDrawsText = DynamicOptions & UpdateDynamicDrawText;
-
-type DynamicOptionsDrawImages = DynamicOptions & UpdateDynamicDrawImages;
-
-type DrawImagesOptions = DrawImagesBase & StaticOptions;
 
 type DrawTextsOption = DrawTextsBase & StaticOptions;
 
@@ -1753,8 +1888,6 @@ type DrawBGType = "rect" | "arc";
 type TypeDrawImageOrColor = "fill" | "stroke";
 
 type StringNumber = string | number;
-
-type ColorDrawType<T extends StringNumber = string, K extends StringNumber = T> = { fill?: T; stroke?: K;}
 
 type RenderType = "image/png" | "image/jpeg";
 
