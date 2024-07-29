@@ -239,7 +239,7 @@ class Profile {
         delete sortBadges[i].priority;
         const bg = sortBadges[i];
         const prewBG = sortBadges[i - 1];
-        console.log(sortBadges[i], sortBadges[i - 1]);
+
         if (i === 0) {
           x = bg.x ?? 0;
           y = bg.y ?? 0;
@@ -251,7 +251,7 @@ class Profile {
 
         x += (prewBG.x ?? 0) - (bg.space ?? 10) - (bg.w ?? 20) - (bg.x ?? 0);
         y = (prewBG.y ?? 0) + (bg.y ?? 0);
-        console.log(prewBG.x, prewBG.y);
+        
         const result = { x, y };
         badges.push({ ...bg, ...result });
       }
@@ -939,6 +939,16 @@ class Profile {
 }
 
 
+const loadImages = async () => {
+  const bg = await sharp(`${imagePath}/bg.png`).resize(1000, 200, { fit: `cover` }).toBuffer();
+  const badge = await sharp(`${imagePath}/avatar.png`).toBuffer();
+  const bottombg = await sharp(`${imagePath}/tenshi.png`).resize(1000, 1447, { fit: `cover` }).toBuffer();
+  const avatar = await sharp(`${imagePath}/kogasa.png`).resize(160, 160, { fit: `cover` }).toBuffer();
+  const guildIconImg = await sharp(`${imagePath}/tenshi.png`).resize(80, 115, { fit: `cover` }).toBuffer();
+
+  return { bg, badge, bottombg, avatar, guildIconImg };
+}
+
 const main: () => Promise<void>  = async () => {
   
   const canvas = createCanvas(1000, 700);
@@ -948,11 +958,7 @@ const main: () => Promise<void>  = async () => {
     font: `Arial`
   }; 
 
-  const bg = await sharp(`${imagePath}/bg.png`).resize(1000, 200, { fit: `cover` }).toBuffer();
-  const badge = await sharp(`${imagePath}/avatar.png`).toBuffer();
-  const bottombg = await sharp(`${imagePath}/tenshi.png`).resize(1000, 1447, { fit: `cover` }).toBuffer();
-  const avatar = await sharp(`${imagePath}/kogasa.png`).resize(160, 160, { fit: `cover` }).toBuffer();
-  const guildIconImg = await sharp(`${imagePath}/tenshi.png`).resize(80, 115, { fit: `cover` }).toBuffer();
+  const { bg, badge, bottombg, avatar, guildIconImg } = await loadImages();
 
   type DrawRoundedRectType = { x: number, y: number, w: number, h: number, r: number };
 
@@ -1408,12 +1414,7 @@ const main: () => Promise<void>  = async () => {
 
 //main();
 const someTest: () => Promise<void> = async () => {
-  const bg = await sharp(`${imagePath}/bg.png`).resize(1000, 200, { fit: `cover` }).toBuffer();
-  const badge = await sharp(`${imagePath}/avatar.png`).toBuffer();
-  const bottombg = await sharp(`${imagePath}/tenshi.png`).resize(1000, 1447, { fit: `cover` }).toBuffer();
-  const bottomCopybg = await sharp(`${imagePath}/tenshi.png`).resize(1000, 1447, { fit: `cover` }).toBuffer();
-  const avatar = await sharp(`${imagePath}/kogasa.png`).resize(164, 164, { fit: `cover` }).toBuffer();
-  const guildIconImg = await sharp(`${imagePath}/tenshi.png`).resize(80, 115, { fit: `cover` }).toBuffer();
+  const { bg, badge, bottombg, avatar, guildIconImg } = await loadImages();
 
   const icon = await loadImage(badge);
   const bgImg = await loadImage(bg);
@@ -1452,28 +1453,20 @@ const someTest: () => Promise<void> = async () => {
       { text: `Сфера Полубога`, x1: 772, x2: 970, y: 258, textDirect: `center`, dynamicOptions: { dynamic: true, dynamicCorrector: -2, lines: 0 }, fontOptions: { size: 15, color: `white` } },
     ])
     .drawTemplateBlock({
-      bio: {},
-      guild: {}
+      bioCenter: {}
     })
-    .drawGuildIcon({ x1: 775, y1: 370, r: 40, x2: 735, y2: 330, w: 80, h: 80, icon: guildIcon })
-    /**
-     *  ctx.arc(775, 370, 40, 0, Math.PI * 2);
-        ctx.fillStyle = `grey`;
-        //ctx.fill();
-        ctx.clip();
-        ctx.drawImage(guildIcon, 735, 330, 80, 80);
-     */
+    //.drawGuildIcon({ x1: 775, y1: 370, r: 40, x2: 735, y2: 330, w: 80, h: 80, icon: guildIcon })
     .drawTemplateText({ 
-      bio: { 
-        text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1` 
+      bioCenter: { 
+        text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1` 
       },
-      guild: {
+      /*guild: {
         guildName: { text: `Имя гильдии/клана очень-и-очень большое` },
         guildType: { text: `Тип: гильдия` },
         members: { text: `Участники: 100/100` },
         perms: { text: `Позиция: Участник` },
         guildIcon: true
-      }
+      }*/
     })
     .drawBadge( [{ badge: icon }, { badge: icon }, { badge: icon }, { badge: icon }, { badge: icon }], { x: -20, y: 155 })
 
@@ -1481,7 +1474,90 @@ const someTest: () => Promise<void> = async () => {
   sharp(test.render()).toFile(`./abyss/res.png`);
 };
 
-someTest();
+const guildProfile = async () => {
+  const { bg, badge, bottombg, avatar, guildIconImg } = await loadImages();
+  const canvas = createCanvas(1000, 700);
+  const ctx = canvas.getContext("2d");
+  
+  const icon = await loadImage(badge);
+  const bgImg = await loadImage(bg);
+  const bbg = await loadImage(bottombg);
+  const avImg = await loadImage(avatar);
+  const guildIcon = await loadImage(guildIconImg);
+  
+  //блок - просто область профиля
+  ctx.beginPath();
+  ctx.rect(0, 0, canvas.width, canvas.height);
+  ctx.stroke();
+  ctx.closePath();
+
+  //аватарка
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(100, 100, 75, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.drawImage(avImg, 25, 25, 150, 150);
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = `#019b01`;
+  ctx.stroke();
+  ctx.closePath();
+  ctx.restore();
+  
+  //блок - разделение банера и остальной части профиля гильдии
+  ctx.beginPath();
+  ctx.moveTo(0, 200);
+  ctx.lineTo(canvas.width, 200);
+  ctx.stroke();
+  ctx.closePath();
+
+  //блок - тип гильдии
+  ctx.save();
+  ctx.beginPath();
+  ctx.translate(950, 150);
+  ctx.rect(-150, 0, 180, 30);
+  //ctx.fillStyle = `#0097c9`;
+  ctx.stroke();
+  ctx.closePath();
+  ctx.beginPath();
+  ctx.moveTo(-60, 0);
+  ctx.lineTo(-60, 30);
+  ctx.stroke();
+  ctx.closePath();
+  ctx.restore();
+
+  //блок - участники
+  ctx.beginPath();
+  ctx.rect(20, 220, 250, 460);
+  ctx.stroke();
+  ctx.closePath();
+  ctx.beginPath();
+  ctx.moveTo(20, 270);
+  ctx.lineTo(270, 270);
+  ctx.stroke();
+  ctx.closePath();
+
+  //блок - название
+  ctx.beginPath();
+  ctx.rect(200, 25, 250, 50);
+  ctx.stroke();
+  ctx.closePath();
+
+  //блок - статус
+  ctx.beginPath();
+  ctx.rect(200, 90, 350, 80);
+  ctx.stroke();
+  ctx.closePath();
+
+  //блок - описание гильдии
+  ctx.beginPath();
+  ctx.rect(365, 430, 550, 250);
+  ctx.stroke();
+  ctx.closePath();
+
+  sharp(canvas.toBuffer(`image/png`)).toFile(`./abyss/guild.png`);
+}
+guildProfile();
+//someTest();
 
 interface DrawBadgeOptinalOptions extends X_And_Y  {
   bgColor?: StringOrGradient | FillOrStrokeOption<string>;
