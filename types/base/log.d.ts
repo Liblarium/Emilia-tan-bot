@@ -1,4 +1,4 @@
-export type TypeText = string | number | object | any[];
+export type TypeText = string | number | object | unknown[];
 export enum TypeLogEnum {
   info = 0 | 1,
   error = 2,
@@ -9,7 +9,13 @@ export enum TypeLogEnum {
 export type TypeLog = `info` | `error` | `warning` | `debug` | `test` | TypeLogEnum;
 export type TypeInline = 0 | 1 | 2 | 3;
 export type LineType = `` | `\n`;
-export type BaseLogOptions = { text: TypeText; type: TypeLog; event: boolean; logs: boolean; inline: TypeInline };
+export interface BaseLogOptions {
+  text: TypeText;
+  type: TypeLog;
+  event: boolean;
+  logs: boolean;
+  inline: TypeInline
+}
 
 export interface IBaseLog {
   text: TypeText;

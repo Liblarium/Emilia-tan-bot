@@ -1,9 +1,13 @@
-import { Message, ChatInputCommandInteraction } from "discord.js"
+import { Message, ChatInputCommandInteraction } from "discord.js";
 //import { Database } from "../../srcTs/database";
 import { Log } from "../../srcTs/log";
 
 export type CategoryType = `bot` | `mongo`;
-export type BaseEventsOptions = { name: string; category: CategoryType; once?: boolean };
+export interface BaseEventsOptions {
+  name: string;
+  category: CategoryType;
+  once?: boolean
+}
 export interface IBaseEvent {
   name: string;
   once: boolean;

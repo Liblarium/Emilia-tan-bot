@@ -1,18 +1,18 @@
 import { ChannelType, type Message /*, PermissionsBitField */ } from "discord.js";
-import { CommandHandler } from "./messageComponents/command.handler";
-import type { EmiliaClient } from "../../client";
 import { BaseEvent } from "../../base/event";
-import { AddInDB } from "../../util/addInDB";
+import type { EmiliaClient } from "../../client";
 import { Log } from "../../log";
+import { AddInDB } from "../../util/addInDB";
+import { CommandHandler } from "./messageComponents/command.handler";
 
 //const { Flags: { SendMessages } } = PermissionsBitField;
 
 export default class MessageCreate extends BaseEvent {
   constructor() {
-    super({ name: `messageCreate`, category: `bot` });
+    super({ name: "messageCreate", category: "bot" });
   }
 
-  async execute(message: Message, client: EmiliaClient) {
+  execute(message: Message, client: EmiliaClient): undefined {
     new AddInDB(message);
     //const db = this.db;
     //const logMessage: LogOptions = { text: ``, type: 1, event: true, categories: [`global`, `command`] /*, db: true*/ };
@@ -26,8 +26,8 @@ export default class MessageCreate extends BaseEvent {
     if (message.channel.type !== ChannelType.DM) {
       try {
         new CommandHandler(message, client);
-      } catch (e) {
-        new Log({ text: e, type: `error`, event: true, categories: [`global`, `command`] });
+      } catch (e: unknown) {
+        new Log({ text: e as Error, type: "error", event: true, categories: ["global", "command"] });
       }
     }
   }

@@ -1,0 +1,59 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "ignoreUnknown": true,
+    "include": [
+      "srcTs/**/*.ts",
+      "srcTs/**/*.js",
+      "srcTs/**/*.d.ts",
+      "abyss/src/*.ts",
+      "abyss/*.ts",
+      "abyss/*.js"
+    ],
+    "ignore": [
+      "srcJs/*",
+      "abyss/dist/*",
+      "package.json",
+      "node_modules/*"
+    ]
+  },
+  "linter": {
+    "include": [
+      "srcTs/**/*.ts",
+      "abyss/**/*.ts",
+      "types/**/*.d.ts"
+    ],
+    "ignore": [
+      "srcJs/*",
+      "abyss/dist/*",
+      "package.json",
+      "node_modules/*"
+    ],
+    "rules": {
+      "complexity": {
+        "noForEach": "off"
+      },
+      "style": {
+        "noCommaOperator": "off",
+        "noParameterAssign": "off"
+      }
+    }
+  },
+  "formatter": {
+    "include": [
+      "srcTs/**/*.ts",
+      "abyss/**/*.ts",
+      "types/**/*.d.ts"
+    ],
+    "indentWidth": 2,
+    "ignore": [
+      "srcJs/*",
+      "abyss/dist/*",
+      "package.json",
+      "node_modules/*"
+    ]
+  },
+  "organizeImports": {
+    "enabled": true
+  }
+}

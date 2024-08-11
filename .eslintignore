@@ -1,8 +1,0 @@
-node_modules/
-serJs/
-target/
-Logs/
-#abyss/ # пока уберу это с игнора
-.*/
-.*
-canvas/

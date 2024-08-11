@@ -1,9 +1,10 @@
-import { Entity, Column, PrimaryColumn } from "typeorm";
+/* eslint-disable indent */
+import { Column, Entity, PrimaryColumn } from "typeorm";
 import { IClans } from "../../../types/database/schema/clans";
 
 export const defaultClans: IClans[`info`] = {
-  name: ``,
-  master: ``,
+  name: "",
+  master: "",
   deputu: {},
   positions: {
     "master": { position: 100 },
@@ -19,18 +20,18 @@ export const defaultClans: IClans[`info`] = {
     max: 50
   },
   deputu_max: 2
-}
+};
 
-@Entity({ name: `clans` })
+@Entity({ name: "clans" })
 class Clans implements IClans {
-  @PrimaryColumn({ type: `bigint` })
-    id!: IClans[`id`];
+  @PrimaryColumn({ type: "bigint" })
+  id!: IClans[`id`];
 
-  @Column({ type: `text`})
-    type!: IClans[`type`];
+  @Column({ type: "text" })
+  type!: IClans[`type`];
 
-  @Column({ type: `jsonb`, default: defaultClans })
-    info!: IClans[`info`];
+  @Column({ type: "jsonb", default: defaultClans })
+  info!: IClans[`info`];
 }
 
 export { Clans, IClans };

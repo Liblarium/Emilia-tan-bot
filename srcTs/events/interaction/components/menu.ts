@@ -1,25 +1,26 @@
-import { AnySelectMenuInteraction } from "discord.js";
-import { EmiliaClient } from "../../../client";
-import { isComponents, isModal, isReply } from "../../../utils";
+import type { AnySelectMenuInteraction } from "discord.js";
+import type { EmiliaClient } from "../../../client";
+//import { isComponents, isModal, isReply } from "../../../utils";
 
 class MenuComponent {
   constructor(interaction: AnySelectMenuInteraction, client: EmiliaClient) {
-    this.build(interaction, client);
+    this.build(interaction, client);//.catch((e: unknown) => { console.error(e); });
   }
 
   /**
-   * @param {AnySelectMenuInteraction} interaction
-   * @param {EmiliaClient} client
-   * @private
+   * @param interaction
+   * @param client
    */
-  private async build(interaction: AnySelectMenuInteraction, client: EmiliaClient) {
+  private build(interaction: AnySelectMenuInteraction, client: EmiliaClient) {
     const isCustom = interaction.customId;
-    const isMember = interaction.member;
+    /*const isMember = interaction.member;
     const isUser = interaction.user;
     const isGuild = interaction.guild;
     const isMessage = interaction.message;
     const isChannel = interaction.channel;
-    const isValue = interaction.values;
+    const isValue = interaction.values;*/
+    client;
+    isCustom;
   }
 }
 

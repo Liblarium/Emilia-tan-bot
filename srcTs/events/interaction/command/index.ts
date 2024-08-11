@@ -4,7 +4,7 @@ import { Log } from "../../../log";
 
 class SlashCommand {
   constructor(interaction: ChatInputCommandInteraction, client: EmiliaClient) {
-    this.build(interaction, client);
+    this.build(interaction, client).catch((e: unknown) => { console.error(e); });
   }
 
   private async build(interaction: ChatInputCommandInteraction, client: EmiliaClient) {
@@ -12,15 +12,15 @@ class SlashCommand {
       const slas_command = client.slashCommands.get(interaction.commandName);
 
       if (!slas_command) {
-        return interaction.reply({ content: `Такой команды нет.`, ephemeral: true });
+        return interaction.reply({ content: "Такой команды нет.", ephemeral: true });
       }
-      if (slas_command.option.developer && interaction.user.id !== `211144644891901952`) {
-        return interaction.reply({ content: `Эта команда доступна только разработчику бота.`, ephemeral: true });
+      if (slas_command.option.developer && interaction.user.id !== "211144644891901952") {
+        return interaction.reply({ content: "Эта команда доступна только разработчику бота.", ephemeral: true });
       }
 
       await slas_command.execute(interaction, client);
-    } catch (e) {
-      new Log({ text: e, type: 2, categories: [`global`, `event`] });
+    } catch (e: unknown) {
+      new Log({ text: (e as Error).message, type: 2, categories: ["global", "event"] });
     }
   }
 }

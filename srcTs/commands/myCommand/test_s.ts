@@ -1,33 +1,33 @@
-import { ChatInputCommandInteraction } from "discord.js";
+import type { ChatInputCommandInteraction } from "discord.js";
 import { BaseCommand } from "../../base/command";
-import { EmiliaClient } from "../../client";
+import type { EmiliaClient } from "../../client";
 
 export default class Test extends BaseCommand {
   constructor() {
     super({
-      name: `тест`,
-      description: `Тестовая команда`,
+      name: "тест",
+      description: "Тестовая команда",
       option: {
-        type: `slash`,
+        type: "slash",
         developer: true,
       },
     });
   }
 
-  async execute(interaction: ChatInputCommandInteraction, client: EmiliaClient) {
-    // prettier-ignore
+  async execute(interaction: ChatInputCommandInteraction, client: EmiliaClient): Promise<undefined> {
     await interaction.reply({
-      content: `Тут ничего нет`,
+      content: "Тут ничего нет",
       components: [{
         type: 1,
         components: [{
           type: 2,
-          customId: `but_test`,
+          customId: "but_test",
           style: 2,
-          label: `test`,
+          label: "test",
         }],
       }],
       ephemeral: true,
     });
+    client;
   }
 }

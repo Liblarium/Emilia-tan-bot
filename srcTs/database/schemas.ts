@@ -1,16 +1,16 @@
-import { Baka, IBaka } from "./schema/baka";
-import { Clans, defaultClans, IClans } from "./schema/clans";
-import { GameClass, IGameClass } from "./schema/game.class";
-import { GameInventory, IGameInventory } from "./schema/game.inventory";
-import { GameItems, IGameItems } from "./schema/game.items";
-import { GameProfile, IGameProfile } from "./schema/game.profile";
-import { GameRace, IGameRace } from "./schema/game.race";
-import { GameSkill, IGameSkill } from "./schema/game.skill";
-import { GameUsers, IGameUsers } from "./schema/game.users";
-import { Guilds, guildsLogDefault, IGuilds } from "./schema/guilds";
-import { IPrivateVoice, PrivateVoice } from "./schema/private_voice";
-import { ITest, Test } from "./schema/test";
-import { defaultUsers, IUsers, Users } from "./schema/users";
+import { Baka, type IBaka } from "./schema/baka";
+import { Clans, type IClans, defaultClans } from "./schema/clans";
+import { GameClass, type IGameClass } from "./schema/game.class";
+import { GameInventory, type IGameInventory } from "./schema/game.inventory";
+import { GameItems, type IGameItems } from "./schema/game.items";
+import { GameProfile, type IGameProfile } from "./schema/game.profile";
+import { GameRace, type IGameRace } from "./schema/game.race";
+import { GameSkill, type IGameSkill } from "./schema/game.skill";
+import { GameUsers, type IGameUsers } from "./schema/game.users";
+import { Guilds, type IGuilds, guildsLogDefault } from "./schema/guilds";
+import { type IPrivateVoice, PrivateVoice } from "./schema/private_voice";
+import { type ITest, Test } from "./schema/test";
+import { type IUsers, Users, defaultUsers } from "./schema/users";
 
 export const schemas = [Users, Baka, Clans, GameClass, GameInventory, GameItems, GameProfile, GameRace, GameSkill, GameUsers, Guilds, PrivateVoice, Test]; //на подключение в БД
 export const defaults = { defaultUsers, guildsLogDefault, defaultClans }; //для изменения дефолтого заполнения
@@ -33,7 +33,7 @@ export const schemasMap = /* для Database */ {
 export type SchemaNames = keyof typeof schemasMap; //для удобства - название идёт в одну строку
 
 // для удоства получения всех интерфейсов в одном типе через SchemaTable[T], где T = SchemaNames
-export type SchemaTable = {
+export interface SchemaTable {
   users: IUsers;
   baka: IBaka;
   clans: IClans;
@@ -47,4 +47,4 @@ export type SchemaTable = {
   guilds: IGuilds;
   private_voice: IPrivateVoice;
   test: ITest;
-};
+}

@@ -7,7 +7,6 @@
     "sourceMap": true,
     "allowJs": true,
     "checkJs": true,
-    "jsx": "react",
     "declarationMap": true,
     "declaration": true,
     "useUnknownInCatchVariables": false,
@@ -15,6 +14,17 @@
     "experimentalDecorators": true,
     "outDir": "srcJs"
   },
-  "include": ["./srcTs", "node_modules/@types", "./types", "./canvas"],
-  "exclude": [ "node_modules", "./srcJs", "./target", "./pg.client.js", "./abyss"] 
+  "include": [
+    "./srcTs",
+    "node_modules/@types",
+    "./types",
+    "./canvas"
+  ],
+  "exclude": [
+    "node_modules",
+    "./srcJs",
+    "./target",
+    "./pg.client.js",
+    "./abyss"
+  ]
 }

@@ -1,9 +1,9 @@
-import { ArrayPathLimit, IBaseHandler, ModuleType } from "../../types/base/handler";
-import { EmiliaTypeError, isClass } from "../utils";
-import { EmiliaClient } from "../client";
-import { readdir } from "fs/promises";
-import { resolve } from "path";
+import { readdir } from "node:fs/promises";
+import { resolve } from "node:path";
+import type { ArrayPathLimit, IBaseHandler, ModuleType } from "../../types/base/handler";
+import type { EmiliaClient } from "../client";
 import { Log } from "../log";
+import { EmiliaTypeError, isClass } from "../utils";
 
 export class BaseHandler implements IBaseHandler {
   client: EmiliaClient;
@@ -12,30 +12,31 @@ export class BaseHandler implements IBaseHandler {
 
   constructor(client: EmiliaClient) {
     this.client = client;
-    this.folderPath = [`srcJs`, `сommands`];
+    this.folderPath = ["srcJs", "сommands"];
     this.filterFile = /^[^.]+\.(js)$/;
   }
 
   /**
    * Метод для изменения фильтра
-   * @param {RegExp} filter
+   * @param filter
    * @default /^[^.]+\.(js)$/
    */
-  setFilter(filter: RegExp): void {
-    if (filter) this.filterFile;
+  setFilter(filter: RegExp): void | Promise<void> {
+    if (typeof filter === "symbol") this.filterFile;
   }
 
   /**
    * Метод для изменения пути поиска
-   * @param {ArrayPathLimit} path
+   * @param path
    * @default [`src`,`command`]
    */
   setFolderPath(path: ArrayPathLimit): void {
     if (path) this.folderPath = path;
   }
 
-  setLogic(modules: ModuleType): void | null | Promise<void | null> {
-    throw new EmiliaTypeError(`Вы не реализовали setLogic!`);
+  setLogic(modules: ModuleType): void | null | Promise<void> {
+    modules;
+    throw new EmiliaTypeError("Вы не реализовали setLogic!");
   }
 
   async build(): Promise<void> {
@@ -48,22 +49,23 @@ export class BaseHandler implements IBaseHandler {
         const fileScan = (await readdir(files)).filter((file) => this.filterFile.test(file));
 
         for (const file of fileScan) {
-          const importModule = await import(`../${this.folderPath[1]}/${folder}/${file}`);
-          const FileModule = importModule.default.default;
+          const importModule = await import(`../${this.folderPath[1]}/${folder}/${file}`) as { default: { default: unknown } };
+          const FileModule: unknown = importModule.default.default;
 
           if (!isClass(FileModule)) {
-            new Log({ text: `Файл ${file} не является классом!`, type: `error`, categories: [`global`, `handler`] });
+            new Log({ text: `Файл ${file} не является классом!`, type: "error", categories: ["global", "handler"] });
             continue;
           }
 
-          const modules: ModuleType = new FileModule();
+          /* biome-ignore lint/suspicious/noExplicitAny: <explanation> */ //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+          const modules: ModuleType = new (FileModule as any)();
           const logic = await this.setLogic(modules);
 
           if (logic === null) continue;
         }
       }
-    } catch (e) {
-      new Log({ text: e, type: `error`, categories: [`global`, `handler`] });
+    } catch (e: unknown) {
+      new Log({ text: (e as Error).message, type: "error", categories: ["global", "handler"] });
     }
   }
 }

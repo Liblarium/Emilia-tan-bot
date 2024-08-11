@@ -1,10 +1,9 @@
-/* prettier-ignore */
 export interface IUsers {
   id: string;
   info?: {
     username: string;
     dostup?: {
-      base: string, 
+      base: string,
       reader?: string,
       additional_access?: string[],
       max_rank?: number
@@ -22,13 +21,13 @@ export interface IUsers {
         max_xp: number,
         next_xp: string
       },
-      local?: {[key: string]: {
+      local?: Record<string, {
         id: string,
         xp: number,
         level: number,
         max_xp: number,
         next_xp: string
-      }}
+      }>
     },
     pechenie?: number,
     clan?: number

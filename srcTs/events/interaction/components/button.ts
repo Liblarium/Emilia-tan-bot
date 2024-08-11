@@ -1,28 +1,28 @@
-import { ButtonInteraction } from "discord.js";
-import { EmiliaClient } from "../../../client";
-import { isComponents, isModal, isReply } from "../../../utils";
+import type { ButtonInteraction } from "discord.js";
+import type { EmiliaClient } from "../../../client";
+//import { isComponents, isModal, isReply } from "../../../utils";
 
 class ButtonComponent {
   constructor(interaction: ButtonInteraction, client: EmiliaClient) {
-    this.build(interaction, client);
+    this.build(interaction, client).catch((e: unknown) => { console.error(e); });
   }
 
   /**
-   * @param {ButtonInteraction} interaction
-   * @param {EmiliaClient} client
-   * @private
+   * @param interaction
+   * @param client
    */
   private async build(interaction: ButtonInteraction, client: EmiliaClient) {
     const isCustom = interaction.customId;
-    const isMember = interaction.member;
+    /*const isMember = interaction.member;
     const isUser = interaction.user;
     const isGuild = interaction.guild;
     const isMessage = interaction.message;
-    const isChannel = interaction.channel;
+    const isChannel = interaction.channel;*/
+    client;
 
-    if (isCustom == `but_test`) {
+    if (isCustom === "but_test") {
       console.log(interaction.message.components);
-      await interaction.reply({ content: `Тут ничего нет`, ephemeral: true });
+      await interaction.reply({ content: "Тут ничего нет", ephemeral: true });
     }
   }
 }

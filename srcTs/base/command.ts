@@ -1,8 +1,16 @@
-import { CommandClassOptions, CommandOptions, IBaseCommand } from "@type/base/command";
-import { SlashCommandBuilder, Message, ChatInputCommandInteraction } from "discord.js";
+import {
+  type ChatInputCommandInteraction,
+  type Message,
+  SlashCommandBuilder,
+} from "discord.js";
+import type {
+  CommandClassOptions,
+  CommandOptions,
+  IBaseCommand,
+} from "../../types/base/command";
+import type { Log } from "../log";
 //import { Database } from "../database";
 import { EmiliaTypeError } from "../utils";
-import { Log } from "../log";
 
 export class BaseCommand implements IBaseCommand {
   /** Это `new SlashCommandBuilder()`. Только для `/` команд. Доп параметры `/` идут только через неё */
@@ -28,7 +36,7 @@ export class BaseCommand implements IBaseCommand {
   //db: Database;
   /**
    * Базовый класс для команд
-   * @param {CommandOptions} commandOptions
+   * @param commandOptions
    * Пример использования
    * ```js
    * //обычная команда
@@ -49,41 +57,52 @@ export class BaseCommand implements IBaseCommand {
    *  }
    * }
    *```
+   * @param commandOptions.name
+   * @param commandOptions.description
+   * @param commandOptions.option
    */
   constructor({ name, description, option }: CommandOptions) {
-    if (!name) throw new EmiliaTypeError(`Вы не указали имя команды!`);
-    if (!option || Object.entries(option).length === 0) throw new EmiliaTypeError(`Вы не указали параметры для команды!`);
-    if (![`command`, `slash`].includes(option?.type)) throw new EmiliaTypeError(`Вы указали не поддерживаемый тип (${option?.type || `[Не указано]`} команды! [Разрешено: command | slash])`);
+    if (!name) throw new EmiliaTypeError("Вы не указали имя команды!");
+    if (typeof option !== "object" || Object.entries(option).length === 0)
+      throw new EmiliaTypeError("Вы не указали параметры для команды!");
+    if (!["command", "slash"].includes(option.type))
+      throw new EmiliaTypeError(
+        `Вы указали не поддерживаемый тип (${option.type.length < 1 ? "[Не указано]" : option.type} команды! [Разрешено: command | slash])`,
+      );
 
     this.name = name;
     this.data = new SlashCommandBuilder();
     //this.db = new Database();
     this.option = {
       type: option.type,
-      aliases: option.aliases || [],
+      aliases: option.aliases ?? [],
       developer: option.developer ?? false,
-      perms: option.perms || 0,
+      perms: option.perms ?? 0,
       test: option.test ?? false,
-      testers: option.testers || [],
+      testers: option.testers ?? [],
       owner: option.owner ?? false,
-      guilds: option.guilds || [],
-      channels: option.channels || [],
-      dUsers: option.dUsers || [],
+      guilds: option.guilds ?? [],
+      channels: option.channels ?? [],
+      dUsers: option.dUsers ?? [],
     };
 
-    if (option?.type == `command`) {
-      this.option.delete = option?.delete ?? false;
+    if (option.type === "command") {
+      this.option.delete = option.delete ?? false;
     } else {
       this.data.setName(name);
       if (description) this.data.setDescription(description);
     }
   }
 
-  /**
-   * @param {...any} args
-   * @returns {void | Log | Message | ChatInputCommandInteraction | Promise<void | Message | ChatInputCommandInteraction | Log>}
-   */
-  execute(...args: any[]): void | Log | Message | ChatInputCommandInteraction | Promise<void | Message | ChatInputCommandInteraction | Log> {
-    throw new EmiliaTypeError(`Вы не реализовали свой execute для [${this.name}] ${this.option.type} команды!`);
+  execute(...args: unknown[]):
+    | undefined
+    | Log
+    | Message
+    | ChatInputCommandInteraction
+    | Promise<undefined | Message | ChatInputCommandInteraction | Log> {
+    args;
+    throw new EmiliaTypeError(
+      `Вы не реализовали свой execute для [${this.name}] ${this.option.type} команды!`,
+    );
   }
 }

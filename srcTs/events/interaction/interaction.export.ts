@@ -1,10 +1,10 @@
-import { ButtonComponent } from "./components/button";
-import { ModalComponent } from "./components/modal";
-import { MenuComponent } from "./components/menu";
-import type { EmiliaClient } from "../../client";
 import type { Interaction } from "discord.js";
+import type { EmiliaClient } from "../../client";
 import { AddInDB } from "../../util/addInDB";
 import { SlashCommand } from "./command";
+import { ButtonComponent } from "./components/button";
+import { MenuComponent } from "./components/menu";
+import { ModalComponent } from "./components/modal";
 
 
 
@@ -15,7 +15,7 @@ class InteractionHandler {
 
   run(interaction: Interaction, client: EmiliaClient) {
     new AddInDB(interaction);
-    
+
     if (interaction.isChatInputCommand()) {
       new SlashCommand(interaction, client); //переписать позже
     }

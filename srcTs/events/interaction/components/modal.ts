@@ -1,6 +1,6 @@
-import { ModalSubmitInteraction } from "discord.js";
-import { EmiliaClient } from "../../../client";
-import { isComponents, isReply } from "../../../utils";
+import type { ModalSubmitInteraction } from "discord.js";
+import type { EmiliaClient } from "../../../client";
+//import { isComponents, isReply } from "../../../utils";
 
 class ModalComponent {
   constructor(interaction: ModalSubmitInteraction, client: EmiliaClient) {
@@ -8,17 +8,18 @@ class ModalComponent {
   }
 
   /**
-   * @param {ModalSubmitInteraction} interaction
-   * @param {EmiliaClient} client
-   * @private
+   * @param interaction
+   * @param client
    */
-  private async build(interaction: ModalSubmitInteraction, client: EmiliaClient) {
+  private build(interaction: ModalSubmitInteraction, client: EmiliaClient) {
     const isCustom = interaction.customId;
-    const isMember = interaction.member;
+    /*const isMember = interaction.member;
     const isUser = interaction.user;
     const isGuild = interaction.guild;
     const isMessage = interaction.message;
-    const isChannel = interaction.channel;
+    const isChannel = interaction.channel;*/
+    client;
+    isCustom;
   }
 }
 

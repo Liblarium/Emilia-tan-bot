@@ -1,35 +1,34 @@
+import type { Message } from "discord.js";
 import { BaseCommand } from "../../base/command";
-import { EmiliaClient } from "../../client";
-import { Message } from "discord.js";
 import { time } from "../../utils";
 
 export default class Time extends BaseCommand {
   constructor() {
     super({
-      name: `time`,
+      name: "time",
       option: {
-        type: `command`,
-        aliases: [`время`],
+        type: "command",
+        aliases: ["время"],
         delete: true
       }
     });
   }
 
-  async execute(message: Message, args: any[], commandName: string, client: EmiliaClient) {
+  execute(message: Message/*, args: string[], commandName: string, client: EmiliaClient*/): undefined {
     if (!message.member) return;
 
-    const color = message.member.displayColor == 0 ? parseInt(`48dfbf`, 16) : message.member.displayColor;
+    const color = message.member.displayColor === 0 ? 0x48_df_bf : message.member.displayColor;
     message.channel.send({
       embeds: [{
-        title: `Время`,
+        title: "Время",
         description: `Сейчас у хоста: **${time()}**`,
         timestamp: new Date().toISOString(),
         color,
         footer: {
-          text: `Часовой пояс хоста - UTC+2`,
+          text: "Часовой пояс хоста - UTC+2",
           icon_url: message.member.displayAvatarURL({ forceStatic: false })
         }
       }]
-    });
+    }).catch((e: unknown) => { console.error(e); });
   }
 }

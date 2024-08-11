@@ -1,4 +1,6 @@
 # Установка табуляции
-[*.{ts,json}]
+root = true
+
+[*.{ts,json, js, mjs}]
 indent_style = space
 indent_size = 2

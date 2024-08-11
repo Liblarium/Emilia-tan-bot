@@ -6,12 +6,12 @@ import { schemas } from "./schemas";
 export class ConnectionInfo extends DataSource {
   constructor() {
     super({
-      type: `postgres`,
+      type: "postgres",
       host: "localhost",
       port: 5432,
-      username: `${process.env.DB_USER}`,
-      password: `${process.env.DB_PASS}`,
-      database: `${process.env.DB_NAME}`,
+      username: process.env?.DB_USER ?? "",
+      password: process.env?.DB_PASS ?? "",
+      database: process.env?.DB_NAME ?? "",
       synchronize: true, // синхронизация данных по указаной схеме. Кроме монго
       logging: false, // логи от typeorm
       entities: schemas,
@@ -19,6 +19,6 @@ export class ConnectionInfo extends DataSource {
       migrations: [],
     });
 
-    this.initialize().then(() => new Log({ text: `i work`, type: `info`, categories: [`global`, `pgsql`] })).catch((e) => new Log({ text: e, type: `error`, categories: [ `pgsql`, `global`] }));
+    this.initialize().then(() => new Log({ text: "i work", type: "info", categories: ["global", "pgsql"] })).catch((e: unknown) => new Log({ text: e as Error, type: "error", categories: ["pgsql", "global"] }));
   }
 }

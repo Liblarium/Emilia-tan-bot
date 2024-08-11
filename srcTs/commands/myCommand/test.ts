@@ -1,33 +1,30 @@
-import { GuildMember, Message } from "discord.js";
-import { Types } from "mongoose";
+import type { Message } from "discord.js";
 import { BaseCommand } from "../../base/command";
-import { EmiliaClient } from "../../client";
-import { Database } from "../../database";
-import { Users } from "../../database/schema/users";
-import { ConnectionInfo } from "../../database/typeorm";
-import { log } from "../../utils";
-
-const { ObjectId } = Types;
+import type { EmiliaClient } from "../../client";
+//import { Database } from "../../database";
+//import { Users } from "../../database/schema/users";
+//import { ConnectionInfo } from "../../database/typeorm";
+//import { log } from "../../utils";
 
 export default class Test extends BaseCommand {
   constructor() {
     super({
-      name: `test`,
+      name: "test",
       option: {
-        aliases: [`ts`],
-        type: `command`,
+        aliases: ["ts"],
+        type: "command",
         test: true,
-        testers: [`357203448640307201`],
+        testers: ["357203448640307201"],
         delete: true,
       },
     });
   }
 
-  async execute(message: Message, args: any[], commandName: string, client: EmiliaClient) {
-    //const db = this.db;
-    const member = message.member as GuildMember;
-
-    message.channel.send({ content: commandName || `ошибка` });
+  execute(message: Message, args: string[], commandName: string, client: EmiliaClient): undefined {
+    /*const db = this.db;*/ client;
+    const member = message.member;
+    member;
+    message.channel.send({ content: commandName || "ошибка" }).catch((e: unknown) => { console.error(e); });
     // prettier-ignore
     /*const find = await db.create({
       _id: new ObjectId(),

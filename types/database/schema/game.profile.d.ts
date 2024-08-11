@@ -1,4 +1,8 @@
-type MaxNow = { max: number; now: number };
+interface MaxNow {
+  max: number;
+  now: number
+}
+
 export interface IGameProfile {
   id: string;
   username: string;

@@ -4,9 +4,9 @@ import { Log } from "../../srcTs/log";
 
 //import { Database } from "../../srcTs/database";
 
-type TypeCommand = { type: "command" | "slash" };
-type DeleteCommandMessage = { delete?: boolean };
-type BaseCommandOptions = {
+interface TypeCommand { type: "command" | "slash" }
+interface DeleteCommandMessage { delete?: boolean }
+interface BaseCommandOptions {
   aliases: ArrayMaybeEmpty<string>;
   developer: boolean;
   perms: number;
@@ -16,10 +16,10 @@ type BaseCommandOptions = {
   guilds: ArrayMaybeEmpty<string>;
   channels: ArrayMaybeEmpty<string>;
   dUsers: ArrayMaybeEmpty<string>;
-};
+}
 type CommandConstructorOptions = Partial<BaseCommandOptions> & TypeCommand & DeleteCommandMessage;
 export type CommandClassOptions = BaseCommandOptions & TypeCommand & DeleteCommandMessage;
-export type CommandOptions = { name: string; option: CommandConstructorOptions; description?: string };
+export interface CommandOptions { name: string; option: CommandConstructorOptions; description?: string }
 
 export interface IBaseCommand {
   data: SlashCommandBuilder;
@@ -27,5 +27,5 @@ export interface IBaseCommand {
   option: CommandClassOptions;
   //db: Database;
 
-  execute: (...args: any[]) => void | Message | ChatInputCommandInteraction | Log | Promise<void | Message | ChatInputCommandInteraction | Log>;
+  execute: (...args: unknown[]) => undefined | Message | ChatInputCommandInteraction | Log | Promise<undefined | Message | ChatInputCommandInteraction | Log>;
 }

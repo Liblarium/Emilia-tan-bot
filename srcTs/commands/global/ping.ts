@@ -1,21 +1,21 @@
+import type { Message } from "discord.js";
 import { BaseCommand } from "../../base/command";
-import { EmiliaClient } from "../../client";
-import { Message } from "discord.js";
+import type { EmiliaClient } from "../../client";
 import { Log } from "../../log";
 
 export default class Ping extends BaseCommand {
   constructor() {
     super({
-      name: `ping`,
+      name: "ping",
       option: {
-        type: `command`,
+        type: "command",
         delete: true,
       }
     });
   }
 
-  async execute(message: Message, args: any[], commandName: string, client: EmiliaClient) {
-    new Log({ text: `Пинг: ${client.ws.ping} ms`, type: 1, categories: [`global`, `command`] });
-    message.channel.send({ embeds: [{ description: `Мой пинг: ${client.ws.ping} ms`, color: message.member?.displayColor == 0 ? 7_180_443 : message.member?.displayColor }] });
+  execute(message: Message, args: unknown[], commandName: string, client: EmiliaClient) {
+    new Log({ text: `Пинг: ${client.ws.ping.toString()} ms`, type: 1, categories: ["global", "command"] });
+    return message.channel.send({ embeds: [{ description: `Мой пинг: ${client.ws.ping.toString()} ms`, color: message.member?.displayColor === 0 ? 7_180_443 : message.member?.displayColor }] });
   }
 }
