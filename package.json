@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "build:watch": "tsc-watch",
-    "abyss-run": "tsc-watch --project abyss/tsconfig.json --onSuccess \"node ./abyss/dist/img.js\""
+    "abyss-run": "tsc-watch --project abyss/tsconfig.json --onSuccess \"node ./abyss/dist/img.js\"",
+    "release": "semantic-release"
   },
   "author": "RanHolly (Miia)",
   "license": "MIT",
@@ -29,8 +30,10 @@
     "@ctrl/eslint-config-biome": "^4.1.1",
     "@rushstack/eslint-patch": "^1.10.4",
     "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^10.1.4",
+    "@semantic-release/release-notes-generator": "^14.0.1",
     "@types/node": "^22.2.0",
     "@typescript-eslint/eslint-plugin": "7.13.1",
     "@typescript-eslint/parser": "7.13.1",

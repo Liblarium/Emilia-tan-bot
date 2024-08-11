@@ -64,7 +64,9 @@
     "*.",
     "*.json",
     "*.mjs",
-    "*.cjs"
+    "*.cjs",
+    "abyss/",
+    "canvas/"
   ],
   "overrides": [
     {
@@ -72,27 +74,6 @@
         "srcTs*/**/*.ts",
         "types/**/*.d.ts"
       ]
-    },
-    {
-      "files": [
-        "abyss/*.ts",
-        "abyss/src/*.ts",
-        "abyss/*.js",
-        "abyss/src/*.js",
-        "abyss/*.html"
-      ],
-      "parserOptions": {
-        "extraFileExtensions": [
-          ".json"
-        ],
-        "ecmaVersion": "latest",
-        "project": "abyss/tsconfig.json"
-      },
-      "rules": {
-        "@typescript-eslint/unified-signatures": "off",
-        "@typescript-eslint/no-meaningless-void-operator": "off",
-        "@typescript-eslint/no-confusing-void-expression": "off"
-      }
     }
   ],
   "rules": {
@@ -107,8 +88,6 @@
       "error",
       "only-multiline"
     ],
-    //"no-unused-vars": "off",
-    //"@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "jsdoc/require-description": "off",
     "jsdoc/require-param-description": "off",
@@ -141,11 +120,11 @@
     "functional/no-conditional-statements": "off",
     "functional/no-loop-statements": "off",
     "functional/immutable-data": "off",
-    //"@typescript-eslint/no-unsafe-argument": "off", //OFF
-    //"@typescript-eslint/no-unsafe-member-access": "off", //OFF TOO
+    //"@typescript-eslint/no-unsafe-argument": "off"
+    //"@typescript-eslint/no-unsafe-member-access": "off",
     "@typescript-eslint/only-throw-error": "off",
     "functional/no-mixed-types": "off", //i micsed types)
-    "functional/prefer-immutable-types": "off", //No
+    "functional/prefer-immutable-types": "off", //No. Off you
     "@typescript-eslint/prefer-literal-enum-member": "off",
     "@typescript-eslint/no-unnecessary-condition": "off",
     "security/detect-non-literal-fs-filename": "off",

@@ -5,14 +5,11 @@
     "include": [
       "srcTs/**/*.ts",
       "srcTs/**/*.js",
-      "srcTs/**/*.d.ts",
-      "abyss/src/*.ts",
-      "abyss/*.ts",
-      "abyss/*.js"
+      "srcTs/**/*.d.ts"
     ],
     "ignore": [
       "srcJs/*",
-      "abyss/dist/*",
+      "abyss/*",
       "package.json",
       "node_modules/*"
     ]
@@ -20,12 +17,11 @@
   "linter": {
     "include": [
       "srcTs/**/*.ts",
-      "abyss/**/*.ts",
       "types/**/*.d.ts"
     ],
     "ignore": [
       "srcJs/*",
-      "abyss/dist/*",
+      "abyss/*",
       "package.json",
       "node_modules/*"
     ],
@@ -42,13 +38,12 @@
   "formatter": {
     "include": [
       "srcTs/**/*.ts",
-      "abyss/**/*.ts",
       "types/**/*.d.ts"
     ],
     "indentWidth": 2,
     "ignore": [
       "srcJs/*",
-      "abyss/dist/*",
+      "abyss/*",
       "package.json",
       "node_modules/*"
     ]
