@@ -1,6 +1,6 @@
 import type { Message } from "discord.js";
 import { BaseCommand } from "../../base/command";
-import { Database } from "../../database";
+import { Database } from "../../database/index.ts.deprecation";
 import { helpList, helpName } from "../../util/help.list";
 import { prefix } from "../../utils";
 

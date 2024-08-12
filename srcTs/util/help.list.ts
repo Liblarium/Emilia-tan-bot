@@ -1,4 +1,4 @@
-const helpArray = [{
+const helpArray: { name: string, text: string, aliases: string[] }[] = [{
   name: "help",
   text: "Команда для просмотра доступных команд. Другие варианты вызова:",
   aliases: ["help", "хелп", "помощь", "command", "commands", "команды", "</хелп:1027277375123230827>"]

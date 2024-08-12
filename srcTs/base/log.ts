@@ -196,6 +196,7 @@ export class BaseLog implements IBaseLog {
 
       if (check) {
         const filePath = resolve(BaseLogPath, category, filename);
+
         await unlink(filePath);
 
         return true;
@@ -207,6 +208,7 @@ export class BaseLog implements IBaseLog {
       return null;
     }
   }
+
   async log(): Promise<void> {
     const text = this.text;
     const type: TypeLog = (typeof this.type === "string" ? this.type.toLowerCase() : (this.setType(this.type), this.type)) as TypeLog;
@@ -240,6 +242,7 @@ export class BaseLog implements IBaseLog {
 
     try {
       await this.addLog(text, type);
+
       const logText = {
         in: typeof text === "object" ? "" : typeof text === "string" ? text : text.toString(),
         out: typeof text === "object" ? text : "",
@@ -251,6 +254,7 @@ export class BaseLog implements IBaseLog {
       if (this.event && splits.length > 0) editText = logText.in.slice(splits[0].length + 2);
 
       if (logs) console.log(`${line.news}[${time()}][${category} | ${typeof type === "string" ? type : type.toString()}]: ${editText}`, logText.out, line.last);
+
     } catch (e: unknown) {
       error("BaseLog.log:", e);
       await this.addLog((e as Error).message, "error");
