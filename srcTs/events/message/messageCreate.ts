@@ -2,7 +2,7 @@ import { ChannelType, type Message /*, PermissionsBitField */ } from "discord.js
 import { BaseEvent } from "../../base/event";
 import type { EmiliaClient } from "../../client";
 import { Log } from "../../log";
-import { AddInDB } from "../../util/addInDB";
+//import { AddInDB } from "../../util/addInDB";
 import { CommandHandler } from "./messageComponents/command.handler";
 
 //const { Flags: { SendMessages } } = PermissionsBitField;
@@ -13,7 +13,7 @@ export default class MessageCreate extends BaseEvent {
   }
 
   execute(message: Message, client: EmiliaClient): undefined {
-    new AddInDB(message);
+    //new AddInDB(message);
     //const db = this.db;
     //const logMessage: LogOptions = { text: ``, type: 1, event: true, categories: [`global`, `command`] /*, db: true*/ };
     /*if (message.content === `add`) {
