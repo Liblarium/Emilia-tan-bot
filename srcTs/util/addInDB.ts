@@ -1,16 +1,34 @@
 import { ChannelType, GuildMember, type Interaction, type Message } from "discord.js";
-import type { ReadonlyDeep } from "type-fest";
 import type { ArrayNotEmpty } from "../../types";
-import { Database, missModelError } from "../database";
+//import { Database, missModelError } from "../database/index.ts.deprecation";
 import { Log } from "../log";
+class Database { //это будет удалено позже
+  findOneBy(a: string, b: object) {
+    a; b;
+    return { res: { addInBD: true, info: { username: "" } }, created: true, error: null };
+  }
+  create(a: string, b: object) {
+    return this.findOneBy(a, b);
+  }
+  findOneOrCreate(b: object) {
+    return this.findOneBy("a", b);
+  }
+  update(a: string, b: object, c: object) {
+    console.log(c);
+    return this.findOneBy(a, b);
+  }
+}
+
+const missModelError = "";
 
 const logCategories: ArrayNotEmpty<string> = ["add_in_db", "utils", "global"];
 
-type MesIntr = ReadonlyDeep<Message | Interaction>;
+type MesIntr = Message | Interaction;
 
+/** @deprecated обновлю позже*/
 export class AddInDB {
   constructor(message: MesIntr) {
-    this.build(message).catch((e: ReadonlyDeep<unknown>) => { console.error(e); });
+    this.build(message).catch((e: unknown) => { console.error(e); });
   }
 
   private async build(message: MesIntr): Promise<undefined | Log> {
@@ -18,14 +36,14 @@ export class AddInDB {
 
     const guildId = message.guildId;
     const db = new Database();
-    const guilddb = await db.findOneBy("guilds", { id: guildId });
+    const guilddb = db.findOneBy("guilds", { id: guildId });
     let errrors = 0;
 
     if (guilddb.error) {
       if (guilddb.error === missModelError) return new Log({ text: missModelError, type: "error", categories: logCategories });
 
       errrors++;
-      const newGuild = await db.create("guilds", { id: guildId, addInBD: ["334418584774246401", "451103537527783455"].includes(guildId) });
+      const newGuild = db.create("guilds", { id: guildId, addInBD: ["334418584774246401", "451103537527783455"].includes(guildId) });
 
       if (newGuild.error) return new Log({ text: newGuild.error, type: "error", categories: logCategories });
 
@@ -44,7 +62,7 @@ export class AddInDB {
 
     if (!(member instanceof GuildMember)) return new Log({ text: "member не member!", type: "error", categories: logCategories });
 
-    const user = await db.findOneOrCreate({
+    const user = db.findOneOrCreate({
       name: "users", filter: { id: member.user.id }, document: {
         id: member.user.id,
         info: { username: member.user.username },
@@ -52,15 +70,15 @@ export class AddInDB {
     });
 
     if (user.error) return new Log({ text: user.error, type: "error", categories: logCategories });
-    if (user.created === true) return new Log({ text: `${member.user.username} был записан в БД!`, type: "info", categories: logCategories });
+    if (user.created) return new Log({ text: `${member.user.username} был записан в БД!`, type: "info", categories: logCategories });
 
     const resUser = user.res;
 
-    if (!(resUser != null && user.created === false)) return;
+    if (!(resUser != null && !user.created)) return;
     if (!resUser.info) return new Log({ text: "users.info = undefined", type: "error", categories: logCategories });
     if (member.user.username === resUser.info.username) return;
 
-    const updUsername = await db.update("users", { id: member.user.id }, { info: { username: member.user.username } });
+    const updUsername = db.update("users", { id: member.user.id }, { info: { username: member.user.username } });
 
     if (updUsername.error) return new Log({ text: updUsername.error, type: "error", categories: logCategories });
 
