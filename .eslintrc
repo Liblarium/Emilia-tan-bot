@@ -24,6 +24,7 @@
     "plugin:regexp/recommended",
     "plugin:security/recommended-legacy",
     "plugin:sonarjs/recommended-legacy",
+    "plugin:@vitest/legacy-recommended",
     "plugin:yml/standard"
   ],
   "parserOptions": {
@@ -38,7 +39,7 @@
   "plugins": [
     "@typescript-eslint",
     "sonarjs",
-    "vitest",
+    "@vitest/eslint-plugin",
     "use-decorator",
     "unused-imports",
     "unicorn",
@@ -66,7 +67,9 @@
     "*.mjs",
     "*.cjs",
     "abyss/",
-    "canvas/"
+    "canvas/",
+    "vitest.config.ts",
+    "*/**/*.deprecation"
   ],
   "overrides": [
     {
