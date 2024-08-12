@@ -1,4 +1,3 @@
-/* eslint @typescript-eslint/no-var-requires: "off" */
 const { spawn } = require("node:child_process");
 const { resolve } = require("node:path");
 require("dotenv").config();
