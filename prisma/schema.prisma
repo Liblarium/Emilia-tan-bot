@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Baka {
+  id    BigInt  @id
+  uname String?
+  test  Json?
+}
+
+model Clan {
+  id   BigInt @id @default(autoincrement())
+  type String
+  info Json   @default("{}")
+}
+
+model GameClass {
+  id      BigInt @id @default(autoincrement())
+  name    String
+  actiove Json   @default("{}")
+  passive Json   @default("{}")
+}
+
+model GameInventory {
+  id         BigInt @id
+  inventory  Json   @default("{}")
+  inv_limits Json   @default("{}") //Вместо max_inv_size и max_inv_weight
+}
+
+model GameItem {
+  id      BigInt   @id @default(autoincrement())
+  name    String
+  weight  Int      @default(0)
+  price   Int
+  isDrop  Boolean? @default(true)
+  isSale  Boolean? @default(true)
+  isCraft Boolean? @default(false)
+  isQuest Boolean? @default(false)
+}
+
+model GameProfileSkill {
+  id BigInt @id
+}
+
+model GameProfile {
+  id        BigInt    @id
+  user      GameUser? @relation(fields: [id], references: [id])
+  character Json      @default("{}")
+}
+
+model GameRace {
+  id             Int    @id @default(autoincrement())
+  name           String
+  characteristic Json   @default("{}")
+}
+
+model GameSkill {
+  id             Int    @id @default(autoincrement())
+  name           String
+  type           String
+  characteristic Json   @default("{}")
+}
+
+model GameUser {
+  id          BigInt       @id
+  username    String       @unique
+  created     String
+  user        User?        @relation(fields: [id], references: [id])
+  registered  String
+  perms       Int          @default(1)
+  gameProfile GameProfile?
+}
+
+model Guild {
+  id      BigInt   @id
+  prefix  Json?    @default("{}")
+  addInBD Boolean? @default(false)
+  logs    Json?    @default("{}")
+}
+
+model PrivateVoice {
+  id    BigInt @id
+  owner BigInt
+  guild BigInt
+}
+
+model User {
+  id       BigInt    @id
+  info     Json?     @default("{}")
+  GameUser GameUser?
+}
