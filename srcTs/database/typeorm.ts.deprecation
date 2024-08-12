@@ -1,4 +1,4 @@
-import "reflect-metadata";
+/*import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { Log } from "../log";
 import { schemas } from "./schemas";
@@ -22,3 +22,4 @@ export class ConnectionInfo extends DataSource {
     this.initialize().then(() => new Log({ text: "i work", type: "info", categories: ["global", "pgsql"] })).catch((e: unknown) => new Log({ text: e as Error, type: "error", categories: ["pgsql", "global"] }));
   }
 }
+*/
