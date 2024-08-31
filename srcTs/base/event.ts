@@ -1,12 +1,11 @@
-import type { ChatInputCommandInteraction, Message } from "discord.js";
 import type {
   BaseEventsOptions,
   CategoryType,
-  IBaseEvent,
-} from "../../types/base/event";
+  EventReturns,
+  IBaseEvent
+} from "@type/base/event";
+import { EmiliaTypeError } from "@util/s";
 //import { Database } from "../database";
-import type { Log } from "../log";
-import { EmiliaTypeError } from "../utils";
 
 export class BaseEvent implements IBaseEvent {
   name: string;
@@ -22,13 +21,7 @@ export class BaseEvent implements IBaseEvent {
   }
 
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  execute(...args: unknown[]):
-    | undefined
-    | Message
-    | ChatInputCommandInteraction
-    | Log
-    | Promise<undefined | Message | ChatInputCommandInteraction | Log> {
+  execute(...args: unknown[]): EventReturns | Promise<EventReturns> {
     throw new EmiliaTypeError(
       `${this.name || "[Ошибка]"} не реализует метод execute!`,
     );

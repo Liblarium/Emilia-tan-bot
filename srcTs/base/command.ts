@@ -1,16 +1,16 @@
+import type { Log } from "@log";
+import type {
+  CommandClassOptions,
+  CommandOptions,
+  IBaseCommand,
+} from "@type/base/command";
+//import { Database } from "@database";
+import { EmiliaTypeError } from "@util/s";
 import {
   type ChatInputCommandInteraction,
   type Message,
   SlashCommandBuilder,
 } from "discord.js";
-import type {
-  CommandClassOptions,
-  CommandOptions,
-  IBaseCommand,
-} from "../../types/base/command";
-import type { Log } from "../log";
-//import { Database } from "../database";
-import { EmiliaTypeError } from "../utils";
 
 export class BaseCommand implements IBaseCommand {
   /** Это `new SlashCommandBuilder()`. Только для `/` команд. Доп параметры `/` идут только через неё */
@@ -57,9 +57,9 @@ export class BaseCommand implements IBaseCommand {
    *  }
    * }
    *```
-   * @param commandOptions.name
-   * @param commandOptions.description
-   * @param commandOptions.option
+   * @param commandOptions.name название команды
+   * @param commandOptions.description описание команды
+   * @param commandOptions.option опции для команды (не /. Смотри выше)
    */
   constructor({ name, description, option }: CommandOptions) {
     if (!name) throw new EmiliaTypeError("Вы не указали имя команды!");
@@ -87,6 +87,7 @@ export class BaseCommand implements IBaseCommand {
     };
 
     if (option.type === "command") {
+      // eslint-disable-next-line drizzle/enforce-delete-with-where
       this.option.delete = option.delete ?? false;
     } else {
       this.data.setName(name);
@@ -95,12 +96,11 @@ export class BaseCommand implements IBaseCommand {
   }
 
   execute(...args: unknown[]):
-    | undefined
+    | void
     | Log
     | Message
     | ChatInputCommandInteraction
-    | Promise<undefined | Message | ChatInputCommandInteraction | Log> {
-    args;
+    | Promise<void | Message | ChatInputCommandInteraction | Log> {
     throw new EmiliaTypeError(
       `Вы не реализовали свой execute для [${this.name}] ${this.option.type} команды!`,
     );
