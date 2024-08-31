@@ -1,7 +1,7 @@
-import { PathArgsLimit } from "..";
-import { BaseCommand } from "../../srcTs/base/command";
-import { BaseEvent } from "../../srcTs/base/event";
-import { EmiliaClient } from "../../srcTs/client";
+import type { BaseCommand } from "@base/command";
+import type { BaseEvent } from "@base/event";
+import type { EmiliaClient } from "@client";
+import type { PathArgsLimit } from "@type";
 
 export type ArrayPathLimit = PathArgsLimit<string, 2>;
 export type ModuleType = BaseCommand | BaseEvent | null;

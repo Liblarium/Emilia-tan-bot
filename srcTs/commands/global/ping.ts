@@ -1,7 +1,7 @@
 import type { Message } from "discord.js";
-import { BaseCommand } from "../../base/command";
-import type { EmiliaClient } from "../../client";
-import { Log } from "../../log";
+import { BaseCommand } from "@base/command";
+import type { EmiliaClient } from "@client";
+import { Log } from "@log";
 
 export default class Ping extends BaseCommand {
   constructor() {

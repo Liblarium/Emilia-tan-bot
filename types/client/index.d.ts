@@ -1,5 +1,5 @@
-import { Collection } from "discord.js";
-import { BaseCommand } from "../../srcTs/base/command";
+import type { BaseCommand } from "@base/command";
+import type { Collection } from "discord.js";
 
 export interface IEmiliaClient {
   events: Collection<string, string>;

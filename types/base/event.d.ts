@@ -1,12 +1,14 @@
-import { Message, ChatInputCommandInteraction } from "discord.js";
-//import { Database } from "../../srcTs/database";
-import { Log } from "../../srcTs/log";
+//import { Database } from "@database";
+import type { Log } from "@log";
+import type { ChatInputCommandInteraction, Message } from "discord.js";
 
 export type CategoryType = `bot` | `mongo`;
+
+export type EventReturns = void | Message | ChatInputCommandInteraction | Log;
 export interface BaseEventsOptions {
   name: string;
   category: CategoryType;
-  once?: boolean
+  once?: boolean;
 }
 export interface IBaseEvent {
   name: string;
@@ -14,5 +16,5 @@ export interface IBaseEvent {
   category: CategoryType;
   //db: Database;
 
-  execute: (...args: any[]) => void | Message | ChatInputCommandInteraction | Log | Promise<void | Message | ChatInputCommandInteraction | Log>;
+  execute: (...args: unknown[]) => EventReturns | Promise<EventReturns>;
 }

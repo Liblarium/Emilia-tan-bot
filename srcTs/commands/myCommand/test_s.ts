@@ -1,6 +1,6 @@
 import type { ChatInputCommandInteraction } from "discord.js";
-import { BaseCommand } from "../../base/command";
-import type { EmiliaClient } from "../../client";
+import { BaseCommand } from "@base/command";
+import type { EmiliaClient } from "@client";
 
 export default class Test extends BaseCommand {
   constructor() {

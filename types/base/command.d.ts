@@ -1,11 +1,19 @@
-import { SlashCommandBuilder, Message, ChatInputCommandInteraction } from "discord.js";
-import { ArrayMaybeEmpty } from "..";
-import { Log } from "../../srcTs/log";
+import type { Log } from "@log";
+import type { ArrayMaybeEmpty } from "@type";
+import type {
+  ChatInputCommandInteraction,
+  Message,
+  SlashCommandBuilder,
+} from "discord.js";
 
 //import { Database } from "../../srcTs/database";
 
-interface TypeCommand { type: "command" | "slash" }
-interface DeleteCommandMessage { delete?: boolean }
+interface TypeCommand {
+  type: "command" | "slash";
+}
+interface DeleteCommandMessage {
+  delete?: boolean;
+}
 interface BaseCommandOptions {
   aliases: ArrayMaybeEmpty<string>;
   developer: boolean;
@@ -17,9 +25,17 @@ interface BaseCommandOptions {
   channels: ArrayMaybeEmpty<string>;
   dUsers: ArrayMaybeEmpty<string>;
 }
-type CommandConstructorOptions = Partial<BaseCommandOptions> & TypeCommand & DeleteCommandMessage;
-export type CommandClassOptions = BaseCommandOptions & TypeCommand & DeleteCommandMessage;
-export interface CommandOptions { name: string; option: CommandConstructorOptions; description?: string }
+type CommandConstructorOptions = Partial<BaseCommandOptions> &
+  TypeCommand &
+  DeleteCommandMessage;
+export type CommandClassOptions = BaseCommandOptions &
+  TypeCommand &
+  DeleteCommandMessage;
+export interface CommandOptions {
+  name: string;
+  option: CommandConstructorOptions;
+  description?: string;
+}
 
 export interface IBaseCommand {
   data: SlashCommandBuilder;
@@ -27,5 +43,12 @@ export interface IBaseCommand {
   option: CommandClassOptions;
   //db: Database;
 
-  execute: (...args: unknown[]) => undefined | Message | ChatInputCommandInteraction | Log | Promise<undefined | Message | ChatInputCommandInteraction | Log>;
+  execute: (
+    ...args: unknown[]
+  ) =>
+    | void
+    | Message
+    | ChatInputCommandInteraction
+    | Log
+    | Promise<void | Message | ChatInputCommandInteraction | Log>;
 }

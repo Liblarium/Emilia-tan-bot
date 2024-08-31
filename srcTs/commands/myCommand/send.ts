@@ -1,6 +1,6 @@
 import type { Message, TextChannel } from "discord.js";
-import { BaseCommand } from "../../base/command";
-import { Log } from "../../log";
+import { BaseCommand } from "@base/command";
+import { Log } from "@log";
 
 export default class Send extends BaseCommand {
   constructor() {

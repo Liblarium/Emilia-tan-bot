@@ -1,10 +1,10 @@
 import type { Message } from "discord.js";
-import { BaseCommand } from "../../base/command";
-import type { EmiliaClient } from "../../client";
-//import { Database } from "../../database";
-//import { Users } from "../../database/schema/users";
-//import { ConnectionInfo } from "../../database/typeorm";
-//import { log } from "../../utils";
+import { BaseCommand } from "@base/command";
+import type { EmiliaClient } from "@client";
+//import { Database } from "@database";
+//import { Users } from "@database/schema/users";
+//import { ConnectionInfo } from "@database/typeorm";
+//import { log } from "@util/s";
 
 export default class Test extends BaseCommand {
   constructor() {

@@ -1,5 +1,5 @@
-import { ArrayNotEmpty } from "..";
-import type { TypeInline, TypeLog, TypeText } from "../base/log";
+import type { ArrayNotEmpty } from "@type";
+import type { TypeInline, TypeLog, TypeText } from "@type/base/log";
 
 export interface LogOptions {
   text: TypeText;
@@ -8,9 +8,9 @@ export interface LogOptions {
   event?: boolean;
   db?: boolean;
   logs?: boolean;
-  inline?: TypeInline
+  inline?: TypeInline;
 }
-export { TypeText, TypeLog, TypeInline };
+export type { TypeText, TypeLog, TypeInline };
 export interface ILog {
   text: TypeText;
   type: TypeLog;

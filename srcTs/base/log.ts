@@ -1,8 +1,8 @@
 import { constants, access, appendFile, mkdir, unlink } from "node:fs/promises";
 import { resolve } from "node:path";
 import { inspect } from "node:util";
-import type { BaseLogOptions, IBaseLog, LineType, TypeInline, TypeLog, TypeLogEnum, TypeText } from "../../types/base/log";
-import { EmiliaTypeError, date, dateAndTime, error, time } from "../utils";
+import type { BaseLogOptions, IBaseLog, LineType, TypeInline, TypeLog, TypeLogEnum, TypeText } from "@type/base/log";
+import { EmiliaTypeError, date, dateAndTime, error, time } from "@util/s";
 
 const BaseLogPath = "logs";
 
@@ -19,7 +19,7 @@ export class BaseLog implements IBaseLog {
   category: string;
 
   constructor({ text, type, event, logs, inline }: BaseLogOptions) {
-    this.text = text || "{Ничего не указано}";
+    this.text = text ?? "{Ничего не указано}";
     this.logs = logs ?? true;
     this.type = type || "info";
     this.inline = inline || 0;

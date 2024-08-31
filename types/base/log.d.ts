@@ -6,9 +6,9 @@ export enum TypeLogEnum {
   debug = 4,
   test = 5,
 }
-export type TypeLog = `info` | `error` | `warning` | `debug` | `test` | TypeLogEnum;
+export type TypeLog = "info" | "error" | "warning" | "debug" | "test" | TypeLogEnum;
 export type TypeInline = 0 | 1 | 2 | 3;
-export type LineType = `` | `\n`;
+export type LineType = "" | "\n";
 export interface BaseLogOptions {
   text: TypeText;
   type: TypeLog;

@@ -1,7 +1,7 @@
+import { BaseCommand } from "@base/command";
+import { sharMap } from "@util/ball.list";
+import { random } from "@util/s";
 import type { Message } from "discord.js";
-import { BaseCommand } from "../../base/command";
-import { sharMap } from "../../util/ball.list";
-import { random } from "../../utils";
 
 export default class Ball extends BaseCommand {
   constructor() {

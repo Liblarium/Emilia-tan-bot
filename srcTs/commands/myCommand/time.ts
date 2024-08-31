@@ -1,6 +1,6 @@
 import type { Message } from "discord.js";
-import { BaseCommand } from "../../base/command";
-import { time } from "../../utils";
+import { BaseCommand } from "@base/command";
+import { time } from "@util/s";
 
 export default class Time extends BaseCommand {
   constructor() {

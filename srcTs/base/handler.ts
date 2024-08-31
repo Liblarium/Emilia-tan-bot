@@ -1,9 +1,9 @@
 import { readdir } from "node:fs/promises";
 import { resolve } from "node:path";
-import type { ArrayPathLimit, IBaseHandler, ModuleType } from "../../types/base/handler";
-import type { EmiliaClient } from "../client";
-import { Log } from "../log";
-import { EmiliaTypeError, isClass } from "../utils";
+import type { EmiliaClient } from "@client";
+import { Log } from "@log";
+import type { ArrayPathLimit, IBaseHandler, ModuleType } from "@type/base/handler";
+import { EmiliaTypeError, isClass } from "@util/s";
 
 export class BaseHandler implements IBaseHandler {
   client: EmiliaClient;
