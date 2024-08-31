@@ -25,7 +25,7 @@ class Profile {
 
   constructor() {
     const content = canvas.getContext('2d');
-    
+
     if (!content) return;
 
     this.canvas = canvas;
@@ -38,23 +38,23 @@ class Profile {
    * @overload
    * @returns {Profile}
    *//**
-   * @overload
-   * @param {DrawBGTypeAllOne} options
-   * @returns {Profile}
-   *//**
-   * @overload
-   * @param {DrawBGTypeFull} options
-   * @returns {Profile}
-   *//**
-   * @overload
-   * @param {DrawBGDrawTypeColor} options
-   * @returns {Profile}
-   *//**
-   * @param {unknown} [option]
-   * @returns {Profile}
-   */
+ * @overload
+ * @param {DrawBGTypeAllOne} options
+ * @returns {Profile}
+ *//**
+  * @overload
+  * @param {DrawBGTypeFull} options
+  * @returns {Profile}
+  *//**
+  * @overload
+  * @param {DrawBGDrawTypeColor} options
+  * @returns {Profile}
+  *//**
+  * @param {unknown} [option]
+  * @returns {Profile}
+  */
   drawBG(option) {
-    const cnt = this.cnt; 
+    const cnt = this.cnt;
 
     if (!option) {
       cnt.fillStyle = `#313338`;
@@ -90,7 +90,7 @@ class Profile {
     // Фон
     ctx.fillStyle = '#123123';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+
     //блок фулл фон
     ctx.save();
     ctx.beginPath();
@@ -178,12 +178,12 @@ class Profile {
     ctx.lineTo(canvas.width, 200);
     ctx.stroke();
     ctx.closePath();
-    
+
     //Блок обводки (аватарка)
     ctx.strokeStyle = `black`;
     ctx.lineWidth = 2;
     ctx.filter = `blur(0.7px)`;
-    
+
     ctx.beginPath();
     ctx.arc(150, 200, 100.5, 0, Math.PI, true);
     ctx.stroke();
@@ -211,7 +211,7 @@ class Profile {
     ctx.fill();
     ctx.globalAlpha = 1;
     //ctx.fillRect(70, 310, 160, 35); // Позиция и размеры прямоугольника
-    
+
     // Опыт
     const startAngle = -Math.PI / 2;
     const xp = 77.5;
@@ -268,7 +268,7 @@ class Profile {
     ctx.globalAlpha = 0.5;
 
     //блок био //w: 710, full = w: 960
-    this.#drawRoundedRect({ x: 20, y: 370, w: 710 , h: 310, r: 11 });
+    this.#drawRoundedRect({ x: 20, y: 370, w: 710, h: 310, r: 11 });
     ctx.fill();
     ctx.globalAlpha = 1;
     ctx.stroke();
@@ -279,14 +279,14 @@ class Profile {
     ctx.stroke();
     ctx.fillStyle = 'white';
     ctx.globalAlpha = 0.5;
-    
+
     this.#drawRoundedRect({ x: 750, y: 370, w: 230, h: 310, r: 11 });
     ctx.fill();
     ctx.strokeStyle = `#124124`;
     ctx.globalAlpha = 1;
     ctx.stroke();
     ctx.closePath();
-    
+
     //блок аватарка клана
     ctx.save();
     ctx.beginPath();
@@ -299,7 +299,7 @@ class Profile {
     ctx.restore();
     ctx.closePath();
     ctx.beginPath();
-    ctx.arc (775, 370, 42, 0, Math.PI * 2);
+    ctx.arc(775, 370, 42, 0, Math.PI * 2);
     ctx.lineWidth = 5;
     ctx.stroke();
     ctx.closePath();
@@ -310,7 +310,7 @@ class Profile {
 
     this.drawTexts([
       //Bio текст. x2: 710, full = x2: 970
-      { text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1`, x1: 30, x2: 710, y: 400, dynamicOptions: { dynamic: true, dynamicCorrector: 1, isClip: true, lineSpacing: 17, lines: 10 }, fontOptions: { size: 25 } }, 
+      { text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1`, x1: 30, x2: 710, y: 400, dynamicOptions: { dynamic: true, dynamicCorrector: 1, isClip: true, lineSpacing: 17, lines: 10 }, fontOptions: { size: 25 } },
       //Никнейм
       { text: `Qipeax`, x1: 294, x2: 670, y: 245, dynamicOptions: { dynamic: true }, fontOptions: { color: `white`, size: 35 } },
       //титул
@@ -371,7 +371,7 @@ class Profile {
         if (isClip) {
           for (const word of words) {
             const testLine = lines[currentLineIndex] + (lines[currentLineIndex] ? ' ' : '') + word;
-          
+
             if (currentLineIndex > linesNext) break;
             if (cnt.measureText(testLine).width < maxWidth) {
               const newLineIndex = word.indexOf(`\n`);
@@ -381,9 +381,9 @@ class Profile {
               } else {
                 const beforeNewLine = testLine.slice(0, (testLine.length - word.length) + newLineIndex);
                 const afterNewLine = word.slice(newLineIndex + 1);
-              
+
                 lines[currentLineIndex++] = beforeNewLine;
-              
+
                 if (currentLineIndex <= linesNext) lines[currentLineIndex] = afterNewLine;
               }
               continue;
@@ -397,9 +397,9 @@ class Profile {
            */
             const whileClip = (cache, elseWidth = 0) => {
               let cached = cache;
-              while(cnt.measureText(cached).width + elseWidth > maxWidth) {
-                if (cached.length === 0) { 
-                  reject(undefined); 
+              while (cnt.measureText(cached).width + elseWidth > maxWidth) {
+                if (cached.length === 0) {
+                  reject(undefined);
                   throw new TypeError(`infinite while`);
                 }
 
@@ -415,12 +415,12 @@ class Profile {
              * @returns {string}
              */
             const textFormater = ({ text, cache, curInd }) => {
-              return curInd < linesNext ? ((isStartEmpty.test(text) || isEndEmpty.test(cache)) ? cache : `${cache}-`) : dynamic && curInd === linesNext ? (isEndEmpty.test(cache) ? `${cache.slice(0, -1)}...` : `${cache}...`) : cache; 
+              return curInd < linesNext ? ((isStartEmpty.test(text) || isEndEmpty.test(cache)) ? cache : `${cache}-`) : dynamic && curInd === linesNext ? (isEndEmpty.test(cache) ? `${cache.slice(0, -1)}...` : `${cache}...`) : cache;
             }
-          
-            cacheWord = whileClip(cacheWord, currentLineIndex < linesNext ? dashWidth : (dynamic && currentLineIndex === linesNext ? (ellipsisWidth + dynamicCorrector): 0));
+
+            cacheWord = whileClip(cacheWord, currentLineIndex < linesNext ? dashWidth : (dynamic && currentLineIndex === linesNext ? (ellipsisWidth + dynamicCorrector) : 0));
             const cacheWordNewIndex = cacheWord.indexOf(`\n`);
-          
+
             if (cacheWordNewIndex !== -1) cacheWord = cacheWord.slice(0, cacheWordNewIndex);
 
             const tLClip = testLine.slice(cacheWord.length + (cacheWordNewIndex === -1 ? 0 : 1));
@@ -428,9 +428,9 @@ class Profile {
             const textFormated = textFormater({ text: testLineClip, cache: cacheWord, curInd: currentLineIndex });
             lines[currentLineIndex] = textFormated.endsWith(`--`) ? textFormated.slice(0, -1) : textFormated;
             let cacheLine = isStartEmpty.test(testLineClip) ? testLineClip.slice(1) : testLineClip;
-          
+
             ++currentLineIndex;
-          
+
             if (currentLineIndex <= linesNext) {
               lines[currentLineIndex] = ``;
               if (testLineClip.length >= cacheWord.length) {
@@ -444,39 +444,39 @@ class Profile {
                   let clipedWord = `${beforeNewLine ?? ``}${cacheLine.slice(startNum, sliceNum)}`;
                   startNum = sliceNum;
                   const newClipWordIndex = clipedWord.indexOf(`\n`);
-                
+
                   if (newClipWordIndex !== -1) {
                     beforeNewLine = clipedWord;
                     clipedWord = clipedWord.slice(0, newClipWordIndex);
                     beforeNewLine = beforeNewLine.slice(newClipWordIndex + 1);
                   } else beforeNewLine = ``;
-                
+
                   lineCache.push(clipedWord);
                   cacheWord = cacheWord.slice(clipedWord.length);
                 }
-              
+
                 cacheWord = ``;
                 cacheLine = ``;
 
                 for (const line of lineCache) {
-                  cacheWord = whileClip(line, currentLineIndex <= linesNext ? dashWidth : (dynamic && currentLineIndex === linesNext ? (ellipsisWidth + dynamicCorrector): 0));
+                  cacheWord = whileClip(line, currentLineIndex <= linesNext ? dashWidth : (dynamic && currentLineIndex === linesNext ? (ellipsisWidth + dynamicCorrector) : 0));
                   const textFormated = textFormater({ text: line, cache: cacheWord, curInd: currentLineIndex });
                   lines[currentLineIndex] = (textFormated.endsWith(`-`) && lineCache[lineCache.length - 1] == line || textFormated.endsWith(`--`)) ? textFormated.slice(0, -1) : textFormated;
                   ++currentLineIndex;
                 }
 
               } else lines[currentLineIndex] = testLineClip;
-            }  
+            }
           }
         }
-  
+
         if (textWidth > maxWidth && !isClip) {
           while (cnt.measureText(truncatedText).width + (ellipsisWidth + dynamicCorrector) > maxWidth) {
             if (truncatedText.length == 0) {
               reject(undefined);
               throw new TypeError(`Бесконечный while!`);
             }
-          
+
             truncatedText = truncatedText.slice(0, -1);
           }
 
@@ -502,14 +502,14 @@ class Profile {
    * @param {DrawTextsOption} options доп опции
    * @returns {Profile}
    *//**
-   * @overload
-   * @param {DrawTextOptions[]} args параметры для отрисовки текста
-   * @returns {Profile}
-   *//**
-   * @param {DrawTextOptions[]} args параметры для отрисовки текста
-   * @param {DrawTextsOption} [option] доп опции
-   * @returns {Profile}
-   */
+ * @overload
+ * @param {DrawTextOptions[]} args параметры для отрисовки текста
+ * @returns {Profile}
+ *//**
+  * @param {DrawTextOptions[]} args параметры для отрисовки текста
+  * @param {DrawTextsOption} [option] доп опции
+  * @returns {Profile}
+  */
   drawTexts(args, option) {
     let index = 0;
     /** @type {object} */
@@ -554,7 +554,7 @@ class Profile {
     ctx.arcTo(x, y + h, x, y, r);
     ctx.arcTo(x, y, x + w, y, r);
     ctx.closePath();
-    
+
     return this;
   }
 }
@@ -573,7 +573,7 @@ icon.src = `./avatar.png`;
  * @param {string | number} num
  * @returns {string}
  */
-function numberClip (num) {
+function numberClip(num) {
   if (typeof num != `string`) num = `${num}`;
 
   const numLength = num.length;
@@ -586,7 +586,7 @@ function numberClip (num) {
  * @param {number} s секунды. Не строкой
  * @returns {{ hours: number, minutes: number, seconds: number }}
  */
-function parseSecond (s) {
+function parseSecond(s) {
   const minutes = Math.floor(s / 60);
   const hours = Math.floor(minutes / 60);
   return {
@@ -798,7 +798,7 @@ function timeFormatter(time) {
  * @typedef {object} UpdateDynamicDrawText
  * @property {Partial<DrawTextOptions>} update значения, что заменять существующие в массиве - на другие по указанным start/end элементам
  */
-  
+
 /**
  * @typedef {object} UpdateDynamicDrawImages
  * @property {Partial<DrawImageOptions>} update значения, что заменять существующие в массиве - на другие по указанным start/end элементам
