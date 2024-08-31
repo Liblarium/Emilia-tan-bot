@@ -1,6 +1,6 @@
+import type { EmiliaClient } from "@client";
 import type { AnySelectMenuInteraction } from "discord.js";
-import type { EmiliaClient } from "../../../client";
-//import { isComponents, isModal, isReply } from "../../../utils";
+//import { isComponents, isModal, isReply } from "@util/s";
 
 class MenuComponent {
   constructor(interaction: AnySelectMenuInteraction, client: EmiliaClient) {

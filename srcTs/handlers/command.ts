@@ -1,7 +1,7 @@
-import type { BaseCommand } from "../base/command";
-import { BaseHandler } from "../base/handler";
-import type { EmiliaClient } from "../client";
-import { Log } from "../log";
+import type { BaseCommand } from "@base/command";
+import { BaseHandler } from "@base/handler";
+import type { EmiliaClient } from "@client";
+import { Log } from "@log";
 
 export class CommandHandler extends BaseHandler {
   constructor(client: EmiliaClient) {

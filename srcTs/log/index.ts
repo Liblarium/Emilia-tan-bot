@@ -1,7 +1,7 @@
-import type { ArrayMaybeEmpty } from "../../types";
-import type { ILog, LogOptions } from "../../types/log";
-import { BaseLog } from "../base/log";
-import { time } from "../utils";
+import { BaseLog } from "@base/log";
+import type { ArrayMaybeEmpty } from "@type";
+import type { ILog, LogOptions } from "@type/log";
+import { time } from "@util/s";
 
 const catchs = (e: unknown) => { console.error(e); };
 

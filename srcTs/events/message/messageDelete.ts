@@ -1,6 +1,6 @@
+import { BaseEvent } from "@base/event";
+import type { EmiliaClient } from "@client";
 import type { Message, PartialMessage } from "discord.js";
-import { BaseEvent } from "../../base/event";
-import type { EmiliaClient } from "../../client";
 
 export default class MessageDelete extends BaseEvent {
   constructor() {

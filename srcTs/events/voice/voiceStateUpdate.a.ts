@@ -1,6 +1,6 @@
+import { BaseEvent } from "@base/event";
+import type { EmiliaClient } from "@client";
 import type { /*ChannelType,*/ VoiceState } from "discord.js";
-import { BaseEvent } from "../../base/event";
-import type { EmiliaClient } from "../../client";
 
 //const { GuildVoice } = ChannelType;
 

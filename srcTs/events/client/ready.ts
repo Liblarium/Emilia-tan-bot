@@ -1,8 +1,9 @@
+import "module-alias/register";
+import { BaseEvent } from "@base/event";
+import type { EmiliaClient } from "@client";
+import { Log } from "@log";
+import { prefix } from "@util/s";
 import { REST, Routes, type SlashCommandBuilder } from "discord.js";
-import { BaseEvent } from "../../base/event";
-import type { EmiliaClient } from "../../client";
-import { Log } from "../../log";
-import { prefix } from "../../utils";
 
 export default class Ready extends BaseEvent {
   constructor() {

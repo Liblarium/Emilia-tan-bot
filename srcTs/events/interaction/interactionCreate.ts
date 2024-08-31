@@ -1,6 +1,6 @@
+import { BaseEvent } from "@base/event";
+import type { EmiliaClient } from "@client";
 import type { Interaction } from "discord.js";
-import { BaseEvent } from "../../base/event";
-import type { EmiliaClient } from "../../client";
 import { InteractionHandler } from "./interaction.export";
 
 

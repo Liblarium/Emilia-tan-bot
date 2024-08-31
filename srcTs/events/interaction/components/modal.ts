@@ -1,6 +1,6 @@
+import type { EmiliaClient } from "@client";
 import type { ModalSubmitInteraction } from "discord.js";
-import type { EmiliaClient } from "../../../client";
-//import { isComponents, isReply } from "../../../utils";
+//import { isComponents, isReply } from "@util/s";
 
 class ModalComponent {
   constructor(interaction: ModalSubmitInteraction, client: EmiliaClient) {

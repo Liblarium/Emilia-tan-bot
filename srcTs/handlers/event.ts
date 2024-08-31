@@ -1,7 +1,7 @@
-import type { BaseEvent } from "../base/event";
-import { BaseHandler } from "../base/handler";
-import type { EmiliaClient } from "../client";
-import { Log } from "../log";
+import type { BaseEvent } from "@base/event";
+import { BaseHandler } from "@base/handler";
+import type { EmiliaClient } from "@client";
+import { Log } from "@log";
 
 type EventMapType = Record<string, () => EmiliaClient>;
 

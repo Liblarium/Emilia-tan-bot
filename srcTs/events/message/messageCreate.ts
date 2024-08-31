@@ -1,8 +1,8 @@
+import { BaseEvent } from "@base/event";
+import type { EmiliaClient } from "@client";
+import { Log } from "@log";
 import { ChannelType, type Message /*, PermissionsBitField */ } from "discord.js";
-import { BaseEvent } from "../../base/event";
-import type { EmiliaClient } from "../../client";
-import { Log } from "../../log";
-//import { AddInDB } from "../../util/addInDB";
+//import { AddInDB } from "@util/addInDB"; 
 import { CommandHandler } from "./messageComponents/command.handler";
 
 //const { Flags: { SendMessages } } = PermissionsBitField;

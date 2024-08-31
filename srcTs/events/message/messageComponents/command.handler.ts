@@ -1,7 +1,7 @@
+import type { EmiliaClient } from "@client";
+import { Log } from "@log";
+import { prefix } from "@util/s";
 import { ChannelType, type Message, PermissionsBitField } from "discord.js";
-import type { EmiliaClient } from "../../../client";
-import { Log } from "../../../log";
-import { prefix } from "../../../utils";
 
 const { Flags: { ManageMessages } } = PermissionsBitField;
 
@@ -37,6 +37,7 @@ export class CommandHandler {
     const command = client.commands.get(commandName);
 
     if (!command) return new Log({ text: `${message.member?.user?.username ?? "[Ошибка]"} попытался(ась) заюзать ${commandName || prefix} в ${message.guild?.name ?? "[Ошибка]"}`, type: 2, event: true, categories: ["global", "events"] });
+    // eslint-disable-next-line drizzle/enforce-delete-with-where
     if (command.option.delete && message.channel.permissionsFor(cliUser.id)?.has(ManageMessages)) await message.delete();
 
     await command.execute(message, args, commandName, client);

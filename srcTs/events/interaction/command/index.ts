@@ -1,6 +1,6 @@
+import type { EmiliaClient } from "@client";
+import { Log } from "@log";
 import type { ChatInputCommandInteraction } from "discord.js";
-import type { EmiliaClient } from "../../../client";
-import { Log } from "../../../log";
 
 class SlashCommand {
   constructor(interaction: ChatInputCommandInteraction, client: EmiliaClient) {
