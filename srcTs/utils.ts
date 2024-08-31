@@ -9,6 +9,14 @@ import {
   type RepliableInteraction,
 } from "discord.js";
 
+const GUILD_PERMISSIONS = { //guild logs
+  CREATE: 1 << 0, // 1
+  DELETE: 1 << 1, // 2
+  UPDATE: 1 << 2, // 4
+  JOIN: 1 << 3, // 8
+  LEAVE: 1 << 4, // 16
+};
+
 const time = (): string => {
   const date = new Date();
   const hour = date.getHours().toString().padStart(2, "0");
@@ -184,4 +192,5 @@ export {
   EmiliaTypeError,
   EmiliaError,
   prefix,
+  GUILD_PERMISSIONS
 };
