@@ -1,7 +1,7 @@
+import type { ArrayNotEmpty } from "@type/index";
 import { ChannelType, GuildMember, type Interaction, type Message } from "discord.js";
-import type { ArrayNotEmpty } from "../../types";
-//import { Database, missModelError } from "../database/index.ts.deprecation";
-import { Log } from "../log";
+import { database } from "@client";
+import { Log } from "@log";
 class Database { //это будет удалено позже
   findOneBy(a: string, b: object) {
     a; b;
@@ -18,7 +18,7 @@ class Database { //это будет удалено позже
     return this.findOneBy(a, b);
   }
 }
-
+database;
 const missModelError = "";
 
 const logCategories: ArrayNotEmpty<string> = ["add_in_db", "utils", "global"];
