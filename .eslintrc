@@ -10,9 +10,8 @@
     "plugin:jsdoc/recommended-typescript",
     "plugin:@typescript-eslint/strict-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
-    "plugin:deprecation/recommended",
-    "plugin:import/recommended",
-    "plugin:import/typescript",
+    "plugin:import-x/recommended",
+    "plugin:import-x/typescript",
     "plugin:eslint-plugin/recommended",
     "plugin:regexp/recommended",
     "plugin:n/recommended",
@@ -25,7 +24,7 @@
     "plugin:security/recommended-legacy",
     "plugin:sonarjs/recommended-legacy",
     "plugin:@vitest/legacy-recommended",
-    "plugin:yml/standard"
+    "plugin:drizzle/recommended"
   ],
   "parserOptions": {
     "extraFileExtensions": [
@@ -45,7 +44,8 @@
     "unicorn",
     "tsdoc",
     "no-secrets",
-    "html"
+    "html",
+    "import-x"
   ],
   "globals": {
     "process": true,
@@ -64,33 +64,81 @@
     "*.js",
     "*.",
     "*.json",
-    "*.mjs",
     "*.cjs",
     "abyss/",
     "canvas/",
     "vitest.config.ts",
-    "*/**/*.deprecation"
+    "*/**/*.deprecation",
+    "*.yaml",
+    "*.yml",
+    "test_*/",
+    "tsconfig.*.json",
+    "drizzle",
+    "drizzle.config.ts"
   ],
   "overrides": [
     {
       "files": [
-        "srcTs*/**/*.ts",
-        "types/**/*.d.ts"
+        "srcTs/**/*.ts",
+        "srcTs/**/*.mts",
+        "types/**/*.d.ts",
+        "drizzle.config.ts"
       ]
+    },
+    {
+      "files": [
+        "log/**/*.ts"
+      ],
+      "settings": {
+        "typescript": {
+          "alwaysTryTypes": true,
+          "project": "./log/tsconfig.json"
+        },
+        "node": {
+          "extensions": [
+            ".ts"
+          ]
+        }
+      }
+    },
+    {
+      "files": [
+        "./graphql/*.ts"
+      ],
+      "settings": {
+        "import-x/resolver": {
+          "typescript": {
+            "alwaysTryTypes": true,
+            "project": "./graphql/tsconfig.json"
+          },
+          "node": {
+            "extensions": [
+              ".ts"
+            ],
+            "alias": {
+              "@type": "./types",
+              "@client": "./srcTs/client",
+              "@base": "./srcTs/base",
+              "@util": "./srcTs/util",
+              "@util/s": "./srcTs/utils.ts",
+              "@log": "./srcTs/log",
+              "@handlers": "./srcTs/handlers",
+              "@database": "./srcTs/database"
+            }
+          }
+        }
+      }
     }
   ],
   "rules": {
-    "indent": [
-      "error",
-      2,
-      {
-        "SwitchCase": 1
-      }
-    ],
+    "indent": "off",
     "comma-dangle": [
       "error",
       "only-multiline"
     ],
+    "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/restrict-template-expressions": "off",
+    "@typescript-eslint/no-extraneous-class": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "jsdoc/require-description": "off",
     "jsdoc/require-param-description": "off",
@@ -104,13 +152,14 @@
     "unicorn/prevent-abbreviations": "off",
     "semi": "off",
     "@typescript-eslint/semi": "error",
-    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-unused-vars": "off",
     "no-unused-vars": "off",
     "n/exports-style": [
       "error",
       "module.exports"
     ],
     "eslint-plugin/require-meta-docs-description": "error",
+    "import-x/namespace": "off",
     "unicorn/better-regex": "error",
     "n/no-missing-import": "off",
     "functional/functional-parameters": "off",
@@ -123,33 +172,58 @@
     "functional/no-conditional-statements": "off",
     "functional/no-loop-statements": "off",
     "functional/immutable-data": "off",
-    //"@typescript-eslint/no-unsafe-argument": "off"
-    //"@typescript-eslint/no-unsafe-member-access": "off",
+    "@typescript-eslint/no-redundant-type-constituents": "off",
+    "@typescript-eslint/no-unsafe-argument": "off",
+    "@typescript-eslint/no-unsafe-member-access": "off",
     "@typescript-eslint/only-throw-error": "off",
     "functional/no-mixed-types": "off", //i micsed types)
     "functional/prefer-immutable-types": "off", //No. Off you
     "@typescript-eslint/prefer-literal-enum-member": "off",
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "n/no-unpublished-import": "off",
     "@typescript-eslint/no-unnecessary-condition": "off",
     "security/detect-non-literal-fs-filename": "off",
     "@typescript-eslint/no-invalid-void-type": "off",
     "n/no-unsupported-features/node-builtins": "off",
-    "n/no-extraneous-import": "off"
+    "n/no-extraneous-import": "off",
+    "@typescript-eslint/require-await": "off",
+    "jsdoc/require-jsdoc": "off"
   },
   "settings": {
     "html/html-extensions": [
       ".html",
       ".we"
     ],
-    "import/parsers": {
+    "import-x/parsers": {
       "@typescript-eslint/parser": [
         ".ts",
-        ".tsx"
+        ".mts"
       ]
     },
-    "import/resolver": {
+    "import-x/extensions": [
+      ".ts",
+      ".mts"
+    ],
+    "import-x/resolver": {
       "typescript": {
         "alwaysTryTypes": true,
-        "project": "tsconfig.json"
+        "project": "./tsconfig.json"
+      },
+      "node": {
+        "extensions": [
+          ".ts",
+          ".mts"
+        ],
+        "alias": {
+          "@type": "./types",
+          "@client": "./srcTs/client",
+          "@base": "./srcTs/base",
+          "@util": "./srcTs/util",
+          "@utils_": "./srcTs/utils.ts",
+          "@log": "./log/src",
+          "@handlers": "./srcTs/handlers",
+          "@api-types": "types/api"
+        }
       }
     }
   }
