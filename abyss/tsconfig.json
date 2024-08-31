@@ -1,16 +1,23 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
     "strict": true,
     "allowJs": true,
     "checkJs": true,
-    "outDir": "dist",
+    "outDir": "./dist",
+    "baseUrl": "./",
     "useUnknownInCatchVariables": false,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "skipLibCheck": true
+    "experimentalDecorators": true
   },
-  "include": ["src"],
-  "exclude": [ "node_modules", "./dist"]
+  "include": [
+    "./src",
+    "../node_modules/@types"
+  ],
+  "exclude": [
+    "./dist",
+    "../node_modules"
+  ]
 }

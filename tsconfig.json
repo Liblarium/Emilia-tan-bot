@@ -1,30 +1,59 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
     "mapRoot": "srcJs",
-    "strict": true,
     "sourceMap": true,
-    "allowJs": true,
-    "checkJs": true,
-    "declarationMap": true,
     "declaration": true,
-    "useUnknownInCatchVariables": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "outDir": "srcJs"
+    "declarationMap": true,
+    "outDir": "srcJs",
+    "baseUrl": "./",
+    "paths": {
+      "@type": [
+        "types"
+      ],
+      "@type/*": [
+        "types/*"
+      ],
+      "@client": [
+        "srcTs/client"
+      ],
+      "@base/*": [
+        "srcTs/base/*"
+      ],
+      "@util/*": [
+        "srcTs/util/*"
+      ],
+      "@util/s": [
+        "srcTs/utils.ts"
+      ],
+      "@log": [
+        "srcTs/log"
+      ],
+      "@handlers/*": [
+        "srcTs/handlers/*"
+      ],
+      "@database": [
+        "srcTs/database"
+      ],
+      "@database/*": [
+        "srcTs/database/*"
+      ]
+    }
   },
   "include": [
     "./srcTs",
     "node_modules/@types",
     "./types",
-    "./canvas"
   ],
   "exclude": [
-    "node_modules",
+    "./node_modules",
     "./srcJs",
     "./target",
     "./pg.client.js",
-    "./abyss"
+    "./abyss",
+    "./graphql",
+    "srcTs/log",
+    "./drizzle",
+    "drizzle.config.ts"
   ]
 }
