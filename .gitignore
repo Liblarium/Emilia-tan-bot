@@ -6,6 +6,7 @@
 /target
 /pgdata
 .env
+/drizzle
 /.vs
 tsconfig copy.json
 package-lock.json
