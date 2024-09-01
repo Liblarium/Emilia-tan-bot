@@ -121,7 +121,7 @@ export default [
       "@typescript-eslint/require-await": "off",
       "jsdoc/require-jsdoc": "off"
     },
-    "settings": {
+    settings: {
       "import-x/parsers": {
         "@typescript-eslint/parser": [
           ".ts",
