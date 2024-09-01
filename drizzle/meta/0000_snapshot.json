@@ -1,5 +1,5 @@
 {
-  "id": "d67ef9dc-da06-4dae-9dbd-77d7b24fdb9e",
+  "id": "06c04f3c-f206-406f-82f8-2b4b7c908264",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -86,10 +86,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "clan_master_user_id_fk": {
-          "name": "clan_master_user_id_fk",
+        "clan_master_users_id_fk": {
+          "name": "clan_master_users_id_fk",
           "tableFrom": "clan",
-          "tableTo": "user",
+          "tableTo": "users",
           "columnsFrom": [
             "master"
           ],
@@ -135,10 +135,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "clanMember_user_id_user_id_fk": {
-          "name": "clanMember_user_id_user_id_fk",
+        "clanMember_user_id_users_id_fk": {
+          "name": "clanMember_user_id_users_id_fk",
           "tableFrom": "clanMember",
-          "tableTo": "user",
+          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
@@ -171,7 +171,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "bigserial",
           "primaryKey": true,
           "notNull": true
         },
@@ -199,7 +199,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "bigint",
           "primaryKey": true,
           "notNull": true
         },
@@ -413,8 +413,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.user": {
-      "name": "user",
+    "public.users": {
+      "name": "users",
       "schema": "",
       "columns": {
         "id": {
@@ -431,7 +431,7 @@
         },
         "dostup": {
           "name": "dostup",
-          "type": "uuid",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true
         },
@@ -467,7 +467,7 @@
           "name": "global_level",
           "type": "bigint",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "local_level": {
           "name": "local_level",
@@ -484,9 +484,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "user_dostup_dostup_id_fk": {
-          "name": "user_dostup_dostup_id_fk",
-          "tableFrom": "user",
+        "users_dostup_dostup_id_fk": {
+          "name": "users_dostup_dostup_id_fk",
+          "tableFrom": "users",
           "tableTo": "dostup",
           "columnsFrom": [
             "dostup"
@@ -497,9 +497,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "user_global_level_global_level_id_fk": {
-          "name": "user_global_level_global_level_id_fk",
-          "tableFrom": "user",
+        "users_global_level_global_level_id_fk": {
+          "name": "users_global_level_global_level_id_fk",
+          "tableFrom": "users",
           "tableTo": "global_level",
           "columnsFrom": [
             "global_level"
@@ -510,9 +510,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "user_local_level_global_level_id_fk": {
-          "name": "user_local_level_global_level_id_fk",
-          "tableFrom": "user",
+        "users_local_level_global_level_id_fk": {
+          "name": "users_local_level_global_level_id_fk",
+          "tableFrom": "users",
           "tableTo": "global_level",
           "columnsFrom": [
             "local_level"
