@@ -7,7 +7,7 @@ import { EmiliaTypeError, date, dateAndTime, error, time } from "@util/s";
 const BaseLogPath = "logs";
 
 const checkType = (num: number): num is TypeLogEnum => {
-  return num < 0 && num > 5;
+  return num >= 1 && num <= 5;
 };
 
 export class BaseLog implements IBaseLog {
