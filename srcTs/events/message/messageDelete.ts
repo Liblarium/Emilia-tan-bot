@@ -9,6 +9,5 @@ export default class MessageDelete extends BaseEvent {
 
   execute(message: Message | PartialMessage, client: EmiliaClient): undefined {
     //console.log(message);
-    message; client;
   }
 }

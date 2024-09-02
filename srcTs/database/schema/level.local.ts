@@ -1,7 +1,9 @@
-import { bigint, integer, pgTable } from "drizzle-orm/pg-core";
+import { bigint, bigserial, integer, pgTable } from "drizzle-orm/pg-core";
 
-export const localLevel = pgTable("global_level", {
-  id: bigint("id", { mode: "bigint" }).primaryKey(), //guildId
+//изменить чуть позже, так как guildId не уникален
+export const localLevel = pgTable("local_level", {
+  id: bigserial("id", { mode: "bigint" }).primaryKey(),
+  guildId: bigint("guild_id", { mode: "bigint" }),
   userId: bigint("user_id", { mode: "bigint" }),
   xp: integer("xp"),
   level: integer("level"),

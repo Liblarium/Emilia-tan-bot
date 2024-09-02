@@ -147,7 +147,7 @@ export default [
             "@utils_": "./srcTs/utils.ts",
             "@log": "./log/src",
             "@handlers": "./srcTs/handlers",
-            "@api-types": "types/api"
+            "@schema": "srcTs/database/schema"
           }
         }
       }

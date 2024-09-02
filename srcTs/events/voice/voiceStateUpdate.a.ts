@@ -16,9 +16,5 @@ export default class VoiceStateUpdate extends BaseEvent {
     oldState: VoiceState,
     newState: VoiceState,
     client: EmiliaClient,
-  ): undefined {
-    oldState;
-    newState;
-    client;
-  }
+  ): undefined { }
 }

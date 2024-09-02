@@ -7,9 +7,12 @@
 /pgdata
 .env
 /drizzle
+drizzle/**/*.*
 /.vs
 tsconfig copy.json
 package-lock.json
 /abyss/src/*.tests.ts
 /abyss/res1.png
 /abyss/res.png
+drizzle/meta/_journal.json
+drizzle/meta/0000_snapshot.json

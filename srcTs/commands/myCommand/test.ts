@@ -1,6 +1,6 @@
-import type { Message } from "discord.js";
 import { BaseCommand } from "@base/command";
 import type { EmiliaClient } from "@client";
+import type { Message } from "discord.js";
 //import { Database } from "@database";
 //import { Users } from "@database/schema/users";
 //import { ConnectionInfo } from "@database/typeorm";
@@ -21,9 +21,8 @@ export default class Test extends BaseCommand {
   }
 
   execute(message: Message, args: string[], commandName: string, client: EmiliaClient): undefined {
-    /*const db = this.db;*/ client;
-    const member = message.member;
-    member;
+    /*const db = this.db;*/
+    //const member = message.member;
     message.channel.send({ content: commandName || "ошибка" }).catch((e: unknown) => { console.error(e); });
     // prettier-ignore
     /*const find = await db.create({

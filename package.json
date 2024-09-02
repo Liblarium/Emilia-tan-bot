@@ -11,7 +11,8 @@
     "abyss-run": "tsc-watch --project abyss/tsconfig.json --onSuccess \"node ./abyss/dist/img.js\"",
     "drizzle:generate": "drizzle-kit generate --config=drizzle.config.ts",
     "drizzle:migrate": "drizzle-kit migrate --config=drizzle.config.ts",
-    "drizzle:introspect": "drizzle-kit introspect --config=drizzle.config.ts"
+    "drizzle:introspect": "drizzle-kit introspect --config=drizzle.config.ts",
+    "drizzle:drop": "rm -rf drizzle"
   },
   "author": "RanHolly (Miia)",
   "license": "MIT",

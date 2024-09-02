@@ -18,8 +18,6 @@ class ModalComponent {
     const isGuild = interaction.guild;
     const isMessage = interaction.message;
     const isChannel = interaction.channel;*/
-    client;
-    isCustom;
   }
 }
 

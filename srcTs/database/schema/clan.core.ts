@@ -1,14 +1,14 @@
+import { customJsonb } from "@database/schema.custom.type";
 import { relations } from 'drizzle-orm';
 import { bigint, integer, pgTable, text, uuid } from "drizzle-orm/pg-core";
-import { customJsonb } from "../schema.custom.type";
 import { clanMember } from "./clan.members";
-import { user } from "./user";
+import { users } from "./user";
 
 
 export const clan = pgTable('clan', {
   id: uuid('id').defaultRandom().primaryKey(),
   type: text('type', { enum: ["clan", "guild", "cult", "sect"] }).notNull(),
-  master: bigint('master', { mode: "bigint" }).notNull().references(() => user.id),
+  master: bigint('master', { mode: "bigint" }).notNull().references(() => users.id),
   positions: customJsonb<Record<string, { position: number }>>("positions").default({}),
   positionMax: integer("position_max").default(150),
   limit: integer('limit').default(50),

@@ -5,22 +5,22 @@ import { dostup } from "./dostup";
 import { globalLevel } from "./level.global";
 import { localLevel } from "./level.local";
 
-export const user = pgTable('users', {
+export const users = pgTable('users', {
   id: bigint('id', { mode: "bigint" }).primaryKey(),
   username: text('username').notNull(),
-  dostup: uuid('dostup').notNull().references(() => dostup.id),
+  dostup: bigint('dostup', { mode: "bigint" }).notNull().references(() => dostup.id),
   perms: integer('perms').default(0),
   bio: text('bio').default('Вы можете изменить информацию о пользователе с помощью /newinfo'),
-  potion: integer('potion').default(0),
+  potion: integer('potion').default(0), //от 0 до 100. Где 100 - повышение до чтеца. ниже -100 не может быть
   pechenie: integer('pechenie').default(0),
   globalLevel: bigint("global_level", { mode: "bigint" }).notNull().references(() => globalLevel.id),
-  localLevel: bigint("local_level", { mode: "bigint" }).references(() => localLevel.id),
+  localLevel: bigint("local_level", { mode: "bigint"}).references(() => localLevel.id), // тип данных изменен на uuid
   clanId: uuid("clan")
 });
 
-export const userRelations = relations(user, ({ one }) => ({
+export const userRelations = relations(users, ({ one }) => ({
   clan: one(clan, {
-    fields: [user.clanId],
+    fields: [users.clanId],
     references: [clan.id]
   })
 }));

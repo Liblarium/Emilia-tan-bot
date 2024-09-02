@@ -1,7 +1,7 @@
-import { integer, pgTable, serial, text } from "drizzle-orm/pg-core";
+import { bigserial, integer, pgTable, text } from "drizzle-orm/pg-core";
 
 export const clanRole = pgTable('clanRole', {
-  id: serial('id').primaryKey(),
+  id: bigserial('id', { mode: "number" }).primaryKey(),
   name: text("name").notNull(),
   permission: integer("permission").notNull(),
 });

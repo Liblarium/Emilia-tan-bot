@@ -18,7 +18,6 @@ class ButtonComponent {
     const isGuild = interaction.guild;
     const isMessage = interaction.message;
     const isChannel = interaction.channel;*/
-    client;
 
     if (isCustom === "but_test") {
       console.log(interaction.message.components);

@@ -19,8 +19,6 @@ class MenuComponent {
     const isMessage = interaction.message;
     const isChannel = interaction.channel;
     const isValue = interaction.values;*/
-    client;
-    isCustom;
   }
 }
 

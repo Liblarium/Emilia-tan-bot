@@ -1,31 +1,18 @@
+import { database as db } from "@client";
+import { Log } from "@log";
+import { dostup } from "@schema/dostup";
+import { guild } from "@schema/guild";
+import { globalLevel } from "@schema/level.global";
+import { users } from "@schema/user";
 import type { ArrayNotEmpty } from "@type/index";
 import { ChannelType, GuildMember, type Interaction, type Message } from "discord.js";
-import { database } from "@client";
-import { Log } from "@log";
-class Database { //это будет удалено позже
-  findOneBy(a: string, b: object) {
-    a; b;
-    return { res: { addInBD: true, info: { username: "" } }, created: true, error: null };
-  }
-  create(a: string, b: object) {
-    return this.findOneBy(a, b);
-  }
-  findOneOrCreate(b: object) {
-    return this.findOneBy("a", b);
-  }
-  update(a: string, b: object, c: object) {
-    console.log(c);
-    return this.findOneBy(a, b);
-  }
-}
-database;
-const missModelError = "";
+import { eq } from "drizzle-orm";
+
 
 const logCategories: ArrayNotEmpty<string> = ["add_in_db", "utils", "global"];
 
 type MesIntr = Message | Interaction;
 
-/** @deprecated обновлю позже*/
 export class AddInDB {
   constructor(message: MesIntr) {
     this.build(message).catch((e: unknown) => { console.error(e); });
@@ -35,32 +22,45 @@ export class AddInDB {
     if (message.channel?.type === ChannelType.DM || !message.guildId || !message.guild) return;
 
     const guildId = message.guildId;
-    const db = new Database();
-    const guilddb = db.findOneBy("guilds", { id: guildId });
+    const guilddb = await db.query.guild.findFirst({ where: eq(guild.id, BigInt(guildId)), columns: { id: true, addInBD: true } });
+    //.findOneBy("guilds", { id: guildId });
     let errrors = 0;
 
-    if (guilddb.error) {
-      if (guilddb.error === missModelError) return new Log({ text: missModelError, type: "error", categories: logCategories });
-
+    if (guilddb === undefined) {
       errrors++;
-      const newGuild = db.create("guilds", { id: guildId, addInBD: ["334418584774246401", "451103537527783455"].includes(guildId) });
+      const addedInBD = ["334418584774246401", "451103537527783455"].includes(guildId);
+      const newGuild = await db.insert(guild).values({ id: BigInt(guildId), addInBD: addedInBD }).returning({ insertedId: guild.id });
 
-      if (newGuild.error) return new Log({ text: newGuild.error, type: "error", categories: logCategories });
+      if (newGuild.length < 1) return new Log({ text: "По неизвестным причинам - новый сервер не было добавлен", type: "error", categories: logCategories });
 
       new Log({ text: `Был добавлен новый сервер (| ${message.guild.name} |)[${message.guildId}] в базу данных!`, type: "info", categories: logCategories });
 
-      if (errrors >= 5) throw new TypeError("Смени тип столбца в схеме!");
+      if (errrors >= 5) throw new TypeError("Проверь входящие данные!");
       return this.build(message);
     }
-    if (!guilddb.error) errrors = 0;
+    if (guilddb !== undefined) errrors = 0;
 
-    const res = guilddb.res;
     const member = message.member;
 
-    if (!res) return new Log({ text: "Нет guild!", type: "error", categories: logCategories });
-    if (!res.addInBD || (member?.user.bot ?? !member)) return;
+    if (!guilddb.addInBD || (member?.user.bot ?? !member)) return;
 
     if (!(member instanceof GuildMember)) return new Log({ text: "member не member!", type: "error", categories: logCategories });
+
+    const findOneOrCreateUser = async () => {
+      const find = await db.query.users.findFirst({
+        where: eq(user.id, member.user.id), columns: {
+          id: true
+        }
+      });
+
+      if (find === undefined) {
+        const userId = BigInt(member.user.id);
+        const manyCreated = await db.transaction(async (tx) => {
+          const userRes = await tx.insert(user).values({ id: BigInt(userId), username: member.user.username, dostup: userId, globalLevel: userId }).returning({ insertedId: user.id });
+        });
+        //create dostup & globalLevel
+      }
+    };
 
     const user = db.findOneOrCreate({
       name: "users", filter: { id: member.user.id }, document: {

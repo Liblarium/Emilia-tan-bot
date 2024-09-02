@@ -36,7 +36,8 @@ export class BaseCommand implements IBaseCommand {
   //db: Database;
   /**
    * Базовый класс для команд
-   * @param commandOptions
+   * 
+   * 
    * Пример использования
    * ```js
    * //обычная команда
@@ -57,6 +58,7 @@ export class BaseCommand implements IBaseCommand {
    *  }
    * }
    *```
+   * @param commandOptions Параметры
    * @param commandOptions.name название команды
    * @param commandOptions.description описание команды
    * @param commandOptions.option опции для команды (не /. Смотри выше)
@@ -87,7 +89,6 @@ export class BaseCommand implements IBaseCommand {
     };
 
     if (option.type === "command") {
-      // eslint-disable-next-line drizzle/enforce-delete-with-where
       this.option.delete = option.delete ?? false;
     } else {
       this.data.setName(name);
