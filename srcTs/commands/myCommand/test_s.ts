@@ -1,6 +1,6 @@
-import type { ChatInputCommandInteraction } from "discord.js";
 import { BaseCommand } from "@base/command";
 import type { EmiliaClient } from "@client";
+import type { ChatInputCommandInteraction } from "discord.js";
 
 export default class Test extends BaseCommand {
   constructor() {
@@ -28,6 +28,5 @@ export default class Test extends BaseCommand {
       }],
       ephemeral: true,
     });
-    client;
   }
 }

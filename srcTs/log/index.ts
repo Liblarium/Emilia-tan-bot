@@ -23,7 +23,7 @@ export class Log extends BaseLog implements ILog {
    *  text: `Содержимое логов`.
    *  type: `info`, //тип информации. В числовом виде: 1 - info, 2 - error, 3- warning, 4 - debug, 5 - test
    *  event: false, //|?: по дерфолту false. Нужно ли обрезать вывод в console.log().
-   *  categories: [`global`, `database`], //В какие категории записать все указанные логи. В console.log() выводится один раз.
+   *  categories: [`global`, `database`], //В какие категории записать все указанные логи. В console.log() выводится один раз. Не обязательно global или database, там string[]
    *  logs: true, //|?: нужно ли выводить текст в консоль. По дефолту true
    *  inline: 0, //|?: влияет только на текст в консоле. 0 - Без изменений, 1 - перенос сверху, 2 - снизу, 3 - оба.
    *  db: false //!|?: записывать ли в БД это. По дефолту false. (12.10.2023 временно отключено)

@@ -2,8 +2,7 @@ import { BaseCommand } from "@base/command";
 import type { EmiliaClient } from "@client";
 import type { Message } from "discord.js";
 //import { Database } from "@database";
-//import { Users } from "@database/schema/users";
-//import { ConnectionInfo } from "@database/typeorm";
+//import { Users } from "@schema/user";
 //import { log } from "@util/s";
 
 export default class Test extends BaseCommand {
