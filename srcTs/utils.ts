@@ -1,3 +1,4 @@
+import { Log } from "@log";
 import {
   type ActionRow,
   type AnyComponent,
@@ -137,17 +138,18 @@ function isComponents({
 }
 
 const log = (message?: unknown, ...optionalParams: unknown[]): void => {
-  console.log(`[${time()}][Эмилия-тян | Info]:`, message, ...optionalParams);
+  console.log(`[${time()}][Эмилия-тан | Info]:`, message, ...optionalParams);
 };
 
 const error = (message?: unknown, ...optionalParams: unknown[]): void => {
-  console.error(`[${time()}][Эмилия-тян | Error]:`, message, ...optionalParams);
+  console.error(`[${time()}][Эмилия-тан | Error]:`, message, ...optionalParams);
 };
 
 class EmiliaTypeError extends TypeError {
   constructor(message?: string) {
     super(message);
     this.name = `[${time()} | Emilia | TypeError]`;
+    new Log({ text: `${message}`, type: "error", categories: ["global", "typeError"], logs: false });
   }
 }
 
@@ -155,6 +157,7 @@ class EmiliaError extends Error {
   constructor(message?: string) {
     super(message);
     this.name = `[${time()} | Emilia | Error]`;
+    new Log({ text: `${message}`, type: "error", categories: ["global", "typeError"], logs: false });
   }
 }
 

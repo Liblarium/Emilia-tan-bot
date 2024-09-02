@@ -22,7 +22,7 @@ export class BaseHandler implements IBaseHandler {
    * @default /^[^.]+\.(js)$/
    */
   setFilter(filter: RegExp): void | Promise<void> {
-    if (typeof filter === "symbol") this.filterFile;
+    if (filter instanceof RegExp) this.filterFile = filter;
   }
 
   /**
@@ -35,7 +35,6 @@ export class BaseHandler implements IBaseHandler {
   }
 
   setLogic(modules: ModuleType): void | null | Promise<void> {
-    modules;
     throw new EmiliaTypeError("Вы не реализовали setLogic!");
   }
 
@@ -57,7 +56,7 @@ export class BaseHandler implements IBaseHandler {
             continue;
           }
 
-          /* biome-ignore lint/suspicious/noExplicitAny: <explanation> */ //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+          /* biome-ignore lint/suspicious/noExplicitAny: <explanation> */
           const modules: ModuleType = new (FileModule as any)();
           const logic = await this.setLogic(modules);
 
