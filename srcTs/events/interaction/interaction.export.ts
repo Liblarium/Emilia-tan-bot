@@ -1,6 +1,6 @@
 import type { EmiliaClient } from "@client";
+import { AddInDB } from "@util/addInDB";
 import type { Interaction } from "discord.js";
-//import { AddInDB } from "@util/addInDB";
 import { SlashCommand } from "./command";
 import { ButtonComponent } from "./components/button";
 import { MenuComponent } from "./components/menu";
@@ -14,7 +14,7 @@ class InteractionHandler {
   }
 
   run(interaction: Interaction, client: EmiliaClient) {
-    //new AddInDB(interaction);
+    new AddInDB(interaction);
 
     if (interaction.isChatInputCommand()) {
       new SlashCommand(interaction, client); //переписать позже
