@@ -1,5 +1,7 @@
 import { customJsonb } from "@database/schema.custom.type";
+import { relations } from "drizzle-orm";
 import { bigint, integer, pgTable, text } from "drizzle-orm/pg-core";
+import { users } from "./user";
 
 export const dostup = pgTable('dostup', {
   id: bigint('id', { mode: "bigint" }).primaryKey(), //use user.id form user
@@ -8,3 +10,7 @@ export const dostup = pgTable('dostup', {
   additionalAccess: customJsonb<string[]>('additional_access').default([]),
   maxRank: integer('max_rank').default(9), //0 - infinite, 9 - D5
 });
+
+export const dostupRelations = relations(dostup, ({ one }) => ({
+  user: one(users)
+}));
