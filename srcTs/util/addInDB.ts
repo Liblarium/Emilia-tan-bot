@@ -114,9 +114,7 @@ export class AddInDB {
           .insert(users)
           .values({
             id: userId,
-            username: member.user.username,
-            dostup: userId,
-            globalLevel: userId,
+            username: member.user.username
           })
           .returning({ insertedId: users.username });
 
