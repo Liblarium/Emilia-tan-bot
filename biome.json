@@ -43,7 +43,8 @@
         "noParameterAssign": "off"
       },
       "suspicious": {
-        "noConfusingVoidType": "off"
+        "noConfusingVoidType": "off",
+        "noAssignInExpressions": "off"
       }
     }
   },

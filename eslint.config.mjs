@@ -10,7 +10,6 @@ import importx from "eslint-plugin-import-x";
 import * as regexpPlugin from "eslint-plugin-regexp";
 import n from "eslint-plugin-n";
 import pluginPromise from 'eslint-plugin-promise';
-import functional from "eslint-plugin-functional";
 import jsonc from "eslint-plugin-jsonc";
 import security from "eslint-plugin-security";
 import vitest from "@vitest/eslint-plugin";
@@ -27,7 +26,6 @@ export default [
   regexpPlugin.configs["flat/recommended"],
   n.configs["flat/recommended"],
   pluginPromise.configs['flat/recommended'],
-  functional.configs.recommended,
   ...jsonc.configs["flat/recommended-with-jsonc"],
   security.configs.recommended,
   {
@@ -45,7 +43,8 @@ export default [
       "./package.json",
       ".{js,json,cjs,yaml,yml,*}",
       "./abyss/*",
-      "./canvas/*",
+      "./abyss",
+      "./canvas",
       "./vitest.config.ts",
       "*/**/*.deprecation",
       "./tsconfig.*.json",
@@ -94,22 +93,11 @@ export default [
       "eslint-plugin/require-meta-docs-description": "error",
       "import-x/namespace": "off",
       "n/no-missing-import": "off",
-      "functional/functional-parameters": "off",
-      "functional/no-expression-statements": "off",
-      "functional/no-classes": "off",
-      "functional/no-throw-statements": "off",
       "security/detect-object-injection": "off",
-      "functional/no-return-void": "off",
-      "functional/no-let": "off",
-      "functional/no-conditional-statements": "off",
-      "functional/no-loop-statements": "off",
-      "functional/immutable-data": "off",
       "@typescript-eslint/no-redundant-type-constituents": "off",
       "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
       "@typescript-eslint/only-throw-error": "off",
-      "functional/no-mixed-types": "off",
-      "functional/prefer-immutable-types": "off",
       "@typescript-eslint/prefer-literal-enum-member": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "n/no-unpublished-import": "off",
@@ -119,12 +107,13 @@ export default [
       "n/no-unsupported-features/node-builtins": "off",
       "n/no-extraneous-import": "off",
       "@typescript-eslint/require-await": "off",
-      "jsdoc/require-jsdoc": "off"
+      "jsdoc/require-jsdoc": "off",
+      "@typescript-eslint/no-unused-expressions": "off"
     },
     settings: {
       "import-x/parsers": {
         "@typescript-eslint/parser": [
-          ".ts",
+          ".ts"
         ]
       },
       "import-x/extensions": [
@@ -133,7 +122,7 @@ export default [
       "import-x/resolver": {
         "typescript": {
           "alwaysTryTypes": true,
-          "project": "./tsconfig.json"
+          "project": ["./tsconfig.json", "./tsconfig.base.json"]
         },
         "node": {
           "extensions": [
@@ -147,6 +136,7 @@ export default [
             "@utils_": "./srcTs/utils.ts",
             "@log": "./log/src",
             "@handlers": "./srcTs/handlers",
+            "@database": "./srcTs/database",
             "@schema": "srcTs/database/schema"
           }
         }

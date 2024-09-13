@@ -35,9 +35,6 @@
       "@database": [
         "srcTs/database"
       ],
-      "@database/*": [
-        "srcTs/database/*"
-      ],
       "@schema/*": [
         "srcTs/database/schema/*"
       ]
