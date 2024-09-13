@@ -1,16 +1,11 @@
-import type { Log } from "@log";
 import type {
   CommandClassOptions,
   CommandOptions,
-  IBaseCommand,
+  ExecuteReturns,
+  IBaseCommand
 } from "@type/base/command";
-//import { Database } from "@database";
 import { EmiliaTypeError } from "@util/s";
-import {
-  type ChatInputCommandInteraction,
-  type Message,
-  SlashCommandBuilder,
-} from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 
 export class BaseCommand implements IBaseCommand {
   /** Это `new SlashCommandBuilder()`. Только для `/` команд. Доп параметры `/` идут только через неё */
@@ -32,12 +27,10 @@ export class BaseCommand implements IBaseCommand {
    * - **dUsers**: `string[] | []` - массив с id пользователей, которым не будет доступна команда
    */
   option: CommandClassOptions;
-  /** Класс для работы с Базой данных */
-  //db: Database;
   /**
    * Базовый класс для команд
-   * 
-   * 
+   *
+   *
    * Пример использования
    * ```js
    * //обычная команда
@@ -74,7 +67,6 @@ export class BaseCommand implements IBaseCommand {
 
     this.name = name;
     this.data = new SlashCommandBuilder();
-    //this.db = new Database();
     this.option = {
       type: option.type,
       aliases: option.aliases ?? [],
@@ -96,12 +88,7 @@ export class BaseCommand implements IBaseCommand {
     }
   }
 
-  execute(...args: unknown[]):
-    | void
-    | Log
-    | Message
-    | ChatInputCommandInteraction
-    | Promise<void | Message | ChatInputCommandInteraction | Log> {
+  execute(...args: unknown[]): ExecuteReturns | Promise<ExecuteReturns> {
     throw new EmiliaTypeError(
       `Вы не реализовали свой execute для [${this.name}] ${this.option.type} команды!`,
     );

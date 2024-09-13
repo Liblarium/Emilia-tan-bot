@@ -10,7 +10,7 @@ import {
   type RepliableInteraction,
 } from "discord.js";
 
-const GUILD_PERMISSIONS = { //guild logs
+const GUILD_PERMISSIONS = { //guild logs in db
   CREATE: 1 << 0, // 1
   DELETE: 1 << 1, // 2
   UPDATE: 1 << 2, // 4
@@ -149,7 +149,7 @@ class EmiliaTypeError extends TypeError {
   constructor(message?: string) {
     super(message);
     this.name = `[${time()} | Emilia | TypeError]`;
-    new Log({ text: `${message}`, type: "error", categories: ["global", "typeError"], logs: false });
+    new Log({ text: message, type: "error", categories: ["global", "typeError"], logs: false });
   }
 }
 
@@ -157,7 +157,7 @@ class EmiliaError extends Error {
   constructor(message?: string) {
     super(message);
     this.name = `[${time()} | Emilia | Error]`;
-    new Log({ text: `${message}`, type: "error", categories: ["global", "typeError"], logs: false });
+    new Log({ text: message, type: "error", categories: ["global", "typeError"], logs: false });
   }
 }
 

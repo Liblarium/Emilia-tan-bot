@@ -13,8 +13,6 @@ export const localLevel = pgTable("local_level", {
   nextXp: bigint("next_xp", { mode: "bigint" }).default(sql`CAST(EXTRACT(EPOCH FROM (NOW() + INTERVAL '30 seconds')) * 1000 AS BIGINT)`)
 });
 
-
-
 export const localLevelRelations = relations(localLevel, ({ one }) => ({
   user: one(users, {
     fields: [localLevel.userId],

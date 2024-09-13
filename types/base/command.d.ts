@@ -1,12 +1,12 @@
 import type { Log } from "@log";
 import type { ArrayMaybeEmpty } from "@type";
+import type { EmiliaError, EmiliaTypeError } from "@util/s";
 import type {
   ChatInputCommandInteraction,
+  InteractionResponse,
   Message,
-  SlashCommandBuilder,
+  SlashCommandBuilder
 } from "discord.js";
-
-//import { Database } from "../../srcTs/database";
 
 interface TypeCommand {
   type: "command" | "slash";
@@ -37,18 +37,13 @@ export interface CommandOptions {
   description?: string;
 }
 
+export type ExecuteReturns = void | Message | ChatInputCommandInteraction | InteractionResponse | Log | EmiliaError | EmiliaTypeError;
+
 export interface IBaseCommand {
   data: SlashCommandBuilder;
   name: string;
   option: CommandClassOptions;
-  //db: Database;
-
   execute: (
     ...args: unknown[]
-  ) =>
-    | void
-    | Message
-    | ChatInputCommandInteraction
-    | Log
-    | Promise<void | Message | ChatInputCommandInteraction | Log>;
+  ) => ExecuteReturns | Promise<ExecuteReturns>;
 }

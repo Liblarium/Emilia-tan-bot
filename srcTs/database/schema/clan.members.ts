@@ -1,5 +1,5 @@
-import { customJsonb } from "@database/schema.custom.type";
-import { relations } from "drizzle-orm";
+import { customJsonb } from "@database";
+import { relations, sql } from "drizzle-orm";
 import { bigint, bigserial, pgTable, uuid } from "drizzle-orm/pg-core";
 import { clan } from "./clan.core";
 import { clanRole } from "./clan.roles";
@@ -7,8 +7,8 @@ import { users } from "./user";
 
 export const clanMember = pgTable("clanMember", {
   id: bigserial("id", { mode: "bigint" }).primaryKey(),
-  userId: bigint("user_id", { mode: "bigint" }).references(() => users.id),
-  clanId: bigint("clan_id", { mode: "bigint" }).references(() => clan.id),
+  userId: bigint("user_id", { mode: "bigint" }).references(() => users.id, { onDelete: "set default" }).default(sql`'0'::bigint`),
+  clanId: bigint("clan_id", { mode: "bigint" }).references(() => clan.id, { onDelete: "set default" }).default(sql`'0'::bigint`),
   roleId: bigint("role_id", { mode: "bigint" }).references(() => clanRole.id),
   atribytes: customJsonb<{
     owner: boolean;

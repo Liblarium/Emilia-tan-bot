@@ -6,7 +6,6 @@ export interface LogOptions {
   type: TypeLog;
   categories: ArrayNotEmpty<string>;
   event?: boolean;
-  db?: boolean;
   logs?: boolean;
   inline?: TypeInline;
 }
@@ -16,5 +15,4 @@ export interface ILog {
   type: TypeLog;
   logs: boolean;
   inline: TypeInline;
-  db: boolean;
 }

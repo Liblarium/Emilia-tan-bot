@@ -1,4 +1,3 @@
-//import { Database } from "@database";
 import type { Log } from "@log";
 import type { ChatInputCommandInteraction, Message } from "discord.js";
 
@@ -14,7 +13,6 @@ export interface IBaseEvent {
   name: string;
   once: boolean;
   category: CategoryType;
-  //db: Database;
 
   execute: (...args: unknown[]) => EventReturns | Promise<EventReturns>;
 }

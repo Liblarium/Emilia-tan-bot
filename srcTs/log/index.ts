@@ -3,13 +3,19 @@ import type { ArrayMaybeEmpty } from "@type";
 import type { ILog, LogOptions } from "@type/log";
 import { time } from "@util/s";
 
-const catchs = (e: unknown) => { console.error(e); };
+/**
+ * A function to catch any errors that may occur in the code
+ * and log them to the console with a red color
+ * @param e The error that occurred
+ */
+const catchs = (e: unknown) => {
+  console.error("\x1b[31m", e, "\x1b[0m");
+};
 
 /**
  * Класс для логирования данных в файл и консоль
  */
 export class Log extends BaseLog implements ILog {
-  db: boolean;
   private readonly otherCategories: ArrayMaybeEmpty<string>;
 
   /**
@@ -26,14 +32,12 @@ export class Log extends BaseLog implements ILog {
    *  categories: [`global`, `database`], //В какие категории записать все указанные логи. В console.log() выводится один раз. Не обязательно global или database, там string[]
    *  logs: true, //|?: нужно ли выводить текст в консоль. По дефолту true
    *  inline: 0, //|?: влияет только на текст в консоле. 0 - Без изменений, 1 - перенос сверху, 2 - снизу, 3 - оба.
-   *  db: false //!|?: записывать ли в БД это. По дефолту false. (12.10.2023 временно отключено)
    * });
    * ```
    * @param logOptions
    * @param logOptions.text Содержимое логов
    * @param logOptions.type тип информации. В числовом виде: 1 - info, 2 - error, 3- warning, 4 - debug, 5 - test
    * @param logOptions.event |?по дерфолту false. Нужно ли обрезать вывод в console.log()
-   * @param logOptions.db !|?: записывать ли в БД это. По дефолту false. (12.10.2023 временно отключено)
    * @param logOptions.categories global | database. |? В какие категории записать все указанные логи. В console.log() выводится один раз
    * @param logOptions.logs ?: нужно ли выводить текст в консоль. По дефолту true
    * @param logOptions.inline |?: влияет только на текст в консоле. 0 - Без изменений, 1 - перенос сверху, 2 - снизу, 3 - оба.
@@ -42,7 +46,6 @@ export class Log extends BaseLog implements ILog {
     text,
     type,
     event = false,
-    db = false,
     categories,
     logs = true,
     inline = 0,
@@ -52,7 +55,6 @@ export class Log extends BaseLog implements ILog {
     this.type = type;
     this.logs = logs;
     this.inline = inline;
-    this.db = db;
 
     if (typeof type === "number") this.setType(type);
     if (!categories.length) categories = ["other"];

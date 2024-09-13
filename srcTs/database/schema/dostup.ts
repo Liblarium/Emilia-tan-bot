@@ -1,4 +1,4 @@
-import { customJsonb } from "@database/schema.custom.type";
+import { customJsonb } from "@database";
 import { relations } from "drizzle-orm";
 import { bigint, integer, pgTable, text } from "drizzle-orm/pg-core";
 import { users } from "./user";

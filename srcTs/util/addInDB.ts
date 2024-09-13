@@ -25,7 +25,7 @@ function isGuildMember(member: unknown): member is GuildMember {
 export class AddInDB {
   constructor(message: MesIntr) {
     this.build(message).catch((e: unknown) => {
-      console.error(e);
+      new Log({ text: e, type: "error", categories: ["global", "util"] });
     });
   }
 
@@ -49,7 +49,6 @@ export class AddInDB {
       const addedInBD = ["334418584774246401", "451103537527783455"].includes(
         guildId,
       );
-      console.log(message.guildId, addedInBD);
       const newGuild = await db
         .insert(guild)
         .values({ id: BigInt(guildId), addInBD: addedInBD })
@@ -87,57 +86,10 @@ export class AddInDB {
     }
 
     const userId = BigInt(member.user.id);
-    async function findOneOrCreateUser() {
-      const find = await db.query.users.findFirst({
-        where: eq(users.id, userId),
-        columns: {
-          id: true,
-          username: true
-        },
-      });
 
-      if (find !== undefined) return find;
-      if (!isGuildMember(member)) throw new EmiliaTypeError(`Указанный пользователь ${member} - не является участником сервера!`);
+    const user = await this.findOneOrCreateUser(userId, member);
 
-      const manyCreated = await db.transaction(async (tx) => {
-        const dostupRes = await tx
-          .insert(dostup)
-          .values({ id: userId })
-          .returning({ insertedId: dostup.id });
-
-        const globalLevelRes = await tx
-          .insert(globalLevel)
-          .values({ id: userId })
-          .returning({ insertedId: globalLevel.id });
-
-        const userRes = await tx
-          .insert(users)
-          .values({
-            id: userId,
-            username: member.user.username
-          })
-          .returning({ insertedId: users.username });
-
-
-        return (
-          userRes.length > 0 &&
-          dostupRes.length > 0 &&
-          globalLevelRes.length > 0
-        );
-      });
-      if (manyCreated === true)
-        new Log({
-          text: `Был добавлен новый пользователь (${member.user.username}) в БД!`,
-          type: "info",
-          categories: logCategories,
-        });
-
-      return findOneOrCreateUser();
-    };
-
-    const user = await findOneOrCreateUser();
-
-    if (member.user.username === user.username) return;
+    if (!user || member.user.username === user.username) return;
 
     await db
       .update(users)
@@ -149,5 +101,53 @@ export class AddInDB {
       type: "info",
       categories: logCategories,
     });
+  }
+
+  private async findOneOrCreateUser(userId: bigint, member: GuildMember): Promise<{ id: bigint; username: string; } | void> {
+    const find = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: {
+        id: true,
+        username: true
+      },
+    });
+
+    if (find !== undefined) return find;
+    if (!isGuildMember(member)) throw new EmiliaTypeError(`Указанный пользователь ${member} - не является участником сервера!`);
+
+    const manyCreated = await db.transaction(async (tx) => {
+      const dostupRes = await tx
+        .insert(dostup)
+        .values({ id: userId })
+        .returning({ insertedId: dostup.id });
+
+      const globalLevelRes = await tx
+        .insert(globalLevel)
+        .values({ id: userId })
+        .returning({ insertedId: globalLevel.id });
+
+      const userRes = await tx
+        .insert(users)
+        .values({
+          id: userId,
+          username: member.user.username
+        })
+        .returning({ insertedId: users.username });
+
+
+      return (
+        userRes.length > 0 &&
+        dostupRes.length > 0 &&
+        globalLevelRes.length > 0
+      );
+    });
+    if (manyCreated === true)
+      new Log({
+        text: `Был добавлен новый пользователь (${member.user.username}) в БД!`,
+        type: "info",
+        categories: logCategories,
+      });
+
+    return this.findOneOrCreateUser(userId, member);
   }
 }

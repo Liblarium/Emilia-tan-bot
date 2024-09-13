@@ -1,5 +1,5 @@
 import { bigint, jsonb, pgTable, text } from "drizzle-orm/pg-core";
-//import { customJsonb } from ""@database/schema.custom.type";
+//import { customJsonb } from ""@database";
 
 export const baka = pgTable('baka', {
   id: bigint("id", { mode: "bigint" }).primaryKey(),

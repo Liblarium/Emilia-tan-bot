@@ -1,6 +1,7 @@
 import { Log } from "@log";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import { customJsonb } from "./schema.custom.type";
 import { schema } from "./schemas";
 
 const pgPool = new Pool({
@@ -9,4 +10,5 @@ const pgPool = new Pool({
 
 new Log({ text: "Подключение к базе данных успешно установлено", type: "info", categories: ["global", "pg"] });
 
-export const db = drizzle(pgPool, { schema });
+const db = drizzle(pgPool, { schema });
+export { customJsonb, db };

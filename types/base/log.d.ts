@@ -1,4 +1,4 @@
-export type TypeText = string | number | object | unknown[];
+export type TypeText = string | number | object | unknown[] | unknown;
 export enum TypeLogEnum {
   info = 0 | 1,
   error = 2,

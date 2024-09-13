@@ -13,13 +13,12 @@ export default class Ready extends BaseEvent {
   execute(client: EmiliaClient) {
     if (!client?.user || !process.env.TOKEN) return new Log({ text: "Нет client/client.user или не веден TOKEN", type: "error", categories: ["global", "event"] });
 
-    new Log({ text: `${client.user.username} включилась.`, type: "info", categories: ["global", "event"], db: true });
+    new Log({ text: `${client.user.username} включилась.`, type: "info", categories: ["global", "event"] });
 
     const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
     const slashCommands = client.slashCommands;
     const slashComms: [] | (SlashCommandBuilder | undefined)[] = slashCommands.size > 0 ? slashCommands.map((i) => i.data) : [];
     //let b = 0;
-
     rest.put(Routes.applicationCommands(client.user.id), { body: slashComms }).then(() => {
       new Log({ text: `Загружено ${client.commands.size.toString()} message команд.`, type: "info", categories: ["global", "command"] });
       new Log({ text: `Зарегестрировано ${slashCommands.size.toString()} slash команд.`, type: "info", categories: ["global", "command"] });

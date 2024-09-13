@@ -39,6 +39,7 @@ export class Levels {
     });
 
     if (!guilddb) return; //пока без добавления гильдии отдельно
+
     const user = await db.query.users.findFirst({
       where: eq(users.id, userId),
       with: {
@@ -86,11 +87,10 @@ export class Levels {
 
   private async level({ args, nowMs, dbType, userId, guildId }: LevelOptions): Promise<LevelReturning | Log | void> {
     if (!args || typeof args.nextXp !== "bigint" || typeof args.maxXp !== "number" || typeof args.xp !== "number" || typeof args.level !== "number") {
-      console.log("args: ", args, "nowMs: ", nowMs, "dbType: ", dbType, "userId: ", userId, "guildId: ", guildId);
       return new Log({ text: `Похоже - в Levels.level не были переданы нужные аргументы. (${args}, ${nowMs}, ${dbType}, ${userId})`, type: "error", categories: ["global", "pg"] });
     }
 
-    if (args.nextXp > nowMs) return console.log(`Пока рано (${Number((args.nextXp - nowMs) / BigInt(1000))}s)`);
+    if (args.nextXp > nowMs) return;
 
     const addExp = random(1, 15); //позже добавлю связку с БД для local level
     let newXp = args.xp + addExp;

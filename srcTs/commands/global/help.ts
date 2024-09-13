@@ -37,7 +37,7 @@ export default class Help extends BaseCommand {
           {
             title: "Список команд",
             description: helpName
-              .map((i) => `**${i}** - ${helpList[i]}`)
+              .map((i) => `**${i}** - ${helpList.get(i)?.text ?? "[Ашибка]"}`)
               .join(",\n"),
             color,
             timestamp,
@@ -72,7 +72,7 @@ export default class Help extends BaseCommand {
       embeds: [
         {
           title: helpCommandName,
-          description: helpList[helpCommandName],
+          description: helpList.get(helpCommandName)?.text,
           color,
           timestamp,
           footer: {

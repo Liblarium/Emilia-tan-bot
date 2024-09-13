@@ -5,19 +5,16 @@ import type {
   IBaseEvent
 } from "@type/base/event";
 import { EmiliaTypeError } from "@util/s";
-//import { Database } from "../database";
 
 export class BaseEvent implements IBaseEvent {
   name: string;
   once: boolean;
   category: CategoryType;
-  //db: Database;
 
   constructor({ name, once, category }: BaseEventsOptions) {
     this.name = name;
     this.once = once ?? false;
     this.category = category;
-    //this.db abase();
   }
 
 

@@ -13,7 +13,8 @@ export const users = pgTable('users', {
   bio: text('bio').default('Вы можете изменить информацию о пользователе с помощью /newinfo'),
   potion: integer('potion').default(0), //от 0 до 100. Где 100 - повышение до чтеца. ниже -100 не может быть
   pechenie: integer('pechenie').default(0),
-  localLevelId: bigint("local_level_id", { mode: "bigint" }).references(() => localLevel.id),
+  pol: text('pol').default("неизвестно"),
+  localLevelId: bigint("local_level_id", { mode: "bigint" }).references(() => localLevel.id, { onDelete: "cascade" }),
   clanId: bigint("clan_id", { mode: "bigint" })
 });
 

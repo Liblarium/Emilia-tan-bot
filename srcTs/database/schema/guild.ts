@@ -1,4 +1,4 @@
-import { customJsonb } from "@database/schema.custom.type";
+import { customJsonb } from "@database";
 import { localLevel } from "@schema/level.local";
 import { relations } from "drizzle-orm";
 import { bigint, boolean, pgTable } from "drizzle-orm/pg-core";

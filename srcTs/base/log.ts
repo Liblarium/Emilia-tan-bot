@@ -166,7 +166,7 @@ export class BaseLog implements IBaseLog {
 
     try {
       const logPath = resolve(BaseLogPath, category, `${category}-${date()}.log`);
-      const textOut = typeof text === "object" ? inspect(text) : typeof text === "string" ? text : text.toString();
+      const textOut = typeof text === "object" ? inspect(text) : typeof text === "string" ? text : `${text}`;
       const logText = `${dateAndTime()}[${category.toUpperCase()} | ${type}]: ${textOut}\n`;
       await appendFile(logPath, logText);
       return true;
@@ -244,7 +244,7 @@ export class BaseLog implements IBaseLog {
       await this.addLog(text, type);
 
       const logText = {
-        in: typeof text === "object" ? "" : typeof text === "string" ? text : text.toString(),
+        in: typeof text === "object" ? "" : typeof text === "string" ? text : `${text}`,
         out: typeof text === "object" ? text : "",
       };
       let splits: string[] = [];
