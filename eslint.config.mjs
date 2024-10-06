@@ -17,6 +17,26 @@ import * as drizzle from "eslint-plugin-drizzle";
 import nosecret from "eslint-plugin-no-secrets";
 
 export default [
+  {
+    ignores: [
+      "node_modules",
+      "srcJs/*",
+      "biome.json",
+      "tsconfig.json",
+      "package.json",
+      ".{js,json,cjs,yaml,yml,*}",
+      "abyss/*",
+      "abyss",
+      "canvas",
+      "vitest.config.ts",
+      "*/**/*.deprecation",
+      "tsconfig.*.json",
+      "drizzle/*",
+      "drizzle.config.ts",
+      "eslint.config.mjs",
+      "pg.client.js"
+    ]
+  },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   eslintPlugin.configs["flat/recommended"],
@@ -35,24 +55,7 @@ export default [
       drizzle,
       nosecret
     },
-    ignores: [
-      "node_modules",
-      "./srcJs/*",
-      "./biome.json",
-      "./tsconfig.json",
-      "./package.json",
-      ".{js,json,cjs,yaml,yml,*}",
-      "./abyss/*",
-      "./abyss",
-      "./canvas",
-      "./vitest.config.ts",
-      "*/**/*.deprecation",
-      "./tsconfig.*.json",
-      "./drizzle/*",
-      "./drizzle.config.ts",
-      "./eslint.config.mjs"
-    ],
-    files: ["srcTs/**/*.ts", "types/**/*.d.ts"],
+    files: ["srcTs/**/*.ts", "types/**/*.d.ts", "abyss/src/guild.tests.ts"],
     languageOptions: {
       parser: tsparser,
       parserOptions: {

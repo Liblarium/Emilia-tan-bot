@@ -12,6 +12,8 @@ drizzle/**/*.*
 tsconfig copy.json
 package-lock.json
 /abyss/src/*.tests.ts
+/abyss/src/*.tests.mts
+/abyss/*.tests.*
 /abyss/res1.png
 /abyss/res.png
 drizzle/meta/_journal.json

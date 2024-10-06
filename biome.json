@@ -6,11 +6,14 @@
       "srcTs/**/*.ts",
       "srcTs/**/*.js",
       "srcTs/**/*.d.ts",
-      "types/**/*.d.ts"
+      "types/**/*.d.ts",
+      "abyss/src/guild.tests.*"
     ],
     "ignore": [
       "srcJs/*",
-      "abyss/*",
+      "abyss/*.js",
+      "abyss/src/img.tests.ts",
+      "abyss/src/img.ts",
       "drizzle",
       "package.json",
       "node_modules/**"
@@ -26,13 +29,17 @@
       "srcTs/**/*.ts",
       "srcTs/**/*.js",
       "srcTs/**/*.d.ts",
-      "types/**/*.d.ts"
+      "types/**/*.d.ts",
+      "abyss/src/guild.tests.*"
     ],
     "ignore": [
       "srcJs/*",
-      "abyss/*",
+      "abyss/*.js",
+      "abyss/src/img.tests.ts",
+      "abyss/src/img.ts",
       "package.json",
-      "node_modules/*"
+      "node_modules/*",
+      "node_modules/*.*"
     ],
     "rules": {
       "complexity": {
@@ -53,12 +60,15 @@
       "srcTs/**/*.ts",
       "srcTs/**/*.js",
       "srcTs/**/*.d.ts",
-      "types/**/*.d.ts"
+      "types/**/*.d.ts",
+      "abyss/src/guild.tests.*"
     ],
     "indentWidth": 2,
     "ignore": [
       "srcJs/*",
-      "abyss/*",
+      "abyss/*.js",
+      "abyss/src/img.tests.ts",
+      "abyss/src/img.ts",
       "package.json",
       "node_modules/*"
     ]
