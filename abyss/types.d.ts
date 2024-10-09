@@ -1,5 +1,8 @@
 import type { Image } from "@napi-rs/canvas";
 import sharp from "sharp";
+import * as types from "../types";
+
+export * from "../types";
 
 export interface DrawClanProfileOptions {
   logoUrl: string;
@@ -312,6 +315,55 @@ export interface DrawDynamicOptions {
   lineSpacing?: number;
 }
 
+export interface DrawClanDescriptionBaseOptions {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface DrawClanDescriptionStyleOptions {
+  outlineColor?: string;
+  backgroundColor?: string;
+  lineWidth?: number;
+  blurPx?: number;
+}
+
+export interface DrawClanDescriptionTextOptions {
+  x1: number;
+  x2: number;
+  y: number;
+  text: string;
+  fontOptions: {
+    color: string;
+    size: number;
+  };
+  dynamicOptions: DrawDynamicOptions;
+}
+
+export interface DrawClanInfoOptions extends Partial<Omit<DrawClanDescriptionTextOptions, "text" | "fontOptions">> {
+  x?: number;
+  corrector?: number;
+  created: string;
+  type: string;
+  globalAlpha?: number;
+  fontOptions?: types.ArrayNotEmpty<FontOptions>;
+  blurPx?: number;
+  backgroundColor?: string;
+  outlineColor?: string;
+  width?: number;
+  height?: number;
+  radius?: number;
+}
+
+export interface FontOptions {
+  color?: string; size?: number;
+}
+
+export interface DrawClanDescriptionOptions extends DrawClanDescriptionBaseOptions, DrawClanDescriptionStyleOptions {
+  textOptions: DrawClanDescriptionTextOptions;
+};
+
 export interface GradientOptions {
   type?: "linear" | "radial";
   colorType?: TypeDrawImageOrColor | "both";
@@ -389,16 +441,177 @@ export interface TemplatePositionType {
   height: number;
 }
 
+/**
+ * The options for resizing an image.
+ */
 export interface ImageOptions {
+  /** The width of the image. */
   w?: number;
+  /** The height of the image. */
   h?: number;
+  /** The fit option for resizing the image. */
   fit?: keyof sharp.FitEnum;
 }
 
+
+/**
+ * The options for loading an image with resizing.
+ */
 export interface LoadImageResize {
+  /** The width of the image. */
   w?: number;
+  /** The height of the image. */
   h?: number;
+  /** The additional options for resizing the image. */
   options?: ImageOptions;
+}
+
+
+/**
+ * The options for drawing a rounded rectangle.
+ */
+export interface RoundedRectOptions {
+  /** The x position of the rounded rectangle. */
+  x: number;
+  /** The y position of the rounded rectangle. */
+  y: number;
+  /** The width of the rounded rectangle. */
+  w: number;
+  /** The height of the rounded rectangle. */
+  h: number;
+  /** The radius of the rounded corners. */
+  r?: number;
+}
+
+export interface DrawDeputuOptions {
+  /**
+   * The x position of the deputu image.
+   */
+  x?: number;
+
+  /**
+   * The y position of the deputu image.
+   */
+  y?: number;
+
+  /**
+   * The width of the deputu image.
+   */
+  width?: number;
+
+  /**
+   * The height of the deputu image.
+   */
+  height?: number;
+
+  /**
+   * The radius of the deputu image.
+   */
+  r?: number;
+
+  /**
+   * The x position of the deputu circle.
+   */
+  rx?: number;
+
+  /**
+   * The y position of the deputu circle.
+   */
+  ry?: number;
+
+  /**
+   * The radius of the deputu circle.
+   */
+  rr?: number;
+
+  /**
+   * The x position of the deputu icon.
+   */
+  ix?: number;
+
+  /** The x position of the deputu nickname & role */
+  xt?: number;
+
+  /** The y position of the deputu nickname & role */
+  yt?: number;
+
+  /**
+   * The background color of the deputu image.
+   */
+  bgColor?: string;
+
+  /**
+   * The border style of the deputu image.
+   */
+  borderStyle?: string;
+
+  /**
+   * The line width of the deputu image.
+   */
+  lineWidth?: number;
+
+  /**
+   * The blur amount of the deputu image.
+   */
+  blurPx?: number;
+
+  /**
+   * The global alpha of the deputu image.
+   */
+  globalAlpha?: number;
+
+  /**
+   * The deputu information.
+   */
+  deputu: ClanDeputuDrawOptions[];
+
+  /** The text options (nickname & role) */
+  textOptions?: TextOptionsDeputu;
+}
+
+export interface TextOptionsDeputu {
+  /** The x position of the nickname and role*/
+  x1?: number;
+
+  /** The x2 position of the nickname or role */
+  x2?: number;
+
+  /** The x2 radius position of the role */
+  x2r?: number;
+
+  /** The y position of the nickname and role */
+  y?: number;
+
+  /** The y radius position of the role */
+  yr?: number;
+
+  /** The text color options */
+  colorOptions?: TextColorOptions;
+}
+
+export interface TextColorOptions {
+  /** The nickname color */
+  nickname?: string;
+
+  /** The role color */
+  role?: string;
+}
+
+export interface ClanDeputuDrawOptions {
+  /**
+   * The username of the deputu.
+   */
+  username: string;
+
+  /**
+   * The avatar of the deputu.
+   */
+  avatar: Image;
+
+  /**
+   * The role of the deputu.
+   */
+  role: string;
 }
 
 export type FillOrStrokeOption<T = number, K = T> = { fill?: T; stroke?: K };
