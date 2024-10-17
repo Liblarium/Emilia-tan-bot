@@ -31,10 +31,10 @@ export default class Prefix extends BaseCommand {
     )
       return;
     const guildId = BigInt(message.guild.id);
-    const guilddb = await db.query.guild.findFirst({ where: eq(guild.id, guildId), columns: { prefix: true } });
+    const guildDB = await db.query.guild.findFirst({ where: eq(guild.id, guildId), columns: { prefix: true } });
     const newPrefix = args[0];
 
-    if (guilddb === undefined) {
+    if (guildDB === undefined) {
       message.channel
         .send({
           content:
@@ -55,16 +55,16 @@ export default class Prefix extends BaseCommand {
             embeds: [
               {
                 title,
-                description: "Максимально-доступный размер префикса - 5. Такой размер был установлен, дабы людям не нужно было вводить киллометровый префикс)",
+                description: "Максимально-доступный размер префикса - 5. Такой размер был установлен, дабы людям не нужно было вводить километровый префикс)",
                 footer: {
-                  text: `Размер вашего префиса: ${newPrefix.length.toString()}.`,
+                  text: `Размер вашего префикса: ${newPrefix.length.toString()}.`,
                 },
               },
             ],
           })
           .catch(catchs) as unknown as Message | undefined;
 
-      if (newPrefix === guilddb.prefix?.now)
+      if (newPrefix === guildDB.prefix?.now)
         return message.channel.send({
           embeds: [
             {
@@ -99,7 +99,7 @@ export default class Prefix extends BaseCommand {
               description: `Новый префикс ${newPrefix} установлен.`,
               color: 2_490_112,
               footer: {
-                text: `Стандартный префикс: ${guilddb.prefix?.default ?? prefix ?? "[Ошибка]"}`,
+                text: `Стандартный префикс: ${guildDB.prefix?.default ?? prefix ?? "[Ошибка]"}`,
               },
             },
           ],
@@ -112,7 +112,7 @@ export default class Prefix extends BaseCommand {
         embeds: [
           {
             title: "Префикс бота",
-            description: `Установленный префикс на сервере: **${guilddb.prefix?.now ?? "[Ошибка]"}**, стандартный префикс: ${guilddb.prefix?.default ?? "[Ошибка]"}`,
+            description: `Установленный префикс на сервере: **${guildDB.prefix?.now ?? "[Ошибка]"}**, стандартный префикс: ${guildDB.prefix?.default ?? "[Ошибка]"}`,
             color: 0x25_ff_00,
             footer: {
               text: "Владелец сервера может сменить префикс для сервера",

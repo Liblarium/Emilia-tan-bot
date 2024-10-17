@@ -7,7 +7,8 @@ import {
 import type { ProfileTypes } from "@type/util/profile";
 import { EmiliaTypeError } from "@util/s";
 import sharp from "sharp";
-
+// TODO: Реализовать поддержку большого количества картинок
+// TODO: Реализовать настройку профиля через JSON
 export class Profile {
   canvas: Canvas;
   ctx: SKRSContext2D;
@@ -16,7 +17,7 @@ export class Profile {
     font: "Arial",
   };
   /**
-   * Для более подробной инфы - гляди на основную sharp функцию ;D (просто добавь скобки)
+   * Для более подробной информации - гляди на основную sharp функцию ;D (просто добавь скобки)
    *
    * Или на саму документацию библиотеки `sharp.js` (это библиотека для работы с изображениями)
    */
@@ -138,7 +139,7 @@ export class Profile {
 
     setStyle(avatarBorderColor, "fill", "#123123");
 
-    const avatarLineWidh = avatarBorder?.lineWidth ?? 5;
+    const avatarLineWidth = avatarBorder?.lineWidth ?? 5;
 
     ctx.fill();
     ctx.closePath();
@@ -152,7 +153,7 @@ export class Profile {
     ctx.arc(
       avatarPosition.x ?? 150,
       avatarPosition.y ?? 200,
-      (avatarPosition.radius ?? 86.5) + avatarLineWidh,
+      (avatarPosition.radius ?? 86.5) + avatarLineWidth,
       startAngle,
       endAngle,
       false,
@@ -180,23 +181,23 @@ export class Profile {
       Math.PI * 2,
     );
     setStyle(avatarBorderBackground, "stroke", "#124124");
-    ctx.lineWidth = avatarLineWidh;
+    ctx.lineWidth = avatarLineWidth;
     ctx.stroke();
     ctx.closePath();
 
     ctx.filter = `blur(${blurOptions?.border !== undefined && blurOptions.border.in !== undefined ? blurOptions.border.in : 0}px)`;
 
-    //внутришняя рамка аватарки
+    //внутренняя рамка аватарки
     ctx.beginPath();
     ctx.arc(
       avatarPosition.x ?? 150,
       avatarPosition.y ?? 200,
-      (avatarPosition.radius ?? 98) - (avatarLineWidh + (xp.lineWidth ?? 8)),
+      (avatarPosition.radius ?? 98) - (avatarLineWidth + (xp.lineWidth ?? 8)),
       0,
       Math.PI * 2,
     ); //82.4
     setStyle(avatarBorderBackground, "stroke", "#124124");
-    ctx.lineWidth = avatarLineWidh;
+    ctx.lineWidth = avatarLineWidth;
     ctx.stroke();
     ctx.closePath();
 
@@ -345,14 +346,14 @@ export class Profile {
     return this;
   }
 
-  drawBadge(args: ProfileTypes.DrawBadgeOptions, options: ProfileTypes.DrawBadgeOptinalOptions): Profile;
+  drawBadge(args: ProfileTypes.DrawBadgeOptions, options: ProfileTypes.DrawBadgeOptionalOptions): Profile;
   drawBadge(
     args: ProfileTypes.DrawBadgeOptions[],
-    options: ProfileTypes.DrawBadgeOptinalOptions,
+    options: ProfileTypes.DrawBadgeOptionalOptions,
   ): Profile;
   drawBadge(
     args: ProfileTypes.DrawBadgeOptions | ProfileTypes.DrawBadgeOptions[],
-    options: ProfileTypes.DrawBadgeOptinalOptions,
+    options: ProfileTypes.DrawBadgeOptionalOptions,
   ): Profile {
     if (Array.isArray(args) && args.length > 0) {
       if (args.length === 1) {
@@ -370,7 +371,7 @@ export class Profile {
       for (let i = 0; i < args.length; i++) {
         sortBadges[i].priority = undefined;
         const bg = sortBadges[i];
-        const prewBG = sortBadges[i - 1];
+        const prevBG = sortBadges[i - 1];
 
         if (i === 0) {
           x = bg.x ?? 0;
@@ -381,8 +382,8 @@ export class Profile {
           continue;
         }
 
-        x += (prewBG.x ?? 0) - (bg.space ?? 10) - (bg.w ?? 20) - (bg.x ?? 0);
-        y = (prewBG.y ?? 0) + (bg.y ?? 0);
+        x += (prevBG.x ?? 0) - (bg.space ?? 10) - (bg.w ?? 20) - (bg.x ?? 0);
+        y = (prevBG.y ?? 0) + (bg.y ?? 0);
 
         const result = { x, y };
         badges.push({ ...bg, ...result });
@@ -398,7 +399,7 @@ export class Profile {
 
   #badgeDraw(
     args: ProfileTypes.DrawBadgeOptions,
-    options: ProfileTypes.DrawBadgeOptinalOptions,
+    options: ProfileTypes.DrawBadgeOptionalOptions,
     ind = 0,
     length = 0,
     arr?: ProfileTypes.DrawBadgeOptions[],
@@ -677,7 +678,7 @@ export class Profile {
             ? tLClip.slice(1)
             : tLClip;
 
-          const textFormated = this.#textFormater({
+          const textFormatted = this.#textFormatter({
             text: testLineClip,
             cache: cacheWord,
             curInd: currentLineIndex,
@@ -685,9 +686,9 @@ export class Profile {
             linesNext,
           });
 
-          lines[currentLineIndex] = textFormated.endsWith("--")
-            ? textFormated.slice(0, -1)
-            : textFormated;
+          lines[currentLineIndex] = textFormatted.endsWith("--")
+            ? textFormatted.slice(0, -1)
+            : textFormatted;
 
           let cacheLine = isStartEmpty.test(testLineClip)
             ? testLineClip.slice(1)
@@ -707,18 +708,18 @@ export class Profile {
                 if (lineCache.length + currentLineIndex >= linesNext + 1) break;
 
                 const sliceNum = nextLineNum * (i + 1);
-                let clipedWord = `${beforeNewLine ?? ""}${cacheLine.slice(startNum, sliceNum)}`;
+                let clippedWord = `${beforeNewLine ?? ""}${cacheLine.slice(startNum, sliceNum)}`;
                 startNum = sliceNum;
-                const newClipWordIndex = clipedWord.indexOf("\n");
+                const newClipWordIndex = clippedWord.indexOf("\n");
 
                 if (newClipWordIndex !== -1) {
-                  beforeNewLine = clipedWord;
-                  clipedWord = clipedWord.slice(0, newClipWordIndex);
+                  beforeNewLine = clippedWord;
+                  clippedWord = clippedWord.slice(0, newClipWordIndex);
                   beforeNewLine = beforeNewLine.slice(newClipWordIndex + 1);
                 } else beforeNewLine = "";
 
-                lineCache.push(clipedWord);
-                cacheWord = cacheWord.slice(clipedWord.length);
+                lineCache.push(clippedWord);
+                cacheWord = cacheWord.slice(clippedWord.length);
               }
 
               cacheWord = "";
@@ -735,7 +736,7 @@ export class Profile {
                       : 0,
                 );
 
-                const textFormated = this.#textFormater({
+                const textFormatted = this.#textFormatter({
                   text: line,
                   cache: cacheWord,
                   curInd: currentLineIndex,
@@ -744,11 +745,11 @@ export class Profile {
                 });
 
                 lines[currentLineIndex] =
-                  (textFormated.endsWith("-") &&
+                  (textFormatted.endsWith("-") &&
                     lineCache[lineCache.length - 1] === line) ||
-                    textFormated.endsWith("--")
-                    ? textFormated.slice(0, -1)
-                    : textFormated;
+                    textFormatted.endsWith("--")
+                    ? textFormatted.slice(0, -1)
+                    : textFormatted;
                 ++currentLineIndex;
               }
             } else lines[currentLineIndex] = testLineClip;
@@ -918,7 +919,6 @@ export class Profile {
       }))
       .sort((a, b) => a.priority - b.priority)
       .map((v, i) => {
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
         const n: { [key: string]: any } = {};
         const name = v.name;
         templateNames.push(name);
@@ -1038,7 +1038,7 @@ export class Profile {
 
   /**
    * @param cache входящий текст для изменений
-   * @param maxWidth макстимальная ширина
+   * @param maxWidth максимальная ширина
    * @param [elseWidth] дополнительное значение, что будет участвовать в цикле
    * @returns
    */
@@ -1063,7 +1063,7 @@ export class Profile {
    * @param options.dynamic динамический ли текст
    * @returns
    */
-  #textFormater({
+  #textFormatter({
     text,
     cache,
     curInd,

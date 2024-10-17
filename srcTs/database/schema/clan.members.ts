@@ -10,12 +10,26 @@ export const clanMember = pgTable("clanMember", {
   userId: bigint("user_id", { mode: "bigint" }).references(() => users.id, { onDelete: "set default" }).default(sql`'0'::bigint`),
   clanId: bigint("clan_id", { mode: "bigint" }).references(() => clan.id, { onDelete: "set default" }).default(sql`'0'::bigint`),
   roleId: bigint("role_id", { mode: "bigint" }).references(() => clanRole.id),
-  atribytes: customJsonb<{
+  attributes: customJsonb<{
     owner: boolean;
     elite: boolean;
     deputu: boolean;
-  }>("atribytes"),
+  }>("attributes"),
 });
+
+export interface ClanMemberAttributes {
+  owner: boolean;
+  elite: boolean;
+  deputu: boolean;
+}
+
+export interface ClanMemberTable {
+  id: bigint;
+  userId: bigint;
+  clanId: bigint;
+  roleId: bigint;
+  attributes: ClanMemberAttributes;
+}
 
 export const clanRelation = relations(clanMember, ({ one, many }) => ({
   clan: one(clan, {

@@ -10,7 +10,7 @@
 //   @Column({ type: "text" })
 //   username!: IGameProfile[`username`];
 
-//   @Column({ type: "jsonb", default: { profession: "Безработний", fraction: "Отсутствует" } })
+//   @Column({ type: "jsonb", default: { profession: "Безработный", fraction: "Отсутствует" } })
 //   character!: IGameProfile[`character`];
 // }
 

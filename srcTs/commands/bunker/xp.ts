@@ -24,8 +24,8 @@ export default class Xp extends BaseCommand {
     const member = mbr === undefined ? message.member : mbr;
     const guildId = BigInt(message.guildId);
     const userId = BigInt(member.user.id);
-    const guilddb = await db.query.guild.findFirst({ where: eq(guild.id, guildId), columns: { levelModule: true } });
-    const local_level = guilddb === undefined ? false : typeof guilddb.levelModule === "boolean" ? guilddb.levelModule : false;
+    const guildDB = await db.query.guild.findFirst({ where: eq(guild.id, guildId), columns: { levelModule: true } });
+    const local_level = guildDB === undefined ? false : typeof guildDB.levelModule === "boolean" ? guildDB.levelModule : false;
     const user = await db.query.users.findFirst({ where: eq(users.id, userId), columns: {}, with: { global_level: { columns: { xp: true, level: true, maxXp: true } }, local_level: { where: eq(guild.id, guildId), columns: { xp: true, level: true, maxXp: true } } } });
 
     if (!user) return message.channel.send({ content: "Возможно - указанного пользователя нет в БД)" });

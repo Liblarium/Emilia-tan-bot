@@ -6,3 +6,9 @@ export const baka = pgTable('baka', {
   uname: text("uname"),
   test: jsonb("test")
 });
+
+export interface BakaTable {
+  id: bigint
+  uname?: string
+  test?: object
+}

@@ -1,3 +1,5 @@
+import "reflect-metadata";
+import 'dotenv/config';
 import { addAliases } from "module-alias";
 
 addAliases({

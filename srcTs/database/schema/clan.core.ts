@@ -15,6 +15,23 @@ export const clan = pgTable('clan', {
   deputuMax: integer('deputu_max').default(2),
 });
 
+export enum ClanTypeEnum {
+  clan = "clan",
+  guild = "guild",
+  cult = "cult",
+  sect = "sect"
+}
+
+export interface ClanTable {
+  id: bigint;
+  type: ClanTypeEnum;
+  master: bigint;
+  positions: Record<string, { position: number }>;
+  positionMax: number;
+  limit: number;
+  deputuMax: 0 | 1 | 2;
+}
+
 export const clanRelation = relations(clan, ({ many }) => ({
   members: many(clanMember)
 }));

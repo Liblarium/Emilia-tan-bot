@@ -12,7 +12,7 @@ export class BaseHandler implements IBaseHandler {
 
   constructor(client: EmiliaClient) {
     this.client = client;
-    this.folderPath = ["srcJs", "сommands"];
+    this.folderPath = ["srcJs", "commands"];
     this.filterFile = /^[^.]+\.(js)$/;
   }
 
@@ -56,7 +56,6 @@ export class BaseHandler implements IBaseHandler {
             continue;
           }
 
-          /* biome-ignore lint/suspicious/noExplicitAny: <explanation> */
           const modules: ModuleType = new (FileModule as any)();
           const logic = await this.setLogic(modules);
 
@@ -64,7 +63,7 @@ export class BaseHandler implements IBaseHandler {
         }
       }
     } catch (e: unknown) {
-      new Log({ text: (e as Error).message, type: "error", categories: ["global", "handler"] });
+      new Log({ text: e, type: "error", categories: ["global", "handler"] });
     }
   }
 }

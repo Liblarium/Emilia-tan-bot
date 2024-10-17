@@ -8,3 +8,10 @@ export const clanRole = pgTable('clanRole', {
   name: text("name").notNull(),
   permission: integer("permission").notNull(),
 });
+
+export interface ClanRoleTable {
+  id: bigint;
+  clanId: bigint;
+  name: string;
+  permission: number;
+}

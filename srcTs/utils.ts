@@ -1,3 +1,11 @@
+/// <reference types="../types/util/utils.d.ts" />
+
+/**
+ * @fileoverview Utility functions
+ * @author RanHolly
+ * @license MIT
+ */
+
 import { Log } from "@log";
 import {
   type ActionRow,
@@ -10,6 +18,16 @@ import {
   type RepliableInteraction,
 } from "discord.js";
 
+
+/**
+ * Guild log permission flags
+ * @enum {number}
+ * @property {number} CREATE - 1. Log create channel/role
+ * @property {number} DELETE - 2. Log delete channel/role/message
+ * @property {number} UPDATE - 4. log update channel/role/message/guild (?)
+ * @property {number} JOIN - 8. Log to join in voice channel or guild
+ * @property {number} LEAVE - 16. Log to leave from voice channel or guild
+ */
 const GUILD_PERMISSIONS = { //guild logs in db
   CREATE: 1 << 0, // 1
   DELETE: 1 << 1, // 2
@@ -18,6 +36,10 @@ const GUILD_PERMISSIONS = { //guild logs in db
   LEAVE: 1 << 4, // 16
 };
 
+/**
+ * Get time in format "HH:MM:SS"
+ * @returns {string}
+ */
 const time = (): string => {
   const date = new Date();
   const hour = date.getHours().toString().padStart(2, "0");
@@ -26,12 +48,20 @@ const time = (): string => {
   return `${hour}:${minute}:${second}`;
 };
 
+/**
+ * Get time in format "HH:MM:SS:MMM"
+ * @returns {string}
+ */
 const logTime = (): string => {
   const date = new Date();
   const millisecond = date.getMilliseconds().toString().padStart(3, "0");
   return `${time()}:${millisecond}`;
 };
 
+/**
+ * Get date in format "DD.MM.YYYY"
+ * @returns {string}
+ */
 const date = (): string => {
   const date = new Date();
   const data = date.getDate().toString().padStart(2, "0");
@@ -40,12 +70,16 @@ const date = (): string => {
   return `${data}.${month}.${year}`;
 };
 
+/**
+ * Get date and time in format "[DD.MM.YYYY][HH:MM:SS]"
+ * @returns {string}
+ */
 const dateAndTime = (): string => `[${date()}][${logTime()}]`;
 
 /**
- * Функция для убирания переноса строки
- * @param text входящий текст
- * @returns исходящий текст без переносов
+ * Remove newline from text
+ * @param {string} text - text to remove newline from
+ * @returns {string} - text without newline
  */
 const offNewLine = (text: string): string => {
   const newLinePattern = /\r?\n$/;
@@ -58,62 +92,50 @@ const offNewLine = (text: string): string => {
 };
 
 /**
- * @param obj
- * @returns
+ * Check if object is a class
+ * @param {unknown} obj - object to check
+ * @returns {boolean} - true if class, false otherwise
  */
 const isClass = (obj: unknown): boolean =>
   typeof obj === "function" && /^\s*class\s+/.test(obj.toString());
 
-interface isReplyOptions {
-  interaction: RepliableInteraction;
-  message: InteractionReplyOptions;
-}
 /**
- * Мини-фунция ответа, дабы можно делать return reply без указания undefined в типах базовом классе евента/команды
- * @param options
- * @param options.interaction
- * @param options.message
- * @returns
+ * Reply to interaction
+ * @param {object} args - arguments
+ * @param {RepliableInteraction} args.interaction - interaction to reply to
+ * @param {InteractionReplyOptions} args.message - message to send
+ * @returns {Promise<isReplyOptions>}
  */
-const isReply = async ({
-  interaction,
-  message,
-}: isReplyOptions): Promise<void> => {
+const isReply = async (
+  { interaction, message }: { interaction: RepliableInteraction, message: InteractionReplyOptions },
+): Promise<void> => {
   await interaction.reply({ ...message });
 };
 
-interface isModalOptions {
-  interaction: MessageComponentInteraction | ChatInputCommandInteraction;
-  modal: ModalComponentData;
-}
 /**
- * Мини-функция для вызова модального окна, дабы не писать каждый раз showModal
- * @param options
- * @param options.interaction
- * @param options.modal
- * @returns
+ * Show modal
+ * @param {object} args - arguments
+ * @param {MessageComponentInteraction | ChatInputCommandInteraction} args.interaction - interaction to show modal to
+ * @param {ModalComponentData} args.modal - modal to show
+ * @returns {Promise<void>}
  */
-const isModal = async ({
-  interaction,
-  modal,
-}: isModalOptions): Promise<void> => {
+const isModal = async (
+  { interaction, modal }: { interaction: MessageComponentInteraction | ChatInputCommandInteraction, modal: ModalComponentData },
+): Promise<void> => {
   await interaction.showModal(modal);
 };
 
-interface isComponentsOptions {
-  interaction: MessageComponentInteraction;
-  components: { a?: number; b?: number };
-}
 /**
- * @param componentOptions
- * @param componentOptions.interaction
- * @param componentOptions.components
- * @returns
+ * Get components from message
+ * @param {object} args - arguments
+ * @param {MessageComponentInteraction} args.interaction - interaction to get components from
+ * @param {{ a: number, b?: number }} args.componentOptions - options to get components. a - first component, b - second
+ * @returns {AnyComponent | ActionRow<MessageActionRowComponent> | string} - components or string if error
  */
 function isComponents({
   interaction,
   components = { a: 0 },
-}: isComponentsOptions):
+}: { interaction: MessageComponentInteraction, components: { a: number, b?: number } }):
   | AnyComponent
   | ActionRow<MessageActionRowComponent>
   | string {
@@ -137,14 +159,31 @@ function isComponents({
   return b !== undefined ? comps[a].components[b].data : comps[a];
 }
 
+/**
+ * Log message to console
+ * @param {unknown} message - message to log
+ * @param {...unknown} optionalParams - additional params to log
+ * @returns {void}
+ */
 const log = (message?: unknown, ...optionalParams: unknown[]): void => {
   console.log(`[${time()}][Эмилия-тан | Info]:`, message, ...optionalParams);
 };
 
+/**
+ * Log error to console
+ * @param {unknown} message - message to log
+ * @param {...unknown} optionalParams - additional params to log
+ * @returns {void}
+ */
 const error = (message?: unknown, ...optionalParams: unknown[]): void => {
   console.error(`[${time()}][Эмилия-тан | Error]:`, message, ...optionalParams);
 };
 
+/**
+ * Emilia error class
+ * @class
+ * @extends Error
+ */
 class EmiliaTypeError extends TypeError {
   constructor(message?: string) {
     super(message);
@@ -153,6 +192,11 @@ class EmiliaTypeError extends TypeError {
   }
 }
 
+/**
+ * Emilia error class
+ * @class
+ * @extends Error
+ */
 class EmiliaError extends Error {
   constructor(message?: string) {
     super(message);
@@ -162,22 +206,27 @@ class EmiliaError extends Error {
 }
 
 /**
- * Функция рандома для выдачи чисел от min до max (включительно)
- * @param min мин
- * @param max макс
- * @returns
+ * Generate random number
+ * @param {number} min - min number
+ * @param {number} max - max number
+ * @returns {number} - generated number
  */
 const random = (min: number, max: number): number => {
   if (min >= max)
     throw new EmiliaTypeError(
-      `Агрумент min (${min.toString()}) не может быть больше или равно аргументу max (${max.toString()})!`,
+      `Аргумент min (${min.toString()}) не может быть больше или равно аргументу max (${max.toString()})!`,
     );
   const random = Math.floor(Math.random() * (max - min + 1)) + min;
 
   return random > max ? random - 1 : random;
 };
 
-const prefix = "++";
+/**
+ * Default prefix for all message commands
+ * @type {string} - If prefix in database is not set or guild not found in database - use this prefix
+ * @default "++" //in database too
+ */
+const prefix: string = "++";
 
 export {
   time,

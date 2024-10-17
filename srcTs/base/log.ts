@@ -6,18 +6,51 @@ import { EmiliaTypeError, date, dateAndTime, error, time } from "@util/s";
 
 const BaseLogPath = "logs";
 
+/**
+ * Check if the input number is within the range of TypeLogEnum values (1 to 5)
+ */
 const checkType = (num: number): num is TypeLogEnum => {
   return num >= 1 && num <= 5;
 };
 
+/**
+ * Class for working with logs
+ */
 export class BaseLog implements IBaseLog {
+  /**
+   * Text of log
+   */
   text: TypeText;
+  /**
+   * If true, log will be written to console
+   * @default true
+   */
   logs: boolean;
+  /**
+   * Type of log
+   * @default "info"
+   */
   type: TypeLog;
+  /**
+   * If true, log will be written with event format
+   * @default false
+   */
   event: boolean;
+  /**
+   * If not 0, log will be written with new line
+   * @default 0
+   */
   inline: TypeInline;
+  /**
+   * Category of log
+   * @default "other"
+   */
   category: string;
 
+  /**
+   * Constructor for BaseLog
+   * @param {BaseLogOptions} options
+   */
   constructor({ text, type, event, logs, inline }: BaseLogOptions) {
     this.text = text ?? "{Ничего не указано}";
     this.logs = logs ?? true;
@@ -30,10 +63,11 @@ export class BaseLog implements IBaseLog {
   }
 
   /**
-   * Метод для изменения числового значения типа в строковый
-   * @param type
+   * Method for change number value of type to string
+   * @param {TypeLog | undefined} type
    */
   setType(type: TypeLog | undefined): void {
+    if (type == null) { error("BaseLog.setType: type is null or undefined!"); return; }
     if (typeof type !== "number") { error(`BaseLog.setType: ${type ?? "[error]"} не является числом!`); return; }
     if (!checkType(type)) throw new EmiliaTypeError(`BaseLog.setType: ${(type as number).toString()} не входит в число доступных типов! [Допустимы: 1 - info, 2 - error, 3 - warning, 4 - debug, 5 - test]`);
 
@@ -48,45 +82,41 @@ export class BaseLog implements IBaseLog {
   }
 
   /**
-   * Метод для влючения/выключения сообщения консоли при вводе данных.
-   * @default true
-   * @param logs
+   * Method for enable/disable log writing to console
+   * @param {boolean} logs
    */
   setLogs(logs: boolean): void {
     if (typeof logs === "boolean") this.logs = logs;
   }
 
   /**
-   * Метод для влючения/выключения обрезки сообщения в консоль.
-   * @default false
-   * @param event
+   * Method for enable/disable event log format
+   * @param {boolean} event
    */
   setEvent(event: boolean): void {
     if (typeof event === "boolean") this.event = event;
   }
 
   /**
-   * Метод для консоли. Делает "разрыв" (\n) между строками. 0 - без изменений, 1 - сверху, 2 - снизу, 3 - оба варианта.
-   * @default 0
-   * @param inline
+   * Method for change inline mode
+   * @param {TypeInline} inline
    */
   setInline(inline: TypeInline): void {
     if (typeof inline === "number") this.inline = inline;
   }
 
   /**
-   * Метод для установки категории, куда будет отправлены логи
-   * @default `other`
-   * @param category
+   * Method for change category of log
+   * @param {string} category
    */
   setCategory(category: string): void {
     if (category) this.category = category;
   }
 
   /**
-   * Метод для проверка на наличие файла лога (.txt/.log)
-   * @param names
-   * @returns
+   * Method for check if log file exists
+   * @param {string} names
+   * @returns {Promise<boolean>}
    */
   async checkLog(names: string): Promise<boolean> {
     if (typeof this.category !== "string") this.category = "other";
@@ -104,9 +134,9 @@ export class BaseLog implements IBaseLog {
   }
 
   /**
-   * Метод для создания папки-категории
-   * @param path
-   * @returns
+   * Method for create log folder
+   * @param {string} path
+   * @returns {Promise<true | null>}
    */
   async createFolder(path: string): Promise<true | null> {
     const pathFolder = resolve(BaseLogPath);
@@ -124,9 +154,9 @@ export class BaseLog implements IBaseLog {
   }
 
   /**
-   * Метод для проверки наличия папки-категории. В случае остуствия - создаёт папку. True - есть папка, False - была создана, null - произошла ошибка при создании папки
-   * @param folder
-   * @returns
+   * Method for check if log folder exists. If not, create folder
+   * @param {string} folder
+   * @returns {Promise<boolean | null>}
    */
   async checkFolder(folder: string): Promise<boolean | null> {
     const folderLog = resolve(BaseLogPath, folder.toLowerCase());
@@ -146,10 +176,10 @@ export class BaseLog implements IBaseLog {
   }
 
   /**
-   * Метод для добавления логов. Не основной метод. True - логи добавлены/обновлены, null - ошибка
-   * @param text
-   * @param logType
-   * @returns
+   * Method for add log to file
+   * @param {TypeText} text
+   * @param {TypeLog} logType
+   * @returns {Promise<true | null>}
    */
   async addLog(text: TypeText, logType: TypeLog): Promise<true | null> {
     const types = logType || this.type;
@@ -177,9 +207,9 @@ export class BaseLog implements IBaseLog {
   }
 
   /**
-   * Метод для удаления файлов-логов. Не может удалять папки
-   * @param fileName
-   * @returns
+   * Method for delete log file
+   * @param {string} fileName
+   * @returns {Promise<boolean | null>}
    */
   async deleteFile(fileName: string): Promise<boolean | null> {
     try {
@@ -209,6 +239,10 @@ export class BaseLog implements IBaseLog {
     }
   }
 
+  /**
+   * Method for write log to console and file
+   * @returns {Promise<void>}
+   */
   async log(): Promise<void> {
     const text = this.text;
     const type: TypeLog = (typeof this.type === "string" ? this.type.toLowerCase() : (this.setType(this.type), this.type)) as TypeLog;

@@ -6,6 +6,35 @@ import { dostup } from "./dostup";
 import { globalLevel } from "./level.global";
 import { localLevel } from "./level.local";
 
+export interface UsersTable {
+  /** Идентификатор пользователя. */
+  id: bigint;
+  /** Имя пользователя */
+  username: string;
+  /** Права пользователя. */
+  perms?: number;
+  /** Описание (обо мне) пользователя. */
+  bio?: string;
+  /** 
+   * Значение от `0` до `100`. 
+   * 
+   * Где `100` - повышение до `чтец`а. 
+   * 
+   * А значение ниже `0` - вы не можете быть `чтец`ом по `n` причине.
+   * 
+   * Ниже `-100` не может быть. 
+   * 
+   * @default 0
+   * */
+  potion?: number;
+  /** Печенье пользователя. */
+  pechenie?: number;
+  /** Пол пользователя. */
+  pol?: string;
+  /** Идентификатор клана пользователя. */
+  clanId?: bigint | null;
+}
+
 export const users = pgTable('users', {
   id: bigint('id', { mode: "bigint" }).primaryKey(),
   username: text('username').notNull(),
@@ -14,7 +43,6 @@ export const users = pgTable('users', {
   potion: integer('potion').default(0), //от 0 до 100. Где 100 - повышение до чтеца. ниже -100 не может быть
   pechenie: integer('pechenie').default(0),
   pol: text('pol').default("неизвестно"),
-  localLevelId: bigint("local_level_id", { mode: "bigint" }).references(() => localLevel.id, { onDelete: "cascade" }),
   clanId: bigint("clan_id", { mode: "bigint" })
 });
 

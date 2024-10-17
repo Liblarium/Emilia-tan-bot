@@ -17,11 +17,11 @@ export default class Ready extends BaseEvent {
 
     const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
     const slashCommands = client.slashCommands;
-    const slashComms: [] | (SlashCommandBuilder | undefined)[] = slashCommands.size > 0 ? slashCommands.map((i) => i.data) : [];
+    const slashComm: [] | (SlashCommandBuilder | undefined)[] = slashCommands.size > 0 ? slashCommands.map((i) => i.data) : [];
     //let b = 0;
-    rest.put(Routes.applicationCommands(client.user.id), { body: slashComms }).then(() => {
+    rest.put(Routes.applicationCommands(client.user.id), { body: slashComm }).then(() => {
       new Log({ text: `Загружено ${client.commands.size.toString()} message команд.`, type: "info", categories: ["global", "command"] });
-      new Log({ text: `Зарегестрировано ${slashCommands.size.toString()} slash команд.`, type: "info", categories: ["global", "command"] });
+      new Log({ text: `Зарегистрировано ${slashCommands.size.toString()} slash команд.`, type: "info", categories: ["global", "command"] });
       new Log({ text: `Загружено ${client.events.size.toString()} евентов.`, type: "info", categories: ["global", "event"] });
       return new Log({ text: `Стандартный префикс: ${prefix}`, type: "info", categories: ["global"] });
     }).catch((e: unknown) => new Log({ text: (e as Error).message, type: "error", categories: ["global", "event"] }));

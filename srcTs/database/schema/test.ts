@@ -6,3 +6,7 @@ export const test = pgTable('test', {
   codes: jsonb("codes")
 });
 
+export interface TestTable {
+  id: bigint;
+  codes: object;
+}

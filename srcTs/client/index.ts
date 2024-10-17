@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import type { BaseCommand } from "@base/command";
 import { CommandHandler } from "@handlers/command";
 import { EventHandler } from "@handlers/event";

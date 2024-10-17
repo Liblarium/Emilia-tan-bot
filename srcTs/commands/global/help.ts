@@ -21,8 +21,8 @@ export default class Help extends BaseCommand {
   async execute(message: Message, args: string[], commandName: string) {
     if (!message.member || !message.guild) return;
 
-    const guilddb = await db.query.guild.findFirst({ where: eq(guild.id, BigInt(message.guild.id)), columns: { prefix: true } });
-    const pref = guilddb !== undefined ? (guilddb.prefix)?.now ?? prefix : prefix;
+    const guildDB = await db.query.guild.findFirst({ where: eq(guild.id, BigInt(message.guild.id)), columns: { prefix: true } });
+    const pref = guildDB !== undefined ? (guildDB.prefix)?.now ?? prefix : prefix;
     const helpCommandName = args[0];
     const color =
       message.member.displayColor === 0

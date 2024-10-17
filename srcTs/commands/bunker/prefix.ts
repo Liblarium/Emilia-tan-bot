@@ -55,7 +55,7 @@ export default class Prefix_s extends BaseCommand {
         ephemeral: true
       });
       if (newPrefix.length >= 6) return interaction.reply({
-        content: "Префикс не может быть больше 5 символов! (Такой префикс был установлен, дабы людям не нужно было вводить киллометровый префикс)",
+        content: "Префикс не может быть больше 5 символов! (Такой префикс был установлен, дабы людям не нужно было вводить километровый префикс)",
         ephemeral: true
       });
 

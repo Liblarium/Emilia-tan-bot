@@ -13,34 +13,41 @@ const catchs = (e: unknown) => {
 };
 
 /**
- * Класс для логирования данных в файл и консоль
- */
+* Class for logging data to a file and console
+*
+* "Label" notations in comments:
+* - `!:` - unimplemented mandatory argument
+* - `!|?:` - unimplemented optional argument
+* - `|?:` - optional argument
+* - if without `!` or `?` - then mandatory argument
+* ```js
+* new Log({
+* text: `Log contents`.
+* type: `info`, //information type. Numeric: 1 - info, 2 - error, 3- warning, 4 - debug, 5 - test
+* event: false, //|?: by default false. Whether to truncate output in console.log().
+* categories: [`global`, `database`], //In which categories to write all specified logs. Outputted once in console.log(). Not necessarily global or database, string[] there
+* logs: true, //|?: whether to output text to console. By default, true
+* inline: 0, //|?: affects only the text in the console. 0 - No change, 1 - wrap from top to bottom, 2 - from bottom, 3 - both.
+* });
+* ```
+*/
 export class Log extends BaseLog implements ILog {
+  /**
+   * Other categories to write logs to, excluding the main one
+   * @type {ArrayMaybeEmpty<string>}
+   * @private
+   */
   private readonly otherCategories: ArrayMaybeEmpty<string>;
 
   /**
-   * Обозначения "меток" в комментариях:
-   * - `!:` - не реализованный обязательный аргумент
-   * - `!|?:` - не реализованный необязательный аргумент
-   * - `|?:` - не обязятельный аргумент
-   * - если без `!` или `?` - значит обязательный аргумент
-   * ```js
-   * new Log({
-   *  text: `Содержимое логов`.
-   *  type: `info`, //тип информации. В числовом виде: 1 - info, 2 - error, 3- warning, 4 - debug, 5 - test
-   *  event: false, //|?: по дерфолту false. Нужно ли обрезать вывод в console.log().
-   *  categories: [`global`, `database`], //В какие категории записать все указанные логи. В console.log() выводится один раз. Не обязательно global или database, там string[]
-   *  logs: true, //|?: нужно ли выводить текст в консоль. По дефолту true
-   *  inline: 0, //|?: влияет только на текст в консоле. 0 - Без изменений, 1 - перенос сверху, 2 - снизу, 3 - оба.
-   * });
-   * ```
-   * @param logOptions
-   * @param logOptions.text Содержимое логов
-   * @param logOptions.type тип информации. В числовом виде: 1 - info, 2 - error, 3- warning, 4 - debug, 5 - test
-   * @param logOptions.event |?по дерфолту false. Нужно ли обрезать вывод в console.log()
-   * @param logOptions.categories global | database. |? В какие категории записать все указанные логи. В console.log() выводится один раз
-   * @param logOptions.logs ?: нужно ли выводить текст в консоль. По дефолту true
-   * @param logOptions.inline |?: влияет только на текст в консоле. 0 - Без изменений, 1 - перенос сверху, 2 - снизу, 3 - оба.
+   * Constructs a new Log object
+   * @param {LogOptions} logOptions
+   * @param {string} logOptions.text Log contents
+   * @param {TypeLog} logOptions.type information type. Numeric: 1 - info, 2 - error, 3- warning, 4 - debug, 5 - test
+   * @param {boolean} [logOptions.event=false] |? by default false. Whether to truncate output to console.log()
+   * @param {ArrayMaybeEmpty<string>} logOptions.categories global | database. |? Categories to write all specified logs to. Output is made once in console.log()
+   * @param {boolean} [logOptions.logs=true] ?: whether to output text to console. By default true
+   * @param {TypeInline} [logOptions.inline=0] |?: affects only the text in the console. 0 - No change, 1 - wrap at the top, 2 - at the bottom, 3 - both.
    */
   constructor({
     text,
@@ -51,10 +58,6 @@ export class Log extends BaseLog implements ILog {
     inline = 0,
   }: LogOptions) {
     super({ text, type, event, logs, inline });
-    this.text = text;
-    this.type = type;
-    this.logs = logs;
-    this.inline = inline;
 
     if (typeof type === "number") this.setType(type);
     if (!categories.length) categories = ["other"];
@@ -67,7 +70,9 @@ export class Log extends BaseLog implements ILog {
   }
 
   /**
-   * Метод для "раскидки" оставшихся логов по другим категориям
+   * Private method to add logs to all categories except the main one
+   * @returns {Promise<void>}
+   * @private
    */
   private async _addLogs(): Promise<void> {
     const categories = this.otherCategories;
@@ -92,3 +97,4 @@ export class Log extends BaseLog implements ILog {
     }
   }
 }
+

@@ -32,13 +32,13 @@ export class EventHandler extends BaseHandler {
       };
 
       if (!(event.category in eventMap)) {
-        new Log({ text: `Указаная категория (${event.category}) не входит в число доступных категорий. Доступные: bot и mongo`, type: "error", categories: ["global", "handler", "event"] });
+        new Log({ text: `Указанная категория (${event.category}) не входит в число доступных категорий. Доступные: bot и mongo`, type: "error", categories: ["global", "handler", "event"] });
         return null;
       }
 
       eventMap[event.category]();
     } catch (e: unknown) {
-      new Log({ text: (e as Error).message, type: "error", categories: ["global", "handler", "event"] });
+      new Log({ text: e, type: "error", categories: ["global", "handler", "event"] });
       return null;
     }
   }

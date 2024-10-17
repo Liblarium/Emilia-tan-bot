@@ -11,6 +11,14 @@ export const dostup = pgTable('dostup', {
   maxRank: integer('max_rank').default(9), //0 - infinite, 9 - D5
 });
 
+export interface DostupTable {
+  id: bigint;
+  base: string;
+  reader: string;
+  additionalAccess: string[] | [];
+  maxRank: number;
+}
+
 export const dostupRelations = relations(dostup, ({ one }) => ({
   user: one(users)
 }));

@@ -43,7 +43,7 @@
 //                     name: `Титулы:`,
 //                     value: `${usr.tityl}`,
 //                 }, {
-//                     name: `Попадений в ЧС Liblarium Bunker:`,
+//                     name: `Попаданий в ЧС Liblarium Bunker:`,
 //                     value: `${usr.dn}`,
 //                 }, {
 //                     name: `Информация о пользователе:`,
@@ -58,7 +58,7 @@
 //         } else {
 //             if (new Number(interaction.member.displayColor) == 0) { colors = parseInt(`48dfbf`, 16) } else if (new Number(interaction.member.displayColor) != 0) { colors = interaction.member.displayColor; }
 //             interaction.reply({embeds: [{
-//                 title: `Профль: ${interaction.user.username}`,
+//                 title: `Профиль: ${interaction.user.username}`,
 //                 author: {
 //                     name: `${interaction.user.username}`,
 //                     iconURL: interaction.member.displayAvatarURL({dynamic: true}),
@@ -77,7 +77,7 @@
 //                     name: `Титулы:`,
 //                     value: `${usr.tityl}`,
 //                 }, {
-//                     name: `Попадений в ЧС Liblarium Bunker:`,
+//                     name: `Попаданий в ЧС Liblarium Bunker:`,
 //                     value: `${usr.dn}`,
 //                 }, {
 //                     name: `Информация о пользователе:`,

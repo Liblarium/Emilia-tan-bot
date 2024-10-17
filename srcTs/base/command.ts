@@ -32,13 +32,13 @@ export class BaseCommand implements IBaseCommand {
    *
    *
    * Пример использования
-   * ```js
+   * ```ts
    * //обычная команда
    * import { BaseCommand } from "../Base/command";
    *
    * export default class SomeCommand extends BaseCommand {
    *  constructor() {
-   *    super({ name: `somecommand`,
+   *    super({ name: `someCommand`,
    *      option: {
    *       type: `command`, //Обычная команда. Есть ещё slash
    *       aliases: [`sm`], //только для обычных команд. Альтернативные названия для вызова команды

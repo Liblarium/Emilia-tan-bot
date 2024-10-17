@@ -71,7 +71,7 @@
 //                 { name: `${Usr.pol}`, value: `${per.pol}`, },
 //                 { name: `Титулы:`, value: `${per.tityl}` },
 //                 //{name: `Печенье`, value: `${per.pechenie`} 🍪` },
-//                 { name: `Попадений в ЧС Liblarium Bunker:`, value: `${per.dn}` },
+//                 { name: `Попаданий в ЧС Liblarium Bunker:`, value: `${per.dn}` },
 //                 { name: `Информация о пользователе:`, value: `${per.info}` },
 //             ],
 //             color: colors,

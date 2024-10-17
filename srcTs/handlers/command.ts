@@ -35,7 +35,7 @@ export class CommandHandler extends BaseHandler {
       );
     } catch (e: unknown) {
       new Log({
-        text: (e as Error).message,
+        text: e,
         type: "error",
         categories: ["global", "handler", "command"],
       });

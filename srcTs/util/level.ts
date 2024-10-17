@@ -1,4 +1,4 @@
-import { db } from "@database";
+import { Database } from "@base/database";
 import { Log } from "@log";
 import { guild } from "@schema/guild";
 import { globalLevel } from "@schema/level.global";
@@ -11,15 +11,18 @@ import { ChannelType, type Message } from "discord.js";
 import { and, eq, sql } from "drizzle-orm";
 
 let errs = 0;
-
-export class Levels {
+// TODO: переписать код
+export class Levels extends Database {
   private readonly message: Message;
   constructor(mess: Message) {
+    super();
+
     this.message = mess;
     this._build();
   }
   private async _build() {
     const message = this.message;
+    const db = this.db;
 
     if (
       message.channel.type === ChannelType.DM
@@ -33,14 +36,14 @@ export class Levels {
     const guildId = BigInt(message.guildId);
     const userId = BigInt(message.member.user.id);
 
-    const guilddb = await db.query.guild.findFirst({
+    const guildDB = await this.getGuildTable.findFirst({
       where: eq(guild.id, guildId),
       columns: { addInBD: true, levelModule: true },
     });
 
-    if (!guilddb) return; //пока без добавления гильдии отдельно
+    if (!guildDB) return; //пока без добавления гильдии отдельно
 
-    const user = await db.query.users.findFirst({
+    const user = await this.getUsersTable.findFirst({
       where: eq(users.id, userId),
       with: {
         global_level: {
@@ -65,30 +68,26 @@ export class Levels {
     });
 
     if (!user) {
-      if (guilddb.addInBD !== true) return; //addInBD: boolean | null
+      if (guildDB.addInBD !== true) return; //addInBD: boolean | null
 
       errs++;
-      this.addUser(userId, guilddb.levelModule === true ? guildId : undefined);
-      this._build(); //уходит в начало
+      this.addUser(userId, guildDB.levelModule === true ? guildId : undefined);
     }
 
     errs = 0;
     const nowMs = BigInt(Date.now());
-
     this.level({ args: user?.global_level, nowMs, userId, dbType: "global" });
     const local_level = user?.local_level;
 
     if (guild.levelModule && (local_level !== undefined && local_level.length > 0)) this.level({ args: local_level[0], nowMs, userId, guildId, dbType: "local" });
-    else {
-      this.addUser(userId, guildId);
-      this._build();
-    }
+    else this.addUser(userId, guildId);
+
   }
 
   private async level({ args, nowMs, dbType, userId, guildId }: LevelOptions): Promise<LevelReturning | Log | void> {
-    if (!args || typeof args.nextXp !== "bigint" || typeof args.maxXp !== "number" || typeof args.xp !== "number" || typeof args.level !== "number") {
-      return new Log({ text: `Похоже - в Levels.level не были переданы нужные аргументы. (${args}, ${nowMs}, ${dbType}, ${userId})`, type: "error", categories: ["global", "pg"] });
-    }
+    const db = this.db;
+
+    if (!args || typeof args.nextXp !== "bigint" || typeof args.maxXp !== "number" || typeof args.xp !== "number" || typeof args.level !== "number") throw new Log({ text: `Похоже - в Levels.level не были переданы нужные аргументы. (${args}, ${nowMs}, ${dbType}, ${userId})`, type: "error", categories: ["global", "pg"] });
 
     if (args.nextXp > nowMs) return;
 
@@ -119,7 +118,7 @@ export class Levels {
     if (dbType === "local") {
       if (!guildId) return new Log({ text: `Похоже - в Levels.level не был передан guildId ${guildId}`, type: "error", categories: ["global", "pg"] });
 
-      return await db
+      return result = await db
         .update(localLevel).set(values)
         .where(and(eq(localLevel.userId, userId), eq(localLevel.guildId, guildId)))
         .returning({ insertedId: localLevel.userId });
@@ -129,6 +128,7 @@ export class Levels {
   }
 
   private async addUser(userId: bigint, guildId?: bigint) {
+    const db = this.db;
     new AddInDB(this.message);
 
     await db.transaction(async (tx) => {
@@ -145,10 +145,13 @@ export class Levels {
             guildId,
             userId,
           })
+          .onConflictDoNothing()
           .returning({ insertedId: localLevel.id });
       }
 
       return globalLevelRes.length > 0;
     });
+
+    this._build();
   }
 }

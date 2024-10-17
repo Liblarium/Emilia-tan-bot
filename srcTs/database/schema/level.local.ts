@@ -1,5 +1,6 @@
 import { guild } from "@schema/guild";
 import { users } from "@schema/user";
+import type { Level } from "@type/database/schema";
 import { relations, sql } from "drizzle-orm";
 import { bigint, bigserial, integer, pgTable } from "drizzle-orm/pg-core";
 
@@ -12,6 +13,12 @@ export const localLevel = pgTable("local_level", {
   maxXp: integer("max_xp").default(150),
   nextXp: bigint("next_xp", { mode: "bigint" }).default(sql`CAST(EXTRACT(EPOCH FROM (NOW() + INTERVAL '30 seconds')) * 1000 AS BIGINT)`)
 });
+
+export interface LocalLevelTable extends Level {
+  id: bigint;
+  guildId: bigint;
+  userId: bigint;
+}
 
 export const localLevelRelations = relations(localLevel, ({ one }) => ({
   user: one(users, {

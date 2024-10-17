@@ -69,14 +69,14 @@ export default class Potion extends BaseCommand {
 
         const upd = await db.update(users).set({ potion: newPotion }).where(eq(users.id, userId)).returning({ result: users.potion });
 
-        if (upd.length < 1) return new EmiliaTypeError(`Произошла ошибка при обновлении ${member.user.username} (${member.user.id}) количества postion!`);
+        if (upd.length < 1) return new EmiliaTypeError(`Произошла ошибка при обновлении ${member.user.username} (${member.user.id}) количества potion!`);
         new Log({ text: `${member.user.username} имеет ${newPotion} potion сейчас!`, type: "error", categories: ["global", "potion", "db"] });
         message.channel.send({ content: "Обновлено!" });
       } else if (user.potion === -1 && message.member.id === "211144644891901952" || user.potion === 100 && message.member.id === "211144644891901952") {
         if (newPotion === user.potion) return message.channel.send({ content: "Низя просто взять и выдать то же самое количество!" });
         const upd = await db.update(users).set({ potion: newPotion }).where(eq(users.id, userId)).returning({ result: users.potion });
 
-        if (upd.length < 1) return new EmiliaTypeError(`Произошла ошибка при обновлении ${member.user.username} (${member.user.id}) количества postion!`);
+        if (upd.length < 1) return new EmiliaTypeError(`Произошла ошибка при обновлении ${member.user.username} (${member.user.id}) количества potion!`);
         new Log({ text: `${member.user.username} имеет ${newPotion} potion сейчас!`, type: "error", categories: ["global", "potion", "db"] });
       } else {
         message.channel.send({ content: "Если ты хочешь изменить юзера с 100 или -1, то тыкай Мию)" });

@@ -8,7 +8,7 @@
 //   id!: IGameInventory[`id`];
 
 //   @Column({ type: "jsonb", default: {} })
-//   invetory?: IGameInventory[`invetory`];
+//   inventory?: IGameInventory[`inventory`];
 
 //   @Column({ type: "int", default: 25 })
 //   max_inv_size!: IGameInventory[`max_inv_size`];

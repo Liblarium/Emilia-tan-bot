@@ -20,7 +20,7 @@
 //   isDrop?: IGameItems[`isDrop`];  // выпадает ли предмет с врагов. Мб изменю имя позже
 
 //   @Column({ type: "boolean", default: true })
-//   isSale?: IGameItems[`isSale`]; // покупаемый ли предмед
+//   isSale?: IGameItems[`isSale`]; // покупаемый ли предмет
 
 //   @Column({ type: "boolean", default: false })
 //   isCraft?: IGameItems[`isCraft`]; // можно ли скрафтить
