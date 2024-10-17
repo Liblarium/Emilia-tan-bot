@@ -47,11 +47,13 @@
       },
       "style": {
         "noCommaOperator": "off",
-        "noParameterAssign": "off"
+        "noParameterAssign": "off",
+        "useDefaultParameterLast": "off"
       },
       "suspicious": {
         "noConfusingVoidType": "off",
-        "noAssignInExpressions": "off"
+        "noAssignInExpressions": "off",
+        "noExplicitAny": "off"
       }
     }
   },

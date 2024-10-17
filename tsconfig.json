@@ -1,6 +1,9 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "mapRoot": "srcJs",
     "sourceMap": true,
     "declaration": true,
