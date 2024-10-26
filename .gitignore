@@ -6,8 +6,8 @@
 /target
 /pgdata
 .env
-/drizzle
-drizzle/**/*.*
+/prisma/*
+!prisma/schema.prisma
 /.vs
 tsconfig copy.json
 package-lock.json
@@ -16,5 +16,4 @@ package-lock.json
 /abyss/*.tests.*
 /abyss/res1.png
 /abyss/res.png
-drizzle/meta/_journal.json
-drizzle/meta/0000_snapshot.json
+all_changes.diff

@@ -7,6 +7,7 @@
  */
 
 import { Log } from "@log";
+import type { JsonValue } from "@prisma/client/runtime/library";
 import {
   type ActionRow,
   type AnyComponent,
@@ -18,7 +19,6 @@ import {
   type RepliableInteraction,
 } from "discord.js";
 
-
 /**
  * Guild log permission flags
  * @enum {number}
@@ -28,7 +28,8 @@ import {
  * @property {number} JOIN - 8. Log to join in voice channel or guild
  * @property {number} LEAVE - 16. Log to leave from voice channel or guild
  */
-const GUILD_PERMISSIONS = { //guild logs in db
+const GUILD_PERMISSIONS = {
+  //guild logs in db. Maybe - i rewrite this bit's later
   CREATE: 1 << 0, // 1
   DELETE: 1 << 1, // 2
   UPDATE: 1 << 2, // 4
@@ -106,9 +107,13 @@ const isClass = (obj: unknown): boolean =>
  * @param {InteractionReplyOptions} args.message - message to send
  * @returns {Promise<isReplyOptions>}
  */
-const isReply = async (
-  { interaction, message }: { interaction: RepliableInteraction, message: InteractionReplyOptions },
-): Promise<void> => {
+const isReply = async ({
+  interaction,
+  message,
+}: {
+  interaction: RepliableInteraction;
+  message: InteractionReplyOptions;
+}): Promise<void> => {
   await interaction.reply({ ...message });
 };
 
@@ -119,9 +124,13 @@ const isReply = async (
  * @param {ModalComponentData} args.modal - modal to show
  * @returns {Promise<void>}
  */
-const isModal = async (
-  { interaction, modal }: { interaction: MessageComponentInteraction | ChatInputCommandInteraction, modal: ModalComponentData },
-): Promise<void> => {
+const isModal = async ({
+  interaction,
+  modal,
+}: {
+  interaction: MessageComponentInteraction | ChatInputCommandInteraction;
+  modal: ModalComponentData;
+}): Promise<void> => {
   await interaction.showModal(modal);
 };
 
@@ -135,10 +144,10 @@ const isModal = async (
 function isComponents({
   interaction,
   components = { a: 0 },
-}: { interaction: MessageComponentInteraction, components: { a: number, b?: number } }):
-  | AnyComponent
-  | ActionRow<MessageActionRowComponent>
-  | string {
+}: {
+  interaction: MessageComponentInteraction;
+  components: { a: number; b?: number };
+}): AnyComponent | ActionRow<MessageActionRowComponent> | string {
   if (!(interaction instanceof MessageComponentInteraction)) {
     return "Переменная interaction обязательная!";
   }
@@ -188,7 +197,12 @@ class EmiliaTypeError extends TypeError {
   constructor(message?: string) {
     super(message);
     this.name = `[${time()} | Emilia | TypeError]`;
-    new Log({ text: message, type: "error", categories: ["global", "typeError"], logs: false });
+    new Log({
+      text: message,
+      type: "error",
+      categories: ["global", "typeError"],
+      logs: false,
+    });
   }
 }
 
@@ -201,7 +215,12 @@ class EmiliaError extends Error {
   constructor(message?: string) {
     super(message);
     this.name = `[${time()} | Emilia | Error]`;
-    new Log({ text: message, type: "error", categories: ["global", "typeError"], logs: false });
+    new Log({
+      text: message,
+      type: "error",
+      categories: ["global", "typeError"],
+      logs: false,
+    });
   }
 }
 
@@ -228,6 +247,37 @@ const random = (min: number, max: number): number => {
  */
 const prefix: string = "++";
 
+/**
+ * Convert a string to a BigInt.
+ *
+ * @param {string} str - The string to convert to a BigInt
+ * @returns {bigint} - The BigInt representation of the input string
+ */
+const stringToBigInt = (str: string): bigint => {
+  if (typeof str !== "string")
+    throw new EmiliaError("[utils.stringToBigInt]: str must be a string!");
+  if (!str || str.length === 0)
+    throw new EmiliaError("[utils.stringToBigInt]: str must not be empty!");
+
+  return BigInt(str);
+};
+
+/**
+ * Parse a JsonValue to a typed value.
+ *
+ * @remarks
+ * This function is a cast of the JsonValue to the specified type.
+ * It is up to the caller to ensure that the JsonValue is actually of the specified type.
+ *
+ * @typeParam T - The type to parse the JsonValue to
+ * @param {JsonValue} jsonValue - The JsonValue to parse
+ * @returns {T} - The parsed JsonValue
+ */
+function parseJsonValue<T>(jsonValue: JsonValue): T {
+  return jsonValue as T;
+}
+
+
 export {
   time,
   logTime,
@@ -241,8 +291,10 @@ export {
   log,
   error,
   random,
+  stringToBigInt,
+  parseJsonValue,
   EmiliaTypeError,
   EmiliaError,
   prefix,
-  GUILD_PERMISSIONS
+  GUILD_PERMISSIONS,
 };

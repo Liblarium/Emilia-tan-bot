@@ -1,10 +1,9 @@
 import { BaseCommand } from "@base/command";
-import { db } from "@database";
+import type { EmiliaClient } from "@client";
 import { Log } from "@log";
-import { guild } from "@schema/guild";
-import { prefix } from "@util/s";
+import type { GuildPrefix } from "@type/command";
+import { parseJsonValue, prefix } from "@util/s";
 import type { Message } from "discord.js";
-import { eq } from "drizzle-orm";
 
 const title = "Смена префикса";
 const catchs = (e: unknown) => {
@@ -22,19 +21,28 @@ export default class Prefix extends BaseCommand {
     });
   }
 
-  async execute(message: Message, args: string[]): Promise<Log | undefined | Message | void> {
+  async execute(
+    message: Message,
+    args: string[],
+    commandName: string,
+    client: EmiliaClient,
+  ): Promise<Log | undefined | Message | void> {
     if (
       !message.guild ||
       !message.member ||
       message.member.user.bot ||
-      message.webhookId != null
+      message.webhookId != null ||
+      message.channel.isDMBased()
     )
       return;
     const guildId = BigInt(message.guild.id);
-    const guildDB = await db.query.guild.findFirst({ where: eq(guild.id, guildId), columns: { prefix: true } });
+    const guildDB = await client.db.guild.findFirst({
+      where: { id: guildId },
+      select: { prefix: true },
+    });
     const newPrefix = args[0];
 
-    if (guildDB === undefined) {
+    if (guildDB === null) {
       message.channel
         .send({
           content:
@@ -55,7 +63,8 @@ export default class Prefix extends BaseCommand {
             embeds: [
               {
                 title,
-                description: "Максимально-доступный размер префикса - 5. Такой размер был установлен, дабы людям не нужно было вводить километровый префикс)",
+                description:
+                  "Максимально-доступный размер префикса - 5. Такой размер был установлен, дабы людям не нужно было вводить километровый префикс)",
                 footer: {
                   text: `Размер вашего префикса: ${newPrefix.length.toString()}.`,
                 },
@@ -64,7 +73,10 @@ export default class Prefix extends BaseCommand {
           })
           .catch(catchs) as unknown as Message | undefined;
 
-      if (newPrefix === guildDB.prefix?.now)
+      if (
+        guildDB.prefix &&
+        newPrefix === parseJsonValue<GuildPrefix>(guildDB.prefix).now
+      )
         return message.channel.send({
           embeds: [
             {
@@ -77,18 +89,24 @@ export default class Prefix extends BaseCommand {
           ],
         });
 
-      const updPrefix = await db.update(guild).set({ prefix: { default: prefix, now: newPrefix } }).where(eq(guild.id, guildId)).returning({ prefix: guild.prefix });
+      const updPrefix = await client.db.guild.update({
+        where: { id: guildId },
+        data: { prefix: { default: prefix, now: newPrefix } },
+        select: { prefix: true },
+      });
 
-      if (updPrefix.length < 0 || updPrefix.length > 0 && updPrefix[0].prefix === null) {
+      if (!updPrefix.prefix) {
         new Log({
           text: "При изменении префикса - произошла ошибка.",
           type: 2,
           categories: ["global", "command", "psql"],
         });
 
-        return message.channel.send({
-          content: "При изменении префикса - произошла ошибка.",
-        }).catch(catchs);
+        return message.channel
+          .send({
+            content: "При изменении префикса - произошла ошибка.",
+          })
+          .catch(catchs);
       }
 
       return message.channel
@@ -99,7 +117,7 @@ export default class Prefix extends BaseCommand {
               description: `Новый префикс ${newPrefix} установлен.`,
               color: 2_490_112,
               footer: {
-                text: `Стандартный префикс: ${guildDB.prefix?.default ?? prefix ?? "[Ошибка]"}`,
+                text: `Стандартный префикс: ${parseJsonValue<GuildPrefix>(guildDB.prefix).default ?? "[Ошибка]"}`,
               },
             },
           ],
@@ -112,7 +130,7 @@ export default class Prefix extends BaseCommand {
         embeds: [
           {
             title: "Префикс бота",
-            description: `Установленный префикс на сервере: **${guildDB.prefix?.now ?? "[Ошибка]"}**, стандартный префикс: ${guildDB.prefix?.default ?? "[Ошибка]"}`,
+            description: `Установленный префикс на сервере: **${parseJsonValue<GuildPrefix>(guildDB.prefix).now ?? "[Ошибка]"}**, стандартный префикс: ${parseJsonValue<GuildPrefix>(guildDB.prefix).default} ?? "[Ошибка]"`,
             color: 0x25_ff_00,
             footer: {
               text: "Владелец сервера может сменить префикс для сервера",

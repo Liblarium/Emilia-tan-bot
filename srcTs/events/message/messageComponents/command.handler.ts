@@ -1,10 +1,9 @@
 import type { EmiliaClient } from "@client";
-import { db } from "@database";
+import { db } from "@client";
 import { Log } from "@log";
-import { guild } from "@schema/guild";
-import { prefix } from "@util/s";
-import { ChannelType, type Message, PermissionsBitField } from "discord.js";
-import { eq } from "drizzle-orm";
+import type { GuildPrefix } from "@type/command";
+import { parseJsonValue, prefix, stringToBigInt } from "@util/s";
+import { type Message, PermissionsBitField } from "discord.js";
 
 const { Flags: { ManageMessages } } = PermissionsBitField;
 
@@ -22,10 +21,11 @@ export class CommandHandler {
     const message = this.message;
     const client = this.client;
 
-    if (message.channel.type === ChannelType.DM || !message.guildId) return;
+    if (message.channel.isDMBased() || !message.guildId) return;
 
-    const guilddb = await db.query.guild.findFirst({ where: eq(guild.id, BigInt(message.guildId)), columns: { prefix: true } });
-    const pref = guilddb?.prefix?.now ?? prefix;
+    const guildDB = await db.guild.findFirst({ where: { id: stringToBigInt(message.guildId) }, select: { prefix: true } });
+
+    const pref = guildDB === null ? prefix : parseJsonValue<GuildPrefix>(guildDB.prefix).now;
 
     if (message.author.bot || message.webhookId != null || !message.content.startsWith(pref) || !client.user) return;
 

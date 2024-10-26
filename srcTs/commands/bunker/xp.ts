@@ -1,10 +1,7 @@
 import { BaseCommand } from "@base/command";
 import type { EmiliaClient } from "@client";
-import { db } from "@database";
-import { guild } from "@schema/guild";
-import { users } from "@schema/user";
+import { stringToBigInt } from "@util/s";
 import type { Message } from "discord.js";
-import { eq } from "drizzle-orm";
 
 export default class Xp extends BaseCommand {
   constructor() {
@@ -18,20 +15,25 @@ export default class Xp extends BaseCommand {
   }
 
   async execute(message: Message, args: string[], commandName: string, client: EmiliaClient) {
-    if (!message.guildId || !message.guild || !message.member) return;
+    if (!message.guildId || !message.guild || !message.member || message.channel.isDMBased()) return;
 
+    const db = client.db;
     const mbr = message.mentions.members?.first() || message.guild.members.cache.get(args[0]);
     const member = mbr === undefined ? message.member : mbr;
-    const guildId = BigInt(message.guildId);
-    const userId = BigInt(member.user.id);
-    const guildDB = await db.query.guild.findFirst({ where: eq(guild.id, guildId), columns: { levelModule: true } });
+    const guildId = stringToBigInt(message.guildId);
+    const userId = stringToBigInt(member.user.id);
+    const guildDB = await db.guild.findFirst({ where: { id: guildId }, select: { levelModule: true } });
+
+    if (!guildDB) return message.channel.send({ content: "Возможно - данный сервер не находится в БД." });
+
     const local_level = guildDB === undefined ? false : typeof guildDB.levelModule === "boolean" ? guildDB.levelModule : false;
-    const user = await db.query.users.findFirst({ where: eq(users.id, userId), columns: {}, with: { global_level: { columns: { xp: true, level: true, maxXp: true } }, local_level: { where: eq(guild.id, guildId), columns: { xp: true, level: true, maxXp: true } } } });
+    const user = await db.user.findFirst({ where: { id: userId }, select: { globalLevel: { select: { xp: true, level: true, maxXp: true } }, LocalLevel: { where: { guildId }, select: { xp: true, level: true, maxXp: true } } } });
 
     if (!user) return message.channel.send({ content: "Возможно - указанного пользователя нет в БД)" });
+    if (!user.globalLevel) return message.channel.send({ content: "Возможно - у указанного пользователя нет уровней в БД)" });
 
-    const gRank = user.global_level;
-    const lRank = user.local_level[0];
+    const gRank = user.globalLevel;
+    const lRank = user.LocalLevel[0];
 
     let description = `Уровень: **${gRank.level}**\nОпыт: **${gRank.xp}**/**${gRank.maxXp}**`;
     if (local_level) description += `\n\nЛокальный уровень: **${lRank.level}**\nОпыт: **${lRank.xp}**/**${lRank.maxXp}**`;

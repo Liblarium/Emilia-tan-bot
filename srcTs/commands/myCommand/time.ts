@@ -1,6 +1,6 @@
-import type { Message } from "discord.js";
 import { BaseCommand } from "@base/command";
 import { time } from "@util/s";
+import type { Message } from "discord.js";
 
 export default class Time extends BaseCommand {
   constructor() {
@@ -15,7 +15,7 @@ export default class Time extends BaseCommand {
   }
 
   execute(message: Message/*, args: string[], commandName: string, client: EmiliaClient*/): undefined {
-    if (!message.member) return;
+    if (!message.member || message.channel.isDMBased()) return;
 
     const color = message.member.displayColor === 0 ? 0x48_df_bf : message.member.displayColor;
     message.channel.send({

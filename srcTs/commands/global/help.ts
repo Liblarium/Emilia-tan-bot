@@ -1,10 +1,8 @@
 import { BaseCommand } from "@base/command";
-import { db } from "@database";
-import { guild } from "@schema/guild";
+import type { EmiliaClient } from "@client";
 import { helpList, helpName } from "@util/help.list";
 import { prefix } from "@util/s";
 import type { Message } from "discord.js";
-import { eq } from "drizzle-orm";
 
 export default class Help extends BaseCommand {
   constructor() {
@@ -18,11 +16,31 @@ export default class Help extends BaseCommand {
     });
   }
 
-  async execute(message: Message, args: string[], commandName: string) {
-    if (!message.member || !message.guild) return;
+  async execute(
+    message: Message,
+    args: string[],
+    commandName: string,
+    client: EmiliaClient,
+  ) {
+    if (
+      !message.member ||
+      !message.guild ||
+      !message.guildId ||
+      message.channel.isDMBased()
+    )
+      return;
 
-    const guildDB = await db.query.guild.findFirst({ where: eq(guild.id, BigInt(message.guild.id)), columns: { prefix: true } });
-    const pref = guildDB !== undefined ? (guildDB.prefix)?.now ?? prefix : prefix;
+    const guildDB = await client.db.guild.findFirst({
+      where: { id: BigInt(message.guildId) },
+      select: { prefix: true },
+    });
+
+    const pref =
+      guildDB !== null
+        ? guildDB.prefix === null
+          ? prefix
+          : JSON.parse(guildDB.prefix.toString()).now
+        : prefix;
     const helpCommandName = args[0];
     const color =
       message.member.displayColor === 0
@@ -50,7 +68,10 @@ export default class Help extends BaseCommand {
       });
 
     if (!(helpCommandName in helpList)) {
-      const truncatedCommandName = helpCommandName.length >= 501 ? `${helpCommandName.slice(0, 500)}...` : helpCommandName;
+      const truncatedCommandName =
+        helpCommandName.length >= 501
+          ? `${helpCommandName.slice(0, 500)}...`
+          : helpCommandName;
       const description = `Хочу вас огорчить - в списке команд такой команды (${truncatedCommandName}) нет.`;
 
       return message.channel.send({
@@ -68,19 +89,23 @@ export default class Help extends BaseCommand {
         ],
       });
     }
-    message.channel.send({
-      embeds: [
-        {
-          title: helpCommandName,
-          description: helpList.get(helpCommandName)?.text,
-          color,
-          timestamp,
-          footer: {
-            text: "\u200b",
-            icon_url,
+    message.channel
+      .send({
+        embeds: [
+          {
+            title: helpCommandName,
+            description: helpList.get(helpCommandName)?.text,
+            color,
+            timestamp,
+            footer: {
+              text: "\u200b",
+              icon_url,
+            },
           },
-        },
-      ],
-    }).catch((e: unknown) => { console.error(e); });
+        ],
+      })
+      .catch((e: unknown) => {
+        console.error(e);
+      });
   }
 }

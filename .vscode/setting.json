@@ -1,5 +1,0 @@
-{
-  "typescript.validate.enable": true,
-  "biome.configPath": "./biome.json",
-  "eslint.configPath": "./eslint.config.mjs"
-}

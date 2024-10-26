@@ -34,5 +34,6 @@ declare function isComponents({
 declare function log(message?: unknown, ...optionalParams: unknown[]): void;
 declare function error(message?: unknown, ...optionalParams: unknown[]): void;
 declare function random(min: number, max: number): number;
+declare function stringToBigInt(str: string): bigint;
 declare class EmiliaTypeError extends Error { }
 declare class EmiliaError extends Error { }

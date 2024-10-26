@@ -15,7 +15,7 @@ export default class Ball extends BaseCommand {
   }
 
   async execute(message: Message, args: unknown[]) {
-    if (!message.guildId) return;
+    if (!message.guildId || message.channel.isDMBased()) return;
     if (!args[0]) return message.channel.send({ content: "А где вопрос?" });
 
     const ballMessage = ["334418584774246401", "451103537527783455"].includes(message.guildId) ? random(0, 14) : random(0, 40);

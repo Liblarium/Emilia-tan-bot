@@ -23,13 +23,14 @@ export default class Report extends BaseCommand {
     commandName: string,
     client: EmiliaClient,
   ) {
-    if (message.guildId !== "451103537527783455" || !message.guild || !message.member || !client.user) return; //пока будет только для бункера. Мб позже сменю
+    const channel_ = message.channel;
+    if (message.guildId !== "451103537527783455" || !message.guild || !message.member || !client.user || channel_.isDMBased()) return; //пока будет только для бункера. Мб позже сменю
 
     const reportUser = message.mentions.members?.first() || message.guild.members.cache.get(args[0]);
     const reportReason = args.slice(1).join(" ");
 
-    const send = async ({ color, description, footer }: SendOptions): Promise<Message<boolean>> => {
-      return await message.channel.send({
+    const send = async ({ color, description, footer }: SendOptions) => {
+      return await channel_.send({
         embeds: [{
           title: "Жалоба на пользователя",
           description,
@@ -54,7 +55,7 @@ export default class Report extends BaseCommand {
 
 
     const channel = message.guild.channels.cache.get("931608832575172719");
-    if (!channel || !(channel instanceof TextChannel)) return message.channel.send({ content: "При отправлении жалобы - прошла ошибка. Попробуйте ещё раз или тыкай Мию" });
+    if (!channel || !(channel instanceof TextChannel)) return channel_.send({ content: "При отправлении жалобы - прошла ошибка. Попробуйте ещё раз или тыкай Мию" });
     await send({
       description: "Жалоба была доставлена!",
       color: 0x25_ff_00

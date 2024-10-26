@@ -57,13 +57,15 @@ export class Log extends BaseLog implements ILog {
     logs = true,
     inline = 0,
   }: LogOptions) {
+    const uniqueCategories: ArrayMaybeEmpty<string> = Array.from(new Set(categories)).filter((category) => category !== "");
+
     super({ text, type, event, logs, inline });
 
     if (typeof type === "number") this.setType(type);
     if (!categories.length) categories = ["other"];
 
-    this.setCategory(categories[0]);
-    this.otherCategories = categories.slice(1);
+    this.setCategory(uniqueCategories[0]);
+    this.otherCategories = uniqueCategories.slice(1);
 
     this.log().catch(catchs);
     this._addLogs().catch(catchs);

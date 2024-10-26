@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          BigInt       @id @unique
+  username    String       @db.Text
+  perms       Int          @default(0) @db.Integer
+  bio         String       @default("Вы можете изменить информацию о пользователе с помощью /newinfo") @db.Text
+  potion      Int          @default(0) @db.Integer
+  pechenie    Int          @default(0) @db.Integer
+  pol         String       @default("неизвестно") @db.Text
+  clanId      BigInt?      @db.BigInt
+  dostup      Dostup?      @relation("UserDostup", fields: [id], references: [id], map: "id_dostup")
+  masterClans Clan?        @relation("MasterOfClan")
+  localLevels LocalLevel[] @relation("UserLocalLevels")
+  clanMembers ClanMember[] @relation("UserClanMembers")
+  ClanMember  ClanMember[]
+  LocalLevel  LocalLevel[]
+  globalLevel GlobalLevel? @relation("UserGlobalLevel")
+}
+
+model Clan {
+  id          BigInt       @id @default(autoincrement())
+  type        ClanTypeEnum
+  masterId    BigInt       @unique @db.BigInt
+  master      User         @relation("MasterOfClan", fields: [masterId], references: [id])
+  positions   Json         @default("{}") @db.JsonB
+  positionMax Int          @default(150) @db.Integer
+  limit       Int          @default(50) @db.Integer
+  deputuMax   Int          @default(2) @db.Integer
+  members     ClanMember[] @relation("ClanMembers")
+  roles       ClanRole[]   @relation("ClanRoles")
+  ClanRole    ClanRole[]
+}
+
+enum ClanTypeEnum {
+  CLAN
+  GUILD
+  CULT
+  SECT
+}
+
+model ClanMember {
+  id         BigInt     @id @default(autoincrement())
+  userId     BigInt     @db.BigInt
+  clanId     BigInt     @db.BigInt
+  roleId     BigInt     @db.BigInt
+  attributes Json       @default("{ \"owner\": false, \"elite\": false, \"deputu\": false }") @db.JsonB
+  clan       Clan       @relation("ClanMembers", fields: [clanId], references: [id], onDelete: Cascade)
+  role       ClanRole   @relation(fields: [roleId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+  User       User[]     @relation("UserClanMembers")
+  ClanRole   ClanRole[] @relation("ClanRoleMembers")
+
+  @@unique([userId, clanId]) // Уникальность пользователя в рамках одного клана
+}
+
+model ClanRole {
+  id         BigInt       @id @default(autoincrement())
+  clanId     BigInt       @db.BigInt
+  name       String       @db.Text
+  permission Int          @db.Integer
+  clan       Clan         @relation(fields: [clanId], references: [id], onDelete: Cascade)
+  members    ClanMember[] @relation("ClanRoleMembers")
+  Clan       Clan[]       @relation("ClanRoles")
+  ClanMember ClanMember[]
+}
+
+model GlobalLevel {
+  id     BigInt @id @default(autoincrement())
+  xp     Int    @default(0) @db.Integer
+  level  Int    @default(0) @db.Integer
+  maxXp  Int    @default(150) @db.Integer
+  nextXp BigInt @db.BigInt
+  userId BigInt @unique
+  user   User   @relation("UserGlobalLevel", fields: [userId], references: [id])
+}
+
+model LocalLevel {
+  id      BigInt  @id @default(autoincrement())
+  guildId BigInt  @db.BigInt
+  userId  BigInt  @db.BigInt
+  xp      Int     @default(0) @db.Integer
+  level   Int     @default(0) @db.Integer
+  maxXp   Int     @default(150) @db.Integer
+  nextXp  BigInt  @db.BigInt
+  guild   Guild   @relation(fields: [guildId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  User    User[]  @relation("UserLocalLevels")
+  Guild   Guild[] @relation("GuildLocalLevels")
+}
+
+model Guild {
+  id          BigInt       @id @unique
+  prefix      Json         @default("{ \"default\": \"++\", \"now\": \"++\" }") @db.JsonB
+  addInBD     Boolean      @default(false) @db.Boolean
+  logModule   Boolean      @default(false) @db.Boolean
+  levelModule Boolean      @default(false) @db.Boolean
+  logIntents  Int          @default(0) @db.Integer
+  message     Json         @default("{}") @db.JsonB
+  channel     Json         @default("{}") @db.JsonB
+  guild       Json         @default("{}") @db.JsonB
+  member      Json         @default("{}") @db.JsonB
+  emoji       Json         @default("{}") @db.JsonB
+  role        Json         @default("{}") @db.JsonB
+  localLevels LocalLevel[] @relation("GuildLocalLevels")
+  LocalLevel  LocalLevel[]
+}
+
+model PrivateVoice {
+  id      BigInt @id @unique //channelId
+  ownerId BigInt @db.BigInt
+  guildId BigInt @db.BigInt
+}
+
+model Baka {
+  id    BigInt @id @default(autoincrement())
+  uname String @db.Text
+  test  Json   @db.JsonB
+}
+
+model Test {
+  id    BigInt @id @default(autoincrement())
+  codes Json   @db.JsonB
+}
+
+model Dostup {
+  id               BigInt @id @unique
+  base             String @default("Гость") @db.Text
+  reader           String @default("F") @db.Text
+  additionalAccess Json   @default("[]") @db.JsonB
+  maxRank          Int    @default(9) @db.Integer
+  User             User[] @relation("UserDostup")
+}

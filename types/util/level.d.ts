@@ -30,10 +30,6 @@ export interface LevelOptions {
    */
   args: Level | undefined;
   /**
-   * The current time in milliseconds
-   */
-  nowMs: bigint;
-  /**
    * The user ID
    */
   userId: bigint;
@@ -45,6 +41,10 @@ export interface LevelOptions {
    * The type of level to calculate (global or local)
    */
   dbType: "global" | "local";
+  /**
+   * The local level ID (optional)
+   */
+  localLevelId?: bigint;
 }
 
 /**
@@ -94,9 +94,3 @@ export interface UserValue {
    */
   localLevel?: bigint;
 }
-
-/**
- * The type returned from the database when a level is inserted
- */
-export type LevelReturning = { insertedId: bigint | null; }[];
-

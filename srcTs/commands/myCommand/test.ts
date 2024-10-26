@@ -20,6 +20,8 @@ export default class Test extends BaseCommand {
   }
 
   execute(message: Message, args: string[], commandName: string, client: EmiliaClient): undefined {
+    if (message.channel.isDMBased()) return;
+
     /*const db = this.db;*/
     //const member = message.member;
     message.channel.send({ content: commandName || "ошибка" }).catch((e: unknown) => { console.error(e); });

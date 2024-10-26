@@ -1,62 +1,74 @@
-import { Database } from "@base/database";
+import { db } from "@client";
 import { Log } from "@log";
-import { guild } from "@schema/guild";
-import { globalLevel } from "@schema/level.global";
-import { localLevel } from "@schema/level.local";
-import { users } from "@schema/user";
-import type { LevelOptions, LevelReturning, LevelValues, UserValue } from "@type/util/level";
-import { AddInDB } from "@util/addInDB";
-import { random } from "@util/s";
+import type { LevelOptions, LevelValues } from "@type/util/level";
+import { logCaller } from "@util/decorators";
+import { EmiliaError, random, stringToBigInt } from "@util/s";
 import { ChannelType, type Message } from "discord.js";
-import { and, eq, sql } from "drizzle-orm";
 
 let errs = 0;
-// TODO: переписать код
-export class Levels extends Database {
+export class Levels {
   private readonly message: Message;
   constructor(mess: Message) {
-    super();
-
     this.message = mess;
     this._build();
   }
+
+  /**
+   * Next XP time in milliseconds.
+   * @returns {bigint} The next XP time
+   * @private
+   */
+  private get nextXp(): bigint {
+    return stringToBigInt((Date.now() + (30 * 1000)).toString());
+  }
+  /**
+   * Initialization of the user in the database, if the user is not in the database.
+   * @private
+   */
+  @logCaller
   private async _build() {
     const message = this.message;
-    const db = this.db;
 
     if (
-      message.channel.type === ChannelType.DM
-      || !message.member
-      || !message.guild
-      || !message.guildId
-      || !["451103537527783455", "334418584774246401"].includes(message.guildId)
-      || message?.author?.bot === true
-    ) return;
+      message.channel.type === ChannelType.DM ||
+      !message.member ||
+      !message.guild ||
+      !message.guildId ||
+      !["451103537527783455", "334418584774246401"].includes(message.guildId) ||
+      message?.author?.bot === true
+    )
+      return;
+    const guildId = stringToBigInt(message.guildId);
+    const userId = stringToBigInt(message.member.user.id);
+    const username = message.member.user.username;
 
-    const guildId = BigInt(message.guildId);
-    const userId = BigInt(message.member.user.id);
-
-    const guildDB = await this.getGuildTable.findFirst({
-      where: eq(guild.id, guildId),
-      columns: { addInBD: true, levelModule: true },
+    const guildDB = await db.guild.findFirst({
+      where: { id: guildId },
+      select: { addInBD: true, levelModule: true },
     });
 
-    if (!guildDB) return; //пока без добавления гильдии отдельно
+    if (!guildDB) return; //пока без добавления гильдии отдельно //TODO: Подумать над этим
 
-    const user = await this.getUsersTable.findFirst({
-      where: eq(users.id, userId),
-      with: {
-        global_level: {
-          columns: {
+    const user = await db.user.findFirst({
+      where: { id: userId },
+      select: {
+        globalLevel: {
+          select: {
             xp: true,
             level: true,
             maxXp: true,
             nextXp: true,
           },
         },
-        local_level: {
-          where: eq(localLevel.guildId, guildId),
-          columns: {
+        LocalLevel: {
+          where: {
+            AND: [
+              { userId: { equals: userId } },
+              { guildId: { equals: guildId } },
+            ],
+          },
+          select: {
+            id: true,
             xp: true,
             level: true,
             maxXp: true,
@@ -64,34 +76,68 @@ export class Levels extends Database {
           },
         },
       },
-      columns: {},
     });
 
-    if (!user) {
+    if (!user || !user.globalLevel) {
       if (guildDB.addInBD !== true) return; //addInBD: boolean | null
 
       errs++;
-      this.addUser(userId, guildDB.levelModule === true ? guildId : undefined);
+      return this.addUser(
+        {
+          userId,
+          username,
+          guildId: guildDB.levelModule === true ? guildId : undefined,
+          localLevelId: -1n
+        }
+      );
     }
 
     errs = 0;
-    const nowMs = BigInt(Date.now());
-    this.level({ args: user?.global_level, nowMs, userId, dbType: "global" });
-    const local_level = user?.local_level;
 
-    if (guild.levelModule && (local_level !== undefined && local_level.length > 0)) this.level({ args: local_level[0], nowMs, userId, guildId, dbType: "local" });
-    else this.addUser(userId, guildId);
+    const localLevel = user.LocalLevel;
+    this.level({ args: user.globalLevel, userId, dbType: "global", localLevelId: localLevel.length === 0 ? undefined : localLevel[0].id });
+    const local_level = user?.LocalLevel;
 
+    if (
+      guildDB.levelModule &&
+      local_level !== undefined &&
+      local_level.length > 0
+    )
+      return this.level({
+        args: local_level[0],
+        userId,
+        guildId,
+        dbType: "local",
+        localLevelId: local_level[0].id,
+      });
+
+    return this.addUser({ userId, username, guildId, localLevelId: local_level?.length === 0 ? undefined : local_level[0].id });
   }
 
-  private async level({ args, nowMs, dbType, userId, guildId }: LevelOptions): Promise<LevelReturning | Log | void> {
-    const db = this.db;
+  @logCaller
+  private async level({
+    args,
+    dbType,
+    userId,
+    guildId,
+    localLevelId = -1n
+  }: LevelOptions) {
+    if (
+      !args ||
+      typeof args.nextXp !== "bigint" ||
+      typeof args.maxXp !== "number" ||
+      typeof args.xp !== "number" ||
+      typeof args.level !== "number"
+    )
+      throw new Log({
+        text: `Похоже - в Levels.level не были переданы нужные аргументы. (${args}, ${dbType}, ${userId})`,
+        type: "error",
+        categories: ["global", "pg"],
+      });
 
-    if (!args || typeof args.nextXp !== "bigint" || typeof args.maxXp !== "number" || typeof args.xp !== "number" || typeof args.level !== "number") throw new Log({ text: `Похоже - в Levels.level не были переданы нужные аргументы. (${args}, ${nowMs}, ${dbType}, ${userId})`, type: "error", categories: ["global", "pg"] });
+    if (args.nextXp > stringToBigInt(Date.now().toString())) return;
 
-    if (args.nextXp > nowMs) return;
-
-    const addExp = random(1, 15); //позже добавлю связку с БД для local level
+    const addExp = random(1, 15); //TODO:позже добавлю связку с БД для local level
     let newXp = args.xp + addExp;
     let newLvl = false;
 
@@ -99,59 +145,71 @@ export class Levels extends Database {
       newXp -= args.maxXp;
       newLvl = true;
     }
-
-    const updTable = dbType === "global" ? globalLevel : localLevel;
-    const values: LevelValues = { xp: newXp, nextXp: nowMs + BigInt(30 * 1000) };
-    let result: LevelReturning = [];
+    let result: { xp: number; level: number; maxXp: number } = { xp: 0, level: 0, maxXp: 0 };
+    const values: LevelValues = { xp: newXp, nextXp: this.nextXp };
 
     if (newLvl === true) {
-      values.level = sql`${updTable.level} + 1`;
+      values.level = { increment: 1 };
       values.maxXp = ((args.maxXp ?? 0) + 0.5) * (args.level + 2);
     }
 
     if (dbType === "global") {
-      result = await db
-        .update(globalLevel).set(values)
-        .where(eq(globalLevel.id, userId))
-        .returning({ insertedId: globalLevel.id });
+      result = await db.globalLevel.update({ where: { id: userId }, data: { ...values }, select: { xp: true, level: true, maxXp: true } });
     }
+
     if (dbType === "local") {
       if (!guildId) return new Log({ text: `Похоже - в Levels.level не был передан guildId ${guildId}`, type: "error", categories: ["global", "pg"] });
 
-      return result = await db
-        .update(localLevel).set(values)
-        .where(and(eq(localLevel.userId, userId), eq(localLevel.guildId, guildId)))
-        .returning({ insertedId: localLevel.userId });
+      return result = await db.localLevel.update({ where: { id: localLevelId }, data: { ...values }, select: { xp: true, level: true, maxXp: true } });
     }
 
     return result;
   }
 
-  private async addUser(userId: bigint, guildId?: bigint) {
-    const db = this.db;
-    new AddInDB(this.message);
+  @logCaller
+  private async addUser({ userId, username, guildId, localLevelId }: { userId: bigint, username: string, guildId?: bigint, localLevelId?: bigint }): Promise<unknown> {
+    const dostup = await db.dostup.findFirst({ where: { id: userId }, select: { id: true } });
 
-    await db.transaction(async (tx) => {
-      const globalLevelRes = await tx
-        .insert(globalLevel)
-        .values({ id: userId })
-        .returning({ insertedId: globalLevel.id })
-        .onConflictDoNothing();
+    if (!dostup) await db.dostup.create({ data: { id: userId }, select: { id: true } });
 
-      if (guildId !== undefined) {
-        await tx
-          .insert(localLevel)
-          .values({
-            guildId,
-            userId,
-          })
-          .onConflictDoNothing()
-          .returning({ insertedId: localLevel.id });
-      }
+    //const user = await db.user.findFirst({ where: { id: userId }, select: { id: true } });
 
-      return globalLevelRes.length > 0;
-    });
+    await db.$transaction([
+      db.user.upsert({
+        where: { id: userId },
+        update: {},
+        create: {
+          id: userId,
+          username
+        },
+        select: { id: true }
+      }),
+      db.globalLevel.create({
+        data: {
+          id: userId,
+          userId,
+          nextXp: this.nextXp
+        },
+        select: { id: true }
+      })
+    ]);
 
-    this._build();
+    if (guildId !== undefined) {
+      if (!localLevelId) throw new EmiliaError("Where is localLevelId?");
+
+      const localLevel = await db.localLevel.findFirst({
+        where: { id: localLevelId },
+        select: { id: true },
+      });
+
+      if (!localLevel) await db.localLevel.create({
+        data: {
+          xp: 0, level: 0, maxXp: 150, nextXp: this.nextXp, user: { connect: { id: userId } }, guild: { connect: { id: guildId } }
+        },
+        select: { id: true },
+      });
+    }
+
+    return this._build();
   }
 }

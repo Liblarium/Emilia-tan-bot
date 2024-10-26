@@ -1,11 +1,8 @@
 import { BaseCommand } from "@base/command";
 import type { EmiliaClient } from "@client";
-import { db } from "@database";
 import { Log } from "@log";
-import { users } from "@schema/user";
 import { EmiliaTypeError, error, log } from "@util/s";
 import type { Message } from "discord.js";
-import { eq } from "drizzle-orm";
 
 export default class Potion extends BaseCommand {
   constructor() {
@@ -28,8 +25,9 @@ export default class Potion extends BaseCommand {
     commandName: string,
     client: EmiliaClient,
   ) {
-    if (!message.guild || !message.member) return;
+    if (!message.guild || !message.member || message.channel.isDMBased()) return;
 
+    const db = client.db;
     const member =
       message.mentions.members?.first() ||
       message.guild?.members.cache.get(args[0]);
@@ -51,9 +49,9 @@ export default class Potion extends BaseCommand {
         content: "Низя изменить значение для чтеца (ур доступа) или бота!",
       });
 
-    const user = await db.query.users.findFirst({
-      where: eq(users.id, userId),
-      columns: { potion: true },
+    const user = await db.user.findFirst({
+      where: { id: userId },
+      select: { potion: true },
     });
 
     if (!user || !user.potion)
@@ -67,16 +65,16 @@ export default class Potion extends BaseCommand {
         if (Number.isNaN(newPotion)) return message.channel.send({ content: `${newPotion} не является числом!` });
         if (newPotion < minPotion && newPotion > maxPotion) return message.channel.send({ content: `Число ${newPotion} ${newPotion < minPotion ? "меньше минимального" : "больше максимального"} значения!` });
 
-        const upd = await db.update(users).set({ potion: newPotion }).where(eq(users.id, userId)).returning({ result: users.potion });
+        const upd = await db.user.update({ where: { id: userId }, data: { potion: newPotion }, select: { potion: true } });
 
-        if (upd.length < 1) return new EmiliaTypeError(`Произошла ошибка при обновлении ${member.user.username} (${member.user.id}) количества potion!`);
+        if (!upd.potion) return new EmiliaTypeError(`Произошла ошибка при обновлении ${member.user.username} (${member.user.id}) количества potion!`);
         new Log({ text: `${member.user.username} имеет ${newPotion} potion сейчас!`, type: "error", categories: ["global", "potion", "db"] });
         message.channel.send({ content: "Обновлено!" });
       } else if (user.potion === -1 && message.member.id === "211144644891901952" || user.potion === 100 && message.member.id === "211144644891901952") {
         if (newPotion === user.potion) return message.channel.send({ content: "Низя просто взять и выдать то же самое количество!" });
-        const upd = await db.update(users).set({ potion: newPotion }).where(eq(users.id, userId)).returning({ result: users.potion });
+        const upd = await db.user.update({ where: { id: userId }, data: { potion: newPotion }, select: { potion: true } });
 
-        if (upd.length < 1) return new EmiliaTypeError(`Произошла ошибка при обновлении ${member.user.username} (${member.user.id}) количества potion!`);
+        if (!upd.potion) return new EmiliaTypeError(`Произошла ошибка при обновлении ${member.user.username} (${member.user.id}) количества potion!`);
         new Log({ text: `${member.user.username} имеет ${newPotion} potion сейчас!`, type: "error", categories: ["global", "potion", "db"] });
       } else {
         message.channel.send({ content: "Если ты хочешь изменить юзера с 100 или -1, то тыкай Мию)" });

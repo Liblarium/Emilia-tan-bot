@@ -3,7 +3,7 @@ import type { EmiliaClient } from "@client";
 import { Log } from "@log";
 import { AddInDB } from "@util/addInDB";
 import { Levels } from "@util/level";
-import { ChannelType, type Message /*, PermissionsBitField */ } from "discord.js";
+import type { Message /*, PermissionsBitField */ } from "discord.js";
 import { CommandHandler } from "./messageComponents/command.handler";
 
 //const { Flags: { SendMessages } } = PermissionsBitField;
@@ -14,8 +14,11 @@ export default class MessageCreate extends BaseEvent {
   }
 
   execute(message: Message, client: EmiliaClient): undefined {
+    if (!message.member) return;
+
     new AddInDB(message);
-    new Levels(message);
+
+    if (!message.member.user.bot) new Levels(message);
 
     //const db = this.db;
     //const logMessage: LogOptions = { text: ``, type: 1, event: true, categories: [`global`, `command`] /*, db: true*/ };
@@ -26,11 +29,16 @@ export default class MessageCreate extends BaseEvent {
           console.log(newGuild);
       }
     }*/
-    if (message.channel.type !== ChannelType.DM) {
+    if (!message.channel.isDMBased()) {
       try {
         new CommandHandler(message, client);
       } catch (e: unknown) {
-        new Log({ text: e as Error, type: "error", event: true, categories: ["global", "command"] });
+        new Log({
+          text: e,
+          type: "error",
+          event: true,
+          categories: ["global", "command"],
+        });
       }
     }
   }

@@ -59,7 +59,30 @@ export class BaseLog implements IBaseLog {
     this.event = event ?? false;
     this.category = "other";
 
+    this.checkBaseFolder();
+
     if (typeof type === "number") this.setType(type);
+  }
+
+  /**
+   * Checks if the base log folder exists and has the necessary permissions.
+   * If the folder does not exist, attempts to create it.
+   * Logs an error if folder creation fails.
+   * @private
+   * @returns {Promise<void>}
+   */
+  private async checkBaseFolder(): Promise<void> {
+    const folderLogPath = resolve(BaseLogPath);
+    try {
+      await access(folderLogPath, constants.F_OK | constants.W_OK);
+    } catch (error) {
+      try {
+        await access(folderLogPath, constants.W_OK);
+        await mkdir(BaseLogPath, { recursive: true });
+      } catch (e) {
+        console.error(`[${time()}]: BaseLog.#checkBaseFolder:`, e);
+      }
+    }
   }
 
   /**

@@ -1,0 +1,1 @@
+export type GuildPrefix = { now: string, default: string };

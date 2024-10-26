@@ -16,6 +16,8 @@ export default class Send extends BaseCommand {
   }
 
   async execute(message: Message, args: string[]) {
+    if (message.channel.isDMBased()) return;
+
     let msg: string;
     const channel = message.mentions.channels.first() as unknown as TextChannel | undefined;
     new Log({ text: `${message.member?.user.username ?? "[Ошибка]"} использовал Скажи`, type: 1, categories: ["global", "command"] });

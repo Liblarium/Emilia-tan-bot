@@ -4,5 +4,7 @@
     "fileoverview",
     "Repliable"
   ],
-  "cSpell.language": "en,ru,ru-RU"
+  "cSpell.language": "en,ru,ru-RU",
+  "typescript.validate.enable": true,
+  "editor.formatOnSave": true
 }
