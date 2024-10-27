@@ -12,22 +12,6 @@ import type {
 } from "discord.js";
 
 /**
- * Type of command
- */
-interface TypeCommand {
-  /** "command" - message command. "slash" - slash command */
-  type: "command" | "slash";
-}
-
-/**
- * Option for delete command message
- */
-interface DeleteCommandMessage {
-  /** If command message should be deleted */
-  delete?: boolean;
-}
-
-/**
  * Base options for command
  */
 interface BaseCommandOptions {
@@ -67,26 +51,30 @@ interface BaseCommandOptions {
    * Users who can't use command
    */
   dUsers: ArrayMaybeEmpty<string>;
+  /** 
+   * If command message should be deleted 
+   */
+  delete?: boolean;
 }
+
+type CommandType = "command" | "slash";
+
+type EditedBaseCommandOptions = Omit<BaseCommandOptions, "aliases" | "perms" | "delete">;
 
 /**
  * Options for command constructor
  */
-type CommandConstructorOptions = Partial<BaseCommandOptions> &
-  TypeCommand &
-  DeleteCommandMessage;
+type CommandConstructorOptions<T extends CommandType = "command"> = T extends "command" ? Partial<BaseCommandOptions> : Partial<EditedBaseCommandOptions>;
 
 /**
  * Options for command class
  */
-export type CommandClassOptions = BaseCommandOptions &
-  TypeCommand &
-  DeleteCommandMessage;
+export type CommandClassOptions<T extends CommandType = "command"> = T extends "command" ? Partial<BaseCommandOptions> : Partial<EditedBaseCommandOptions>;
 
 /**
  * Options for command
  */
-export interface CommandOptions {
+export interface CommandOptions<T extends CommandType = "command"> {
   /**
    * Name of command
    */
@@ -94,40 +82,15 @@ export interface CommandOptions {
   /**
    * Options for command
    */
-  option: CommandConstructorOptions;
+  option?: CommandConstructorOptions;
   /**
    * Description of command
    */
-  description?: string;
+  description?: T extends "command" ? undefined : string;
 }
 
 /**
  * Type of return value of execute function
  */
 export type ExecuteReturns = void | Message | ChatInputCommandInteraction | InteractionResponse | Log | EmiliaError | EmiliaTypeError;
-
-/**
- * Interface for base command
- */
-export interface IBaseCommand {
-  /**
-   * Data of command
-   */
-  data: SlashCommandBuilder;
-  /**
-   * Name of command
-   */
-  name: string;
-  /**
-   * Options of command
-   */
-  option: CommandClassOptions;
-  /**
-   * Function for execute command. Main command function
-   */
-  execute: (
-    ...args: unknown[]
-  ) => ExecuteReturns | Promise<ExecuteReturns>;
-}
-
 

@@ -1,17 +1,15 @@
 import { BaseCommand } from "@base/command";
 import type { EmiliaClient } from "@client";
-import { sharMap } from "@util/ball.list";
-import { random } from '@util/s';
-import { type ChatInputCommandInteraction, GuildMember } from "discord.js";
+import { getRandomBall } from "@util/commands/ball";
+import { displayColor, isGuildMember } from "@util/s";
+import type { ChatInputCommandInteraction } from "discord.js";
 
-export default class Bal_s extends BaseCommand {
+export default class Bal_s extends BaseCommand<"slash"> {
   constructor() {
     super({
       name: "шар",
-      option: {
-        type: "slash",
-      },
-      description: "Задай вопрос боту - она ответит тебе"
+      description: "Задай вопрос боту - она ответит тебе",
+      commandType: "slash",
     });
 
     this.data
@@ -20,7 +18,7 @@ export default class Bal_s extends BaseCommand {
           .setName("вопрос")
           .setDescription("Введи вопрос для получения ответа")
           .setMaxLength(4000)
-          .setRequired(true)
+          .setRequired(true),
       )
       .addBooleanOption((option) =>
         option
@@ -36,22 +34,31 @@ export default class Bal_s extends BaseCommand {
     interaction: ChatInputCommandInteraction,
     client: EmiliaClient,
   ) {
-    const color = interaction.member instanceof GuildMember ? interaction.member?.displayColor === 0 ? 0x48_df_bf : interaction.member.displayColor : 0x48_df_bf;
+    if (!isGuildMember(interaction.member)) return;
+
+    const memberColor = interaction.member.displayColor;
+    const color = displayColor(memberColor, "#48dfbf");
     const privates = interaction.options.getBoolean("приватность");
     const question = interaction.options.getString("вопрос", true);
-    const bal = random(0, interaction.guildId === "451103537527783455" ? 40 : 14);
+    const bal = getRandomBall(
+      interaction.guildId === "451103537527783455" ? 40 : 14,
+    );
 
     await interaction.reply({
-      embeds: [{
-        title: "Вопрос:",
-        description: `${question}`,
-        color,
-        fields: [{
-          name: "Ответ:",
-          value: `\u000A${sharMap[bal]}`,
-        }]
-      }],
-      ephemeral: privates ?? false
+      embeds: [
+        {
+          title: "Вопрос:",
+          description: `${question}`,
+          color,
+          fields: [
+            {
+              name: "Ответ:",
+              value: `\u000A${bal}`,
+            },
+          ],
+        },
+      ],
+      ephemeral: privates ?? false,
     });
   }
 }

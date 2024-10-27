@@ -1,6 +1,7 @@
 import { BaseCommand } from "@base/command";
 import type { EmiliaClient } from "@client";
-import { Log } from "@log";
+import { getPing } from "@util/commands/ping";
+import { isGuildMember } from "@util/s";
 import type { Message } from "discord.js";
 
 export default class Ping extends BaseCommand {
@@ -15,10 +16,10 @@ export default class Ping extends BaseCommand {
   }
 
   execute(message: Message, args: unknown[], commandName: string, client: EmiliaClient) {
-    new Log({ text: `Пинг: ${client.ws.ping.toString()} ms`, type: 1, categories: ["global", "command"] });
+    if (message.channel.isDMBased() || !isGuildMember(message.member)) return;
 
-    if (message.channel.isDMBased()) return;
+    const pingMessage = getPing(client, message.member.displayColor);
 
-    return message.channel.send({ embeds: [{ description: `Мой пинг: ${client.ws.ping.toString()} ms`, color: message.member?.displayColor === 0 ? 7_180_443 : message.member?.displayColor }] });
+    return message.channel.send({ embeds: [pingMessage] });
   }
 }

@@ -1,6 +1,5 @@
 import { BaseCommand } from "@base/command";
-import { sharMap } from "@util/ball.list";
-import { random } from "@util/s";
+import { getRandomBall } from "@util/commands/ball";
 import type { Message } from "discord.js";
 
 export default class Ball extends BaseCommand {
@@ -18,7 +17,7 @@ export default class Ball extends BaseCommand {
     if (!message.guildId || message.channel.isDMBased()) return;
     if (!args[0]) return message.channel.send({ content: "А где вопрос?" });
 
-    const ballMessage = ["334418584774246401", "451103537527783455"].includes(message.guildId) ? random(0, 14) : random(0, 40);
-    await message.reply(`\u000A${sharMap[ballMessage]}`);
+    const ballMessage = getRandomBall(["334418584774246401", "451103537527783455"].includes(message.guildId) ? 14 : 40);
+    await message.reply(`\u000A${ballMessage}`);
   }
 }

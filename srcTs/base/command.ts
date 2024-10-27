@@ -1,21 +1,19 @@
 import type {
   CommandClassOptions,
   CommandOptions,
-  ExecuteReturns,
-  IBaseCommand
+  ExecuteReturns
 } from "@type/base/command";
 import { EmiliaTypeError } from "@util/s";
 import { SlashCommandBuilder } from "discord.js";
 
-export class BaseCommand implements IBaseCommand {
+export class BaseCommand<T extends "command" | "slash"> {
   /** Это `new SlashCommandBuilder()`. Только для `/` команд. Доп параметры `/` идут только через неё */
   data: SlashCommandBuilder;
   /** Имя команды */
   name: string;
   /**
    * Параметры команды.
-   * - **type**: `command` | `slash` - тип команды.
-   * - **aliases**: `string[] | []` - альтернативные названия команды.
+   * - **aliases**: `string[] | []` - альтернативные названия команды. Нет в slash командах
    * - **delete**: `boolean` - доступна только для обычных команд. Удалять ли сообщение с командой
    * - **developer**: `boolean` - команда доступна только для разработчика
    * - **perms**: `number` - ограничения по уровню доступа. Не по правам диса
@@ -26,7 +24,12 @@ export class BaseCommand implements IBaseCommand {
    * - **channels**: `string[] | []` - массив с id каналов, где не будет доступна команда
    * - **dUsers**: `string[] | []` - массив с id пользователей, которым не будет доступна команда
    */
-  option: CommandClassOptions;
+  option: CommandClassOptions<T>;
+
+  /**
+   * Тип команды. command | slash
+   */
+  commandType: T;
   /**
    * Базовый класс для команд
    *
@@ -35,17 +38,19 @@ export class BaseCommand implements IBaseCommand {
    * ```ts
    * //обычная команда
    * import { BaseCommand } from "../Base/command";
+   * import type { EmiliaClient } from "@client";
+   * import type { Message } from "discord.js";
    *
-   * export default class SomeCommand extends BaseCommand {
+   * export default class SomeCommand extends BaseCommand<"command"> {
    *  constructor() {
    *    super({ name: `someCommand`,
+   *      commandType: `command`, //Обычная команда. Есть ещё slash
    *      option: {
-   *       type: `command`, //Обычная команда. Есть ещё slash
    *       aliases: [`sm`], //только для обычных команд. Альтернативные названия для вызова команды
    *    }});
    *   }
    *
-   *   execute(message: Message, args: any[], commandName: string, client: EmiliaClient) {
+   *   execute(message: Message, args: string[], commandName: string, client: EmiliaClient) {
    *     message.channel.send({ content: `Сообщение о использовании ${commandName}` });
    *   }
    *  }
@@ -56,22 +61,18 @@ export class BaseCommand implements IBaseCommand {
    * @param commandOptions.description описание команды
    * @param commandOptions.option опции для команды (не /. Смотри выше)
    */
-  constructor({ name, description, option }: CommandOptions) {
+  constructor({ name, description, commandType, option = {} }: CommandOptions<T> & { commandType: T }) {
     if (!name) throw new EmiliaTypeError("Вы не указали имя команды!");
-    if (typeof option !== "object" || Object.entries(option).length === 0)
-      throw new EmiliaTypeError("Вы не указали параметры для команды!");
-    if (!["command", "slash"].includes(option.type))
+    if (!["command", "slash"].includes(commandType))
       throw new EmiliaTypeError(
-        `Вы указали не поддерживаемый тип (${option.type.length < 1 ? "[Не указано]" : option.type} команды! [Разрешено: command | slash])`,
+        `Вы указали не поддерживаемый тип (${commandType.length < 1 ? "[Не указано]" : commandType} команды! [Разрешено: command | slash])`,
       );
 
+    this.commandType = commandType;
     this.name = name;
     this.data = new SlashCommandBuilder();
     this.option = {
-      type: option.type,
-      aliases: option.aliases ?? [],
       developer: option.developer ?? false,
-      perms: option.perms ?? 0,
       test: option.test ?? false,
       testers: option.testers ?? [],
       owner: option.owner ?? false,
@@ -80,9 +81,15 @@ export class BaseCommand implements IBaseCommand {
       dUsers: option.dUsers ?? [],
     };
 
-    if (option.type === "command") {
-      this.option.delete = option.delete ?? false;
-    } else {
+    if (commandType === "command") {
+      this.option = {
+        ...this.option,
+        aliases: option.aliases ?? [],
+        perms: option.perms ?? 0,
+        delete: option.delete ?? false,
+      };
+    }
+    if (commandType === "slash") {
       this.data.setName(name);
       if (description) this.data.setDescription(description);
     }
@@ -90,7 +97,7 @@ export class BaseCommand implements IBaseCommand {
 
   execute(...args: unknown[]): ExecuteReturns | Promise<ExecuteReturns> {
     throw new EmiliaTypeError(
-      `Вы не реализовали свой execute для [${this.name}] ${this.option.type} команды!`,
+      `Вы не реализовали свой execute для [${this.name}] ${this.commandType} команды!`,
     );
   }
 }
