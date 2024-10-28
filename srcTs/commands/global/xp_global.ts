@@ -4,14 +4,15 @@ import { getXp } from "@util/commands/xp";
 import { isGuildMember } from "@util/s";
 import type { Message } from "discord.js";
 
-export default class Xp extends BaseCommand<"command"> {
+export default class Xp extends BaseCommand {
   constructor() {
     super({
       name: "xp",
       commandType: "command",
-      //description: "Показывает текущий опыт пользователя.",
+      aliases: ["exp", "опыт"],
+      description: "Показывает текущий опыт пользователя.",
       option: {
-        aliases: ["exp", "опыт"],
+
         delete: true
       }
     });

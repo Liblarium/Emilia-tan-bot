@@ -16,10 +16,6 @@ import type {
  */
 interface BaseCommandOptions {
   /**
-   * Aliases for command
-   */
-  aliases: ArrayMaybeEmpty<string>;
-  /**
    * If command is developer command
    */
   developer: boolean;
@@ -57,28 +53,34 @@ interface BaseCommandOptions {
   delete?: boolean;
 }
 
-type CommandType = "command" | "slash";
-
-type EditedBaseCommandOptions = Omit<BaseCommandOptions, "aliases" | "perms" | "delete">;
+export type CommandType = "command" | "slash";
 
 /**
  * Options for command constructor
  */
-type CommandConstructorOptions<T extends CommandType = "command"> = T extends "command" ? Partial<BaseCommandOptions> : Partial<EditedBaseCommandOptions>;
+type CommandConstructorOptions = Partial<BaseCommandOptions>;
 
 /**
  * Options for command class
  */
-export type CommandClassOptions<T extends CommandType = "command"> = T extends "command" ? Partial<BaseCommandOptions> : Partial<EditedBaseCommandOptions>;
+export type CommandClassOptions = Partial<BaseCommandOptions>;
 
 /**
  * Options for command
  */
-export interface CommandOptions<T extends CommandType = "command"> {
+export interface CommandOptions {
   /**
    * Name of command
    */
   name: string;
+  /**
+   * Aliases for command
+   */
+  aliases?: ArrayMaybeEmpty<string>;
+  /**
+   * Type of command. "command" or "slash"
+   */
+  commandType: CommandType;
   /**
    * Options for command
    */
@@ -86,7 +88,7 @@ export interface CommandOptions<T extends CommandType = "command"> {
   /**
    * Description of command
    */
-  description?: T extends "command" ? undefined : string;
+  description?: string;
 }
 
 /**

@@ -1,11 +1,10 @@
 import { BaseCommand } from "@base/command";
 import type { EmiliaClient } from "@client";
-import { stringToBigInt } from "@type/util/utils";
 import { editPol } from "@util/commands/pol";
-import { isGuildMember } from "@util/s";
+import { isGuildMember, stringToBigInt } from "@util/s";
 import type { ChatInputCommandInteraction } from "discord.js";
 
-export default class Pol_s extends BaseCommand<"slash"> {
+export default class Pol_s extends BaseCommand {
   constructor() {
     super({
       name: "pol",

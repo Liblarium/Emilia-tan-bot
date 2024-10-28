@@ -1,12 +1,13 @@
+import type { ArrayMaybeEmpty } from "@type";
 import type {
   CommandClassOptions,
   CommandOptions,
-  ExecuteReturns
+  ExecuteReturns,
 } from "@type/base/command";
 import { EmiliaTypeError } from "@util/s";
 import { SlashCommandBuilder } from "discord.js";
 
-export class BaseCommand<T extends "command" | "slash"> {
+export class BaseCommand {
   /** Это `new SlashCommandBuilder()`. Только для `/` команд. Доп параметры `/` идут только через неё */
   data: SlashCommandBuilder;
   /** Имя команды */
@@ -24,12 +25,13 @@ export class BaseCommand<T extends "command" | "slash"> {
    * - **channels**: `string[] | []` - массив с id каналов, где не будет доступна команда
    * - **dUsers**: `string[] | []` - массив с id пользователей, которым не будет доступна команда
    */
-  option: CommandClassOptions<T>;
+  option: CommandClassOptions;
 
+  aliases: ArrayMaybeEmpty<string>;
   /**
    * Тип команды. command | slash
    */
-  commandType: T;
+  commandType: "command" | "slash";
   /**
    * Базовый класс для команд
    *
@@ -61,11 +63,11 @@ export class BaseCommand<T extends "command" | "slash"> {
    * @param commandOptions.description описание команды
    * @param commandOptions.option опции для команды (не /. Смотри выше)
    */
-  constructor({ name, description, commandType, option = {} }: CommandOptions<T> & { commandType: T }) {
+  constructor({ name, description, aliases, commandType, option = {} }: CommandOptions) {
     if (!name) throw new EmiliaTypeError("Вы не указали имя команды!");
     if (!["command", "slash"].includes(commandType))
       throw new EmiliaTypeError(
-        `Вы указали не поддерживаемый тип (${commandType.length < 1 ? "[Не указано]" : commandType} команды! [Разрешено: command | slash])`,
+        `[${name}]: Вы указали не поддерживаемый тип (${typeof commandType === "string" ? commandType.length > 1 ? "[Не указано]" : commandType : "[Ошибка]"} команды! [Разрешено: command | slash])`,
       );
 
     this.commandType = commandType;
@@ -80,11 +82,11 @@ export class BaseCommand<T extends "command" | "slash"> {
       channels: option.channels ?? [],
       dUsers: option.dUsers ?? [],
     };
+    this.aliases = aliases ?? [];
 
     if (commandType === "command") {
       this.option = {
         ...this.option,
-        aliases: option.aliases ?? [],
         perms: option.perms ?? 0,
         delete: option.delete ?? false,
       };

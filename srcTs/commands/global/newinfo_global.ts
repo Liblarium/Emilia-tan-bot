@@ -8,12 +8,12 @@ export default class NewInfo extends BaseCommand {
   constructor() {
     super({
       name: "newinfo",
+      commandType: "command",
+      aliases: ["nio"],
       option: {
-        type: "command",
-        aliases: ["nio"],
         delete: true,
       },
-      description: "Изменение информации о себе",
+      //description: "Изменение информации о себе",
     });
   }
 
@@ -33,6 +33,6 @@ export default class NewInfo extends BaseCommand {
 
     const updateMessage = await updateUserBio({ userId: message.author.id, newBio: bio });
 
-    return message.reply({ embeds: [updateMessage] });
+    return message.channel.send({ embeds: [updateMessage] });
   }
 }

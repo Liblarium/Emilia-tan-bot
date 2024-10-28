@@ -3,13 +3,13 @@ import type { EmiliaClient } from "@client";
 import { setReport } from "@util/commands/report";
 import type { Message } from "discord.js";
 
-export default class Report extends BaseCommand<"command"> {
+export default class Report extends BaseCommand {
   constructor() {
     super({
       name: "report",
       commandType: "command",
+      aliases: ["репорт"],
       option: {
-        aliases: ["репорт"],
         delete: true,
       },
       //description: "Пожаловаться на другого пользователя",
@@ -23,7 +23,7 @@ export default class Report extends BaseCommand<"command"> {
     client: EmiliaClient,
   ) {
     if (
-      message.guildId !== "451103537527783455" ||
+      message.guildId !== "334418584774246401" ||//"451103537527783455" ||
       !message.guild ||
       !message.member
     )

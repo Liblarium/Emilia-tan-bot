@@ -4,7 +4,7 @@ import { getHelpMessage } from "@util/commands/help.message";
 import { isGuildMember } from "@util/s";
 import type { ChatInputCommandInteraction } from "discord.js";
 
-export default class Help_s extends BaseCommand<"slash"> {
+export default class Help_s extends BaseCommand {
   constructor() {
     super({
       name: "help",

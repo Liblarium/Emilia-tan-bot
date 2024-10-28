@@ -4,13 +4,13 @@ import { getTime } from "@util/commands/time";
 import { isGuildMember } from "@util/s";
 import type { Message } from "discord.js";
 
-export default class Time extends BaseCommand<"command"> {
+export default class Time extends BaseCommand {
   constructor() {
     super({
       name: "time",
       commandType: "command",
+      aliases: ["время"],
       option: {
-        aliases: ["время"],
         delete: true,
       },
     });

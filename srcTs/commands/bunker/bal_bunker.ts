@@ -1,10 +1,10 @@
 import { BaseCommand } from "@base/command";
 import type { EmiliaClient } from "@client";
-import { getRandomBall } from "@util/commands/ball";
+import { getRandomBall } from "@util/commands/bal";
 import { displayColor, isGuildMember } from "@util/s";
 import type { ChatInputCommandInteraction } from "discord.js";
 
-export default class Bal_s extends BaseCommand<"slash"> {
+export default class Bal_s extends BaseCommand {
   constructor() {
     super({
       name: "шар",

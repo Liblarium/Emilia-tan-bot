@@ -4,7 +4,7 @@ import { getOrEditPrefix } from "@util/commands/prefix";
 import { isGuildMember } from "@util/s";
 import type { Message } from "discord.js";
 
-export default class Prefix extends BaseCommand<"command"> {
+export default class Prefix extends BaseCommand {
   constructor() {
     super({
       name: "prefix",

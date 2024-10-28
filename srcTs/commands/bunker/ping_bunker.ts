@@ -4,7 +4,7 @@ import { getPing } from "@util/commands/ping";
 import { isGuildMember } from "@util/s";
 import type { ChatInputCommandInteraction } from "discord.js";
 
-export default class Ping_s extends BaseCommand<"slash"> {
+export default class Ping_s extends BaseCommand {
   constructor() {
     super({
       name: "ping",

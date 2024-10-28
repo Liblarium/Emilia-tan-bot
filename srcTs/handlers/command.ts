@@ -18,19 +18,19 @@ export class CommandHandler extends BaseHandler {
     const client = this.client;
 
     try {
-      if (!["command", "slash"].includes(command.option.type))
+      if (!["command", "slash"].includes(command.commandType))
         throw new Log({
-          text: `${command.name || "Ошибка"} имеет ${command.option.type || "[Не указано]"} не поддерживаемый тип. Доступные: command, slash.`,
+          text: `${command.name || "Ошибка"} имеет ${command.commandType || "[Не указано]"} не поддерживаемый тип. Доступные: command, slash.`,
           type: "error",
           categories: ["global", "handler", "command"],
         });
 
       const commandType =
-        command.option.type === "command" ? "commands" : "slashCommands";
+        command.commandType === "command" ? "commands" : "slashCommands";
 
       client[commandType].set(command.name, command);
 
-      command.option.aliases.forEach((alias) =>
+      command.aliases.forEach((alias) =>
         client[commandType].set(alias, command),
       );
     } catch (e: unknown) {

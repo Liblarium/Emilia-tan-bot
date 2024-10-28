@@ -1,6 +1,5 @@
 import { db } from "@client";
-import { stringToBigInt } from "@type/util/utils";
-import { displayColor, hexToDecimal } from "@util/s";
+import { displayColor, hexToDecimal, stringToBigInt } from "@util/s";
 import type { APIEmbed } from "discord.js";
 
 export async function editPol({

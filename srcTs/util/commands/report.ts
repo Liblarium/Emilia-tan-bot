@@ -15,7 +15,7 @@ type ReportArgs<T extends "message" | "interaction"> = {
   reporter: GuildMember;
   reported: GuildMember | undefined;
 }
-
+const errColor = hexToDecimal("#ff2500");
 type ReportReturn = Message | InteractionResponse;
 
 export function setReport<T extends "interaction">(args: ReportArgs<T>): Promise<ReportReturn> | void;
@@ -28,14 +28,8 @@ export function setReport<T extends "message" | "interaction">({
 }: ReportArgs<T>): Promise<ReportReturn> | void {
   if (!mesInt.guild) return;
 
-  const errColor = hexToDecimal("#ff2500");
-
   if (!reported || !report) {
-    if (
-      mesInt instanceof ChatInputCommandInteraction ||
-      mesInt.channel.isDMBased()
-    )
-      return;
+    if (!mesInt.channel || mesInt.channel.isDMBased()) return;
 
     if (!reported)
       return mesInt.channel.send({
@@ -94,7 +88,7 @@ export function setReport<T extends "message" | "interaction">({
     }
   }
 
-  const channel = mesInt.guild.channels.cache.get("931608832575172719");
+  const channel = mesInt.guild.channels.cache.get("1017800152230133810");//("931608832575172719");
 
   if (!channel) {
     const content = "❌ Не удалось найти канал для репортов!";

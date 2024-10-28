@@ -4,7 +4,7 @@ import { updateUserBio } from "@util/commands/newinfo";
 import { isGuildMember } from "@util/s";
 import type { ChatInputCommandInteraction } from "discord.js";
 
-export default class NewInfo_s extends BaseCommand<"slash"> {
+export default class NewInfo_s extends BaseCommand {
   constructor() {
     super({
       name: "newinfo",

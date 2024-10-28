@@ -1,13 +1,13 @@
 import { BaseCommand } from "@base/command";
-import { getRandomBall } from "@util/commands/ball";
+import { getRandomBall } from "@util/commands/bal";
 import type { Message } from "discord.js";
 
 export default class Ball extends BaseCommand {
   constructor() {
     super({
       name: "шар",
+      commandType: "command",
       option: {
-        type: "command",
         delete: false,
       }
     });

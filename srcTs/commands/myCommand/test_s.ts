@@ -6,9 +6,9 @@ export default class Test extends BaseCommand {
   constructor() {
     super({
       name: "тест",
+      commandType: "slash",
       description: "Тестовая команда",
       option: {
-        type: "slash",
         developer: true,
       },
     });

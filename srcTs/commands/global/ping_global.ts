@@ -8,8 +8,8 @@ export default class Ping extends BaseCommand {
   constructor() {
     super({
       name: "ping",
+      commandType: "command",
       option: {
-        type: "command",
         delete: true,
       }
     });

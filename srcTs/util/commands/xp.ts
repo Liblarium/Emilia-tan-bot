@@ -1,6 +1,5 @@
 import { db } from "@client";
-import { stringToBigInt } from "@type/util/utils";
-import { hexToDecimal } from "@util/s";
+import { hexToDecimal, stringToBigInt } from "@util/s";
 import type { APIEmbed } from "discord.js";
 
 /**

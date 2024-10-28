@@ -9,7 +9,7 @@ export function getPing(
 ): APIEmbed {
   if (typeof color === "string") color = hexToDecimal(color);
 
-  const description = `Мой пинг: ${client.ws.ping.toString()} ms\nNode.js пинг: ${Math.round(process.uptime() * 1000)} ms`;
+  const description = `Мой пинг: ${client.ws.ping.toString()} ms`;
   new Log({ text: description, type: 1, categories: ["global", "command"] });
 
   return {

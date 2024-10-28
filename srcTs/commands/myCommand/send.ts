@@ -6,9 +6,8 @@ export default class Send extends BaseCommand {
   constructor() {
     super({
       name: "скажи",
+      commandType: "command",
       option: {
-        aliases: [],
-        type: "command",
         delete: true,
         developer: true,
       }

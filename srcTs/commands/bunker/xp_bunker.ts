@@ -4,7 +4,7 @@ import { getXp } from "@util/commands/xp";
 import { isGuildMember } from '@util/s';
 import type { ChatInputCommandInteraction } from "discord.js";
 
-export default class Xp extends BaseCommand<"slash"> {
+export default class Xp extends BaseCommand {
   constructor() {
     super({
       name: "xp",

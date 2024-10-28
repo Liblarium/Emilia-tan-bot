@@ -1,21 +1,20 @@
 import { BaseCommand } from "@base/command";
 import type { EmiliaClient } from "@client";
 import { Log } from "@log";
-import { EmiliaTypeError, error, log } from "@util/s";
+import { EmiliaTypeError } from "@util/s";
 import type { Message } from "discord.js";
 
 export default class Potion extends BaseCommand {
   constructor() {
     super({
       name: "potion",
+      commandType: "command",
       option: {
-        aliases: [],
-        type: "command",
         delete: true,
         test: true,
         testers: ["477456988817719307"],
       },
-      description: "Изменение возможности становление чтецом",
+      //description: "Изменение возможности становление чтецом",
     });
   }
 

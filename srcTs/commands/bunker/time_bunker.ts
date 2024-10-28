@@ -4,7 +4,7 @@ import { getTime } from "@util/commands/time";
 import { isGuildMember } from "@util/s";
 import type { ChatInputCommandInteraction } from "discord.js";
 
-export default class Time extends BaseCommand<"slash"> {
+export default class Time extends BaseCommand {
   constructor() {
     super({
       name: "time",

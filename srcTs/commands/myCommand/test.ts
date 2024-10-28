@@ -9,9 +9,9 @@ export default class Test extends BaseCommand {
   constructor() {
     super({
       name: "test",
+      commandType: "command",
+      aliases: ["ts"],
       option: {
-        aliases: ["ts"],
-        type: "command",
         test: true,
         testers: ["357203448640307201"],
         delete: true,

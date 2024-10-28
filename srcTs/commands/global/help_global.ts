@@ -8,9 +8,9 @@ export default class Help extends BaseCommand {
   constructor() {
     super({
       name: "help",
+      commandType: "command",
+      aliases: ["помощь", "command", "команды", "хелп", "commands"],
       option: {
-        type: "command",
-        aliases: ["помощь", "command", "команды", "хелп", "commands"],
         delete: true,
       },
     });

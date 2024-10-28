@@ -9,7 +9,7 @@ import {
   type VoiceChannel,
 } from "discord.js";
 
-export default class Report_s extends BaseCommand<"slash"> {
+export default class Report_s extends BaseCommand {
   constructor() {
     super({
       name: "report",
