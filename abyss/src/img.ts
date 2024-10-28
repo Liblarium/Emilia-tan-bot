@@ -88,7 +88,7 @@ class Profile {
 
     setStyle(avatarBorderColor, `fill`, `#123123`);
 
-    const avatarLineWidh = avatarBorder?.lineWidth ?? 5;
+    const avatarLineWidth = avatarBorder?.lineWidth ?? 5;
 
     ctx.fill();
     ctx.closePath();
@@ -99,7 +99,7 @@ class Profile {
     const endAngle = Math.PI * 2 * (xp.now / xp.max) - Math.PI / 2;
 
     ctx.beginPath();
-    ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, (avatarPosition.radius ?? 86.5) + avatarLineWidh, startAngle, endAngle, false);
+    ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, (avatarPosition.radius ?? 86.5) + avatarLineWidth, startAngle, endAngle, false);
 
     if (blurOptions?.xp !== undefined) ctx.filter = `blur(${blurOptions.xp ?? 0}px)`;
 
@@ -116,17 +116,17 @@ class Profile {
     ctx.beginPath();
     ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, avatarPosition.radius ?? 98, 0, Math.PI * 2);
     setStyle(avatarBorderBackground, `stroke`, `#124124`);
-    ctx.lineWidth = avatarLineWidh;
+    ctx.lineWidth = avatarLineWidth;
     ctx.stroke();
     ctx.closePath();
 
     ctx.filter = `blur(${blurOptions?.border !== undefined && blurOptions.border.in !== undefined ? blurOptions.border.in : 0}px)`;
 
-    //внутришняя рамка аватарки
+    //внутренняя рамка аватарки
     ctx.beginPath();
-    ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, (avatarPosition.radius ?? 98) - (avatarLineWidh + (xp.lineWidth ?? 8)), 0, Math.PI * 2); //82.4
+    ctx.arc(avatarPosition.x ?? 150, avatarPosition.y ?? 200, (avatarPosition.radius ?? 98) - (avatarLineWidth + (xp.lineWidth ?? 8)), 0, Math.PI * 2); //82.4
     setStyle(avatarBorderBackground, `stroke`, `#124124`);
-    ctx.lineWidth = avatarLineWidh;
+    ctx.lineWidth = avatarLineWidth;
     ctx.stroke();
     ctx.closePath();
 
@@ -217,9 +217,9 @@ class Profile {
     return this;
   }
 
-  drawBadge(args: DrawBadgeOptions, options: DrawBadgeOptinalOptions): Profile;
-  drawBadge(args: DrawBadgeOptions[], options: DrawBadgeOptinalOptions): Profile;
-  drawBadge(args: DrawBadgeOptions | DrawBadgeOptions[], options: DrawBadgeOptinalOptions): Profile {
+  drawBadge(args: DrawBadgeOptions, options: DrawBadgeOptionalOptions): Profile;
+  drawBadge(args: DrawBadgeOptions[], options: DrawBadgeOptionalOptions): Profile;
+  drawBadge(args: DrawBadgeOptions | DrawBadgeOptions[], options: DrawBadgeOptionalOptions): Profile {
     if (Array.isArray(args) && args.length > 0) {
       //let lastX = x;
       if (args.length === 1) {
@@ -235,7 +235,7 @@ class Profile {
       for (let i = 0; i < args.length; i++) {
         delete sortBadges[i].priority;
         const bg = sortBadges[i];
-        const prewBG = sortBadges[i - 1];
+        const prevBG = sortBadges[i - 1];
 
         if (i === 0) {
           x = bg.x ?? 0;
@@ -246,8 +246,8 @@ class Profile {
           continue;
         }
 
-        x += (prewBG.x ?? 0) - (bg.space ?? 10) - (bg.w ?? 20) - (bg.x ?? 0);
-        y = (prewBG.y ?? 0) + (bg.y ?? 0);
+        x += (prevBG.x ?? 0) - (bg.space ?? 10) - (bg.w ?? 20) - (bg.x ?? 0);
+        y = (prevBG.y ?? 0) + (bg.y ?? 0);
 
         const result = { x, y };
         badges.push({ ...bg, ...result });
@@ -260,7 +260,7 @@ class Profile {
     return this;
   }
 
-  #badgeDraw(args: DrawBadgeOptions, options: DrawBadgeOptinalOptions, ind: number = 0, length: number = 0, arr?: DrawBadgeOptions[]) {
+  #badgeDraw(args: DrawBadgeOptions, options: DrawBadgeOptionalOptions, ind: number = 0, length: number = 0, arr?: DrawBadgeOptions[]) {
     const ctx = this.ctx;
     const { x, y, bgR = 11, bgH = 34, bgW = 28, bgColor = `#10271d`, offStroke = false, bgLineWidth = 2, globalAlpha = { fill: 0.8, stroke: 0.7 }, blur, bgFill = `full` } = options;
     const { w = 20, h = 20, badge, space = 9 } = args;
@@ -428,8 +428,8 @@ class Profile {
 
           const tLClip = testLine.slice(cacheWord.length + (cacheWordNewIndex === -1 ? 0 : 1));
           const testLineClip = tLClip.startsWith(`-`) ? tLClip.slice(1) : tLClip;
-          const textFormated = this.#textFormater({ text: testLineClip, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
-          lines[currentLineIndex] = textFormated.endsWith(`--`) ? textFormated.slice(0, -1) : textFormated;
+          const textFormatted = this.#textFormatter({ text: testLineClip, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
+          lines[currentLineIndex] = textFormatted.endsWith(`--`) ? textFormatted.slice(0, -1) : textFormatted;
           let cacheLine = isStartEmpty.test(testLineClip) ? testLineClip.slice(1) : testLineClip;
 
           ++currentLineIndex;
@@ -446,18 +446,18 @@ class Profile {
                 if (lineCache.length + currentLineIndex >= linesNext + 1) break;
 
                 const sliceNum = nextLineNum * (i + 1);
-                let clipedWord = `${beforeNewLine ?? ``}${cacheLine.slice(startNum, sliceNum)}`;
+                let clippedWord = `${beforeNewLine ?? ``}${cacheLine.slice(startNum, sliceNum)}`;
                 startNum = sliceNum;
-                const newClipWordIndex = clipedWord.indexOf(`\n`);
+                const newClipWordIndex = clippedWord.indexOf(`\n`);
 
                 if (newClipWordIndex !== -1) {
-                  beforeNewLine = clipedWord;
-                  clipedWord = clipedWord.slice(0, newClipWordIndex);
+                  beforeNewLine = clippedWord;
+                  clippedWord = clippedWord.slice(0, newClipWordIndex);
                   beforeNewLine = beforeNewLine.slice(newClipWordIndex + 1);
                 } else beforeNewLine = ``;
 
-                lineCache.push(clipedWord);
-                cacheWord = cacheWord.slice(clipedWord.length);
+                lineCache.push(clippedWord);
+                cacheWord = cacheWord.slice(clippedWord.length);
               }
 
               cacheWord = ``;
@@ -466,9 +466,9 @@ class Profile {
               for (const line of lineCache) {
                 cacheWord = this.#whileClip(line, maxWidth, currentLineIndex <= linesNext ? dashWidth : (dynamic && currentLineIndex === linesNext ? (ellipsisWidth + dynamicCorrector) : 0));
 
-                const textFormated = this.#textFormater({ text: line, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
+                const textFormatted = this.#textFormatter({ text: line, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
 
-                lines[currentLineIndex] = (textFormated.endsWith(`-`) && lineCache[lineCache.length - 1] == line || textFormated.endsWith(`--`)) ? textFormated.slice(0, -1) : textFormated;
+                lines[currentLineIndex] = (textFormatted.endsWith(`-`) && lineCache[lineCache.length - 1] == line || textFormatted.endsWith(`--`)) ? textFormatted.slice(0, -1) : textFormatted;
                 ++currentLineIndex;
               }
 
@@ -659,7 +659,7 @@ class Profile {
 
   /**
   * @param {string} cache входящий текст для изменений 
-  * @param {number} maxWidth макстимальная ширина
+  * @param {number} maxWidth максимальная ширина
   * @param {number} [elseWidth] дополнительное значение, что будет участвовать в цикле 
   * @returns {string}
   */
@@ -684,7 +684,7 @@ class Profile {
   * @param {boolean} options.dynamic динамический ли текст
   * @returns {string}
   */
-  #textFormater({ text, cache, curInd, linesNext, dynamic = false }: TextFormatterOptions): string {
+  #textFormatter({ text, cache, curInd, linesNext, dynamic = false }: TextFormatterOptions): string {
     const isStartEmpty = /^\s/;
     const isEndEmpty = /\s$/;
 
@@ -994,7 +994,7 @@ const main: () => Promise<void> = async () => {
   ctx.closePath();
   ctx.restore();
 
-  //внешнаяя рамка и фон аватарки
+  //внешняя рамка и фон аватарки
   ctx.save();
   ctx.beginPath();
   ctx.arc(150, 200, 98, 0, Math.PI * 2);
@@ -1006,7 +1006,7 @@ const main: () => Promise<void> = async () => {
   ctx.closePath();
   ctx.restore();
 
-  //внутришняя рамка аватарки
+  //внутренняя рамка аватарки
   ctx.beginPath();
   ctx.arc(150, 200, 82.4, 0, Math.PI * 2);
   ctx.strokeStyle = `#124124`;
@@ -1284,7 +1284,7 @@ const main: () => Promise<void> = async () => {
              * @param {number} options.curInd текущий индекс
              * @returns {string}
              */
-          const textFormater = ({ text, cache, curInd }: TextFormatterOptions): string => {
+          const textFormatter = ({ text, cache, curInd }: TextFormatterOptions): string => {
             return curInd < linesNext ? ((isStartEmpty.test(text) || isEndEmpty.test(cache)) ? cache : `${cache}-`) : dynamic && curInd === linesNext ? (isEndEmpty.test(cache) ? `${cache.slice(0, -1)}...` : `${cache}...`) : cache;
           }
 
@@ -1295,8 +1295,8 @@ const main: () => Promise<void> = async () => {
 
           const tLClip = testLine.slice(cacheWord.length + (cacheWordNewIndex === -1 ? 0 : 1));
           const testLineClip = tLClip.startsWith(`-`) ? tLClip.slice(1) : tLClip;
-          const textFormated = textFormater({ text: testLineClip, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
-          lines[currentLineIndex] = textFormated.endsWith(`--`) ? textFormated.slice(0, -1) : textFormated;
+          const textFormatted = textFormatter({ text: testLineClip, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
+          lines[currentLineIndex] = textFormatted.endsWith(`--`) ? textFormatted.slice(0, -1) : textFormatted;
           let cacheLine = isStartEmpty.test(testLineClip) ? testLineClip.slice(1) : testLineClip;
 
           ++currentLineIndex;
@@ -1311,18 +1311,18 @@ const main: () => Promise<void> = async () => {
                 if (lineCache.length + currentLineIndex >= linesNext + 1) break;
 
                 const sliceNum = nextLineNum * (i + 1);
-                let clipedWord = `${beforeNewLine ?? ``}${cacheLine.slice(startNum, sliceNum)}`;
+                let clippedWord = `${beforeNewLine ?? ``}${cacheLine.slice(startNum, sliceNum)}`;
                 startNum = sliceNum;
-                const newClipWordIndex = clipedWord.indexOf(`\n`);
+                const newClipWordIndex = clippedWord.indexOf(`\n`);
 
                 if (newClipWordIndex !== -1) {
-                  beforeNewLine = clipedWord;
-                  clipedWord = clipedWord.slice(0, newClipWordIndex);
+                  beforeNewLine = clippedWord;
+                  clippedWord = clippedWord.slice(0, newClipWordIndex);
                   beforeNewLine = beforeNewLine.slice(newClipWordIndex + 1);
                 } else beforeNewLine = ``;
 
-                lineCache.push(clipedWord);
-                cacheWord = cacheWord.slice(clipedWord.length);
+                lineCache.push(clippedWord);
+                cacheWord = cacheWord.slice(clippedWord.length);
               }
 
               cacheWord = ``;
@@ -1330,8 +1330,8 @@ const main: () => Promise<void> = async () => {
 
               for (const line of lineCache) {
                 cacheWord = whileClip(line, currentLineIndex <= linesNext ? dashWidth : (dynamic && currentLineIndex === linesNext ? (ellipsisWidth + dynamicCorrector) : 0));
-                const textFormated = textFormater({ text: line, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
-                lines[currentLineIndex] = (textFormated.endsWith(`-`) && lineCache[lineCache.length - 1] == line || textFormated.endsWith(`--`)) ? textFormated.slice(0, -1) : textFormated;
+                const textFormatted = textFormatter({ text: line, cache: cacheWord, curInd: currentLineIndex, dynamic, linesNext });
+                lines[currentLineIndex] = (textFormatted.endsWith(`-`) && lineCache[lineCache.length - 1] == line || textFormatted.endsWith(`--`)) ? textFormatted.slice(0, -1) : textFormatted;
                 ++currentLineIndex;
               }
 
@@ -1557,7 +1557,7 @@ const guildProfile = async () => {
 guildProfile();
 //someTest();
 
-interface DrawBadgeOptinalOptions extends X_And_Y {
+interface DrawBadgeOptionalOptions extends X_And_Y {
   bgColor?: StringOrGradient | FillOrStrokeOption<string>;
   bgW?: number; //ширина блока для значков
   bgH?: number; //высота блока для значков
@@ -1576,7 +1576,7 @@ interface DrawBadgeOptions extends Partial<X_And_Y> {
   h?: number; //высота значка. Если не указано, то h = w
   globalAlpha?: number; //прозрачность. Не знаю - надо или нет. Но пусть будет
   blur?: number; //размытие. Так-же не знаю. Потом увижу
-  priority?: number; //как размещать их. 0 - выший приоритет. Если нет - будет по их расположению в массиве. Если это не массив - оно не будет иметь влияния. Просто не стакайте их на одном месте хд
+  priority?: number; //как размещать их. 0 - высший приоритет. Если нет - будет по их расположению в массиве. Если это не массив - оно не будет иметь влияния. Просто не стакайте их на одном месте хд
 }
 
 interface DrawGuildIconOptions {

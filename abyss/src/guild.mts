@@ -52,7 +52,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const random = (min: number, max: number): number => {
   if (min >= max)
     throw new TypeError(
-      `Агрумент min (${min.toString()}) не может быть больше или равно аргументу max (${max.toString()})!`,
+      `Аргумент min (${min.toString()}) не может быть больше или равно аргументу max (${max.toString()})!`,
     );
   const random = Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -251,7 +251,7 @@ const whileClip = (
  * @param {TextFormatterOptions} options - The options for formatting the text.
  * @returns {string} - The formatted text.
  */
-const textFormater = ({
+const textFormatter = ({
   text,
   cache,
   curInd,
@@ -357,7 +357,7 @@ class BaseDraw {
     };
 
     if (clipNumber || timeFormat)
-      text = this.numberFormated(text, { time: timeFormat, num: clipNumber });
+      text = this.numberFormatted(text, { time: timeFormat, num: clipNumber });
     if (fontOptions) this.setFontStyle(fontOptions);
 
     const iText: string = text.toString();
@@ -534,7 +534,7 @@ class BaseDraw {
    * @throws {TypeError} - If `time` and `num` are both true.
    * @throws {TypeError} - If the input is a string and no numbers are found.
    */
-  private numberFormated(
+  private numberFormatted(
     text: StringNumber,
     { time = false, num = false }: { time?: boolean; num?: boolean },
   ): string {
@@ -680,16 +680,16 @@ class BaseDraw {
         cacheWord.length + (cacheWordNewIndex === -1 ? 0 : 1),
       );
       const testLineClip = tLClip.startsWith("-") ? tLClip.slice(1) : tLClip;
-      const textFormated = textFormater({
+      const textFormatted = textFormatter({
         text: testLineClip,
         cache: cacheWord,
         curInd: currentLineIndex,
         dynamic,
         linesNext,
       });
-      lines[currentLineIndex] = textFormated.endsWith("--")
-        ? textFormated.slice(0, -1)
-        : textFormated;
+      lines[currentLineIndex] = textFormatted.endsWith("--")
+        ? textFormatted.slice(0, -1)
+        : textFormatted;
       let cacheLine = this.isStartEmptyRegExp.test(testLineClip)
         ? testLineClip.slice(1)
         : testLineClip;
@@ -786,7 +786,7 @@ class BaseDraw {
             : 0,
       );
 
-      const textFormated = textFormater({
+      const textFormatted = textFormatter({
         text: line,
         cache: cacheWord,
         curInd: currentLineIndex,
@@ -795,11 +795,11 @@ class BaseDraw {
       });
 
       lines[currentLineIndex] =
-        (textFormated.endsWith("-") &&
+        (textFormatted.endsWith("-") &&
           lineCache[lineCache.length - 1] === line) ||
-          textFormated.endsWith("--")
-          ? textFormated.slice(0, -1)
-          : textFormated;
+          textFormatted.endsWith("--")
+          ? textFormatted.slice(0, -1)
+          : textFormatted;
       ++currentLineIndex;
     }
   }
@@ -837,18 +837,18 @@ class BaseDraw {
       if (lineCache.length + currentLineIndex >= linesNext + 1) break;
 
       const sliceNum = nextLineNum * (i + 1);
-      let clipedWord = `${beforeNewLine ?? ""}${cacheLine.slice(startNum, sliceNum)}`;
+      let clippedWord = `${beforeNewLine ?? ""}${cacheLine.slice(startNum, sliceNum)}`;
       startNum = sliceNum;
-      const newClipWordIndex = clipedWord.indexOf("\n");
+      const newClipWordIndex = clippedWord.indexOf("\n");
 
       if (newClipWordIndex !== -1) {
-        beforeNewLine = clipedWord;
-        clipedWord = clipedWord.slice(0, newClipWordIndex);
+        beforeNewLine = clippedWord;
+        clippedWord = clippedWord.slice(0, newClipWordIndex);
         beforeNewLine = beforeNewLine.slice(newClipWordIndex + 1);
       } else beforeNewLine = "";
 
-      lineCache.push(clipedWord);
-      cacheWord = cacheWord.slice(clipedWord.length);
+      lineCache.push(clippedWord);
+      cacheWord = cacheWord.slice(clippedWord.length);
     }
   }
 }
@@ -982,7 +982,7 @@ class GuildProfile extends BaseDraw {
   /**
    * Draws a panel background on the canvas, with optional blur and gradient fill.
    *
-   * @param {{ blurPx?: number, globalAplha?: number, backgroundColor?: string, outlineColor?: string, lineWidth?: number }} options - The options for drawing the panel.
+   * @param {{ blurPx?: number, globalAlpha?: number, backgroundColor?: string, outlineColor?: string, lineWidth?: number }} options - The options for drawing the panel.
    * @returns {void}
    */
   private drawPanelBG({ blurPx = 1.1, globalAlpha = 0.25, backgroundColor = "#283120", outlineColor = "#283120", lineWidth = 3 }: { blurPx?: number, globalAlpha?: number, backgroundColor?: string, outlineColor?: string, lineWidth?: number }): void {
