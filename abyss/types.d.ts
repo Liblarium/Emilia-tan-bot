@@ -14,7 +14,7 @@ export interface DrawClanProfileOptions {
   achievements: string[];
 }
 
-export interface DrawBadgeOptinalOptions extends X_And_Y {
+export interface DrawBadgeOptionalOptions extends X_And_Y {
   bgColor?: StringOrGradient | FillOrStrokeOption<string>;
   bgW?: number; //ширина блока для значков
   bgH?: number; //высота блока для значков
@@ -33,7 +33,7 @@ export interface DrawBadgeOptions extends Partial<X_And_Y> {
   h?: number; //высота значка. Если не указано, то h = w
   globalAlpha?: number; //прозрачность. Не знаю - надо или нет. Но пусть будет
   blur?: number; //размытие. Так-же не знаю. Потом увижу
-  priority?: number; //как размещать их. 0 - выший приоритет. Если нет - будет по их расположению в массиве. Если это не массив - оно не будет иметь влияния. Просто не стакайте их на одном месте хд
+  priority?: number; //как размещать их. 0 - высший приоритет. Если нет - будет по их расположению в массиве. Если это не массив - оно не будет иметь влияния. Просто не стакайте их на одном месте хд
 }
 
 export interface DrawGuildIconOptions {
