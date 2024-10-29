@@ -935,7 +935,6 @@ class Profile {
   }
 }
 
-
 const loadImages = async () => {
   const bg = await sharp(`${imagePath}/bg.png`).resize(1000, 200, { fit: `cover` }).toBuffer();
   const badge = await sharp(`${imagePath}/avatar.png`).toBuffer();

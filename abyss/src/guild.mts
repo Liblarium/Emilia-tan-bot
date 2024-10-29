@@ -22,8 +22,9 @@ import type {
   DrawClanDescriptionStyleOptions,
   DrawClanDescriptionOptions,
   ArrayNotEmpty,
-  DrawClanInfoOptions
+  DrawClanInfoOptions,
 } from "../types.js";
+import { TextAlignment, FontStyle } from "../types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -333,7 +334,7 @@ class BaseDraw {
     x2 = 0,
     y,
     text,
-    textDirect = "normal",
+    textAlignment = TextAlignment.LEFT,
     dynamicOptions,
     fontOptions,
     clipNumber = false,
@@ -361,8 +362,8 @@ class BaseDraw {
     if (fontOptions) this.setFontStyle(fontOptions);
 
     const iText: string = text.toString();
-    const leftText: boolean = textDirect === "left";
-    const centerText: boolean = textDirect === "center";
+    const leftText: boolean = textAlignment === "left";
+    const centerText: boolean = textAlignment === "center";
     const maxWidth: number = x2 > 0 ? x2 - x1 : x1;
     const ellipsisWidth: number = ctx.measureText("...").width;
     const dashWidth: number = ctx.measureText("-").width;
@@ -490,7 +491,7 @@ class BaseDraw {
 
   /**
    * Sets the font style of the given context to the given options.
-   * @param {{ctx: SKRSContext2D, size?: string | number, font?: string, color?: string, type?: 1 | 2 | 3}} options - The options for setting the font style.
+   * @param {{ctx: SKRSContext2D, size?: string | number, font?: string, color?: string, type?: FontStyle}} options - The options for setting the font style.
    * @param {SKRSContext2D} options.ctx - The context to set the font style of.
    * @param {string | number} [options.size] - The size of the font to set. If a number is given, it is converted to a string with the unit "px".
    * @param {string} [options.font] - The font to set. The default font is "Arial".
@@ -514,8 +515,8 @@ class BaseDraw {
     if (font) fonts.font = font;
     if (size || font) ctx.font = `${size ?? fonts.size} ${font ?? fonts.font}`;
     if (color) {
-      if (type === 1 || type === 3) ctx.fillStyle = color;
-      if (type === 2 || type === 3) ctx.strokeStyle = color;
+      if (type === FontStyle.ONE || type === FontStyle.THREE) ctx.fillStyle = color;
+      if (type === FontStyle.TWO || type === FontStyle.THREE) ctx.strokeStyle = color;
     }
 
     return this;
@@ -1278,7 +1279,7 @@ class GuildProfile extends BaseDraw {
         y: y + 25,
         text: clanInfo[i],
         dynamicOptions: dynamicOptions ?? { dynamic: false, isClip: true, lines: 0 },
-        textDirect: "center",
+        textAlignment: TextAlignment.CENTER,
         fontOptions: fontOptions && fontOptions?.length > 0 ? fontOptions[i] : { color: "white", size: i === 0 ? size : size + 3.0 },
       });
       ctx.restore();
@@ -1479,7 +1480,7 @@ async function blueprintGuildProfile() {
       y: y + 25,
       text: clanInfo[i],
       dynamicOptions: { dynamic: false, isClip: true, lines: 0 },
-      textDirect: "center",
+      textAlignment: TextAlignment.CENTER,
       fontOptions: { color: "white", size: i === 0 ? size : size + 3.0 },
     });
     ctx.restore();
