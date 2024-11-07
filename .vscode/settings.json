@@ -18,5 +18,12 @@
   ],
   "cSpell.language": "en,ru,ru-RU",
   "typescript.validate.enable": true,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "sonarlint.exclude": [
+    "./node_modules/**",
+    "./srcTs/commands/**",
+    "./srcTs/events/interaction/**",
+    "./srcJs/**",
+    "./srcTs/util/commands/**"
+  ]
 }
