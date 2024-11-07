@@ -1,10 +1,9 @@
 import type { Image } from "@napi-rs/canvas";
 import sharp from "sharp";
+import { ActivityLevel, BadgeFillType, FontStyle, XTemplatePosition, DrawBGPosition, DrawBGEnum, DrawMethod, DrawOptions, DrawType, RenderType } from "./src/enum";
 import * as types from "../types";
-import { FontOptions } from './types.d';
-
+import * as enum_ from "./src/enum";
 export * from "../types";
-
 /**
  * Represents the options for drawing a clan profile.
  */
@@ -23,14 +22,6 @@ export interface DrawClanProfileOptions {
   activityLevel?: ActivityLevel; // Добавлено enum
   /** The achievements of the clan. */
   achievements: string[];
-}
-
-/** Enum for representing the activity levels of the clan. */
-export enum ActivityLevel {
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
-  VERY_HIGH = "very_high"
 }
 
 /**
@@ -57,12 +48,7 @@ export interface DrawBadgeOptionalOptions extends XYPosition {
   bgFill?: BadgeFillType; // Изменено на enum
 }
 
-/** Enum for representing the badge fill types. */
-export enum BadgeFillType {
-  FULL = "full",
-  UNIQUE = "unique",
-  NONE = "none"
-}
+
 
 
 /**
@@ -198,17 +184,7 @@ export interface TemplateBlocksOptions {
 }
 
 
-/**  
- * Enum representing priority levels.
- */
-export enum PriorityLevel {
-  One = 1,
-  Two,
-  Three,
-  Four,
-  Five,
-  Six,
-}
+
 
 /**  
  * Options for specifying priority levels.
@@ -651,20 +627,7 @@ export interface ArcDimensions {
   isScaled?: boolean;
 }
 
-/**
- * Enum representing different font styles for text rendering.
- * - 1: Fills the text with the given color.
- * - 2: Strokes the text with the given color.
- * - 3: Both fills and strokes the text with the given color.
- */
-export enum FontStyle {
-  /** Represents the fill font style. */
-  ONE = 1,
-  /** Represents the stroke font style. */
-  TWO,
-  /** Represents both fill and stroke font styles. */
-  THREE
-}
+
 
 
 /**
@@ -740,19 +703,6 @@ export interface DrawTextOptions extends TextBase {
 }
 
 /**
- * Enum for text alignment options.
- * @enum {string}
- */
-export enum TextAlignment {
-  /** Aligns text to the left. */
-  LEFT = "left",
-  /** Centers the text. */
-  CENTER = "center",
-  /** Aligns text to the right. */
-  RIGHT = "right",
-}
-
-/**
  * Base interface for text properties.
  */
 export interface TextBase {
@@ -788,7 +738,6 @@ export interface TextBase {
    */
   dynamicOptions?: DrawDynamicOptions;
 }
-
 
 /**
  * Options for drawing dynamic elements.
@@ -1217,57 +1166,57 @@ export interface RoundedRectOptions {
 }
 
 /**
- * Options for drawing a deputu image.
+ * Options for drawing a deputy image.
  */
-export interface DrawDeputuOptions {
-  /** The x position of the deputu image. */
+export interface DrawDeputyOptions {
+  /** The x position of the deputy image. */
   x?: number;
-  /** The y position of the deputu image. */
+  /** The y position of the deputy image. */
   y?: number;
-  /** The width of the deputu image. */
+  /** The width of the deputy image. */
   width?: number;
-  /** The height of the deputu image. */
+  /** The height of the deputy image. */
   height?: number;
-  /** The radius of the deputu image. */
+  /** The radius of the deputy image. */
   r?: number;
 
-  /** The x position of the deputu circle. */
+  /** The x position of the deputy circle. */
   rx?: number;
-  /** The y position of the deputu circle. */
+  /** The y position of the deputy circle. */
   ry?: number;
-  /** The radius of the deputu circle. */
+  /** The radius of the deputy circle. */
   rr?: number;
 
-  /** The x position of the deputu icon. */
+  /** The x position of the deputy icon. */
   ix?: number;
 
-  /** The x position of the deputu nickname. */
+  /** The x position of the deputy nickname. */
   xt?: number;
-  /** The y position of the deputu nickname. */
+  /** The y position of the deputy nickname. */
   yt?: number;
 
-  /** The background color of the deputu image. */
+  /** The background color of the deputy image. */
   bgColor?: string;
-  /** The border style of the deputu image. */
+  /** The border style of the deputy image. */
   borderStyle?: string;
-  /** The line width of the deputu image. */
+  /** The line width of the deputy image. */
   lineWidth?: number;
-  /** The blur amount of the deputu image. */
+  /** The blur amount of the deputy image. */
   blurPx?: number;
-  /** The global alpha of the deputu image. */
+  /** The global alpha of the deputy image. */
   globalAlpha?: number;
 
-  /** The deputu information. */
-  deputu: ClanDeputuDrawOptions[];
+  /** The deputy information. */
+  deputy: ClanDeputyDrawOptions[];
 
   /** The text options (nickname & role). */
-  textOptions?: TextOptionsDeputu;
+  textOptions?: TextOptionsDeputy;
 }
 
 /**
- * Options for the text (nickname and role) of a deputu.
+ * Options for the text (nickname and role) of a deputy.
  */
-export interface TextOptionsDeputu {
+export interface TextOptionsDeputy {
   /** The x position of the nickname. */
   x1?: number;
   /** The x2 position of the nickname or role. */
@@ -1293,14 +1242,14 @@ export interface TextColorOptions {
 }
 
 /**
- * Options for drawing a deputu.
+ * Options for drawing a deputy.
  */
-export interface ClanDeputuDrawOptions {
-  /** The username of the deputu. */
+export interface ClanDeputyDrawOptions {
+  /** The username of the deputy. */
   username: string;
-  /** The avatar of the deputu. */
+  /** The avatar of the deputy. */
   avatar: Image;
-  /** The role of the deputu. */
+  /** The role of the deputy. */
   role: string;
 }
 
@@ -1328,6 +1277,372 @@ export type BorderOrIcon<T = number, K = T> = {
   /** Optional icon value. */
   icon?: K;
 };
+
+/**
+ * Options for line processing and formatting.
+ */
+export interface LineOptions {
+  /** Array of lines to be processed. */
+  lines: string[];
+  /** Maximum width for line processing. */
+  maxWidth: number;
+  /** Width of the dash used in formatting. */
+  dashWidth: number;
+  /** Width of the ellipsis used in formatting. */
+  ellipsisWidth: number;
+  /** Indicates if dynamic line processing is enabled. */
+  dynamic: boolean;
+  /** Number of lines to process next. */
+  linesNext: number;
+  /** Corrector value for dynamic processing. */
+  dynamicCorrector: number;
+}
+
+/**
+ * Options for clipping text.
+ */
+export interface ClipTextOptions extends LineOptions {
+  /**
+   * Array of words to be clipped.
+   */
+  words: string[];
+}
+
+/**
+ * Options for formatting a line of text.
+ */
+export interface FormatLineOptions {
+  /**
+   * The buffered text to be formatted.
+   */
+  bufferedText: string;
+
+  /**
+   * The clipped text line.
+   */
+  tLClip: string;
+
+  /**
+   * The current line index.
+   */
+  currentLineIndex: number;
+
+  /** 
+   * Array of lines to be formatted. 
+   */
+  lines: string[];
+
+  /** 
+   * The buffered text for formatting. 
+   */
+  bufferedText: string;
+
+  /** 
+   * The clipped text line.
+   */
+  tLClip: string;
+
+  /** 
+   * The current index of the line. 
+   */
+  currentLineIndex: number;
+
+  /** 
+   * Indicates if dynamic formatting is enabled. 
+   */
+  dynamic: boolean;
+
+  /** 
+   * Number of lines to format next. 
+   */
+  linesNext: number;
+}
+
+/**
+ * Options for applying line formatting.
+ */
+export interface ApplyLineFormatOptions {
+  /**
+   * Array of lines to which the line formatting will be applied.
+   */
+  lines: string[];
+
+  /**
+   * Array of strings which will be pushed to lines array.
+   */
+  lineCache: string[];
+
+  /**
+   * Maximum width of the line.
+   */
+  maxWidth: number;
+
+  /**
+   * Current index of the line in lines array.
+   */
+  currentLineIndex: number;
+
+  /**
+   * Maximum number of lines.
+   */
+  linesNext: number;
+
+  /**
+   * Width of a dash.
+   */
+  dashWidth: number;
+
+  /**
+   * Indicates if dynamic formatting is enabled.
+   */
+  dynamic: boolean;
+
+  /**
+   * Width of an ellipsis.
+   */
+  ellipsisWidth: number;
+
+  /**
+   * The number of pixels to correct the width of the line when dynamic formatting is enabled.
+   */
+  dynamicCorrector: number;
+}
+
+/**
+ * Options for splitting text by width of canvas3.
+ */
+export interface SplitTextByWidthOptions {
+  /**
+   * Array of strings which will be pushed to lines array.
+   */
+  lineCache: string[];
+
+  /**
+   * Part of text which remains to be clipped.
+   */
+  bufferedText: string;
+
+  /**
+   * Number of width of line which will be sliced from cacheWord.
+   */
+  nextLineNum: number;
+
+  /**
+   * Current index of line in lines array.
+   */
+  currentLineIndex: number;
+
+  /**
+   * Maximum number of lines.
+   */
+  linesNext: number;
+
+  /**
+   * Part of text which remains from previous clipping.
+   */
+  beforeNewLine: string;
+
+  /**
+   * Part of text which will be sliced.
+   */
+  cacheLine: string;
+}
+
+
+/**
+ * Options for processing a line format.
+ */
+export interface ProcessLineFormatOptions extends LineOptions {
+  /**
+   * The cache line to be processed.
+   */
+  cacheLine: string;
+
+  /**
+   * The current line index.
+   */
+  currentLineIndex: number;
+
+  /**
+   * The text before the new line.
+   */
+  beforeNewLine: string;
+}
+
+/**
+ * Options for handling line width.
+ */
+export interface HandleLineWidthOptions {
+  /**
+   * The test line to be handled.
+   */
+  testLine: string;
+
+  /**
+   * The current word being processed.
+   */
+  word: string;
+
+  /**
+   * The array of lines.
+   */
+  lines: string[];
+
+  /**
+   * The current line index.
+   */
+  currentLineIndex: number;
+
+  /**
+   * The number of lines to clip to.
+   */
+  linesNext: number;
+
+  /**
+   * The text before the new line.
+   */
+  beforeNewLine: string;
+
+  /**
+   * The maximum width of the line.
+   */
+  maxWidth: number;
+}
+
+/**
+ * The return type of the formatTextLine function.
+ */
+export interface FormatTextLineReturns {
+  /**
+   * The line of text to be cached.
+   */
+  cacheLine: string;
+
+  /**
+   * The line of text to be clipped.
+   */
+  testLineClip: string;
+}
+
+/**
+ * Options for clipping buffer text.
+ */
+export interface ClipBufferTextOption {
+  /**
+   * The test line to be clipped.
+   */
+  testLine: string;
+
+  /**
+   * The maximum width of the line.
+   */
+  maxWidth: number;
+
+  /**
+   * The width of the dash.
+   */
+  dashWidth: number;
+
+  /**
+   * The width of the ellipsis.
+   */
+  ellipsisWidth: number;
+
+  /**
+   * Whether the clipping is dynamic.
+   */
+  dynamic: boolean;
+
+  /**
+   * The dynamic corrector value.
+   */
+  dynamicCorrector: number;
+
+  /**
+   * The current line index.
+   */
+  currentLineIndex: number;
+
+  /**
+   * The number of lines to clip to.
+   */
+  linesNext: number;
+}
+
+/**
+ * Return value for clipping buffer text.
+ */
+export interface ClipBufferTextReturn {
+  /**
+   * The clipped buffer text.
+   */
+  bufferedText: string;
+
+  /**
+   * The clipped test line.
+   */
+  tLClip: string;
+}
+
+/**
+ * Options for truncating text if necessary.
+ */
+export interface TruncateTextIfNecessaryOptions {
+  /**
+   * The maximum width allowed for the text.
+   */
+  maxWidth: number;
+
+  /**
+   * The width of the ellipsis to be used when text is truncated.
+   */
+  ellipsisWidth: number;
+
+  /**
+   * A value used to correct the width dynamically.
+   */
+  dynamicCorrector: number;
+
+  /**
+   * The original text that might be truncated.
+   */
+  text: string | number;
+
+  /**
+   * The text that has been truncated.
+   */
+  truncatedText: string;
+}
+
+/**
+ * Options for formatting a number.
+ */
+export interface NumberFormattedOptions {
+  /**
+   * If true, the number is formatted as a time string in the format "HH:mm:ss".
+   */
+  time?: boolean;
+  /**
+   * If true, the number is formatted as a number string with a maximum of 3 decimal places.
+   */
+  num?: boolean;
+}
+
+/**
+ * Options for formatting numbers in a string of text.
+ */
+export interface FormatNumbersInTextOptions extends Omit<NumberFormattedOptions, "num"> {
+  /**
+   * The original text string.
+   */
+  textStr: string;
+
+  /**
+   * The result of the formatting.
+   */
+  result: string;
+}
+
 
 /**
  * Represents a string or gradient options for rendering.
@@ -1360,72 +1675,55 @@ export type DynamicOptionDrawsText = DynamicOptions & UpdateDynamicDrawText;
 export type DrawTextsOption = DrawTextsBase & StaticOptions;
 
 /**
- * Enumeration for horizontal template position.
+ * Represents the initialized return options for drawing text.
  */
-export enum XTemplatePosition {
-  /** Aligns to the right. */
-  RIGHT = "right",
-  /** Centers the content. */
-  CENTER = "center",
-  /** Aligns to the left. */
-  LEFT = "left"
-};
-
-/**
- * Enumeration for background position.
- */
-export enum DrawBGPosition {
-  /** Fills the banner area. */
-  BANNER = "banner",
-  /** Fills the entire area. */
-  FULL = "full",
-  /** Positions at the bottom. */
-  BOTTOM = "bottom"
-};
-
-/**
- * Excludes the "full" option from DrawBGPosition.
- */
-export type PDImagePosition = Exclude<DrawBGPosition, "full">;
-
-/**
- * Enumeration for background types.
- */
-export enum DrawBGEnum {
-  /** Rectangle background type. */
-  RECT = "rect",
-  /** Arc background type. */
-  ARC = "arc"
-};
-
-/**
- * Enum representing the methods of drawing.
- * - FILL indicates filling shapes with color.
- * - STROKE indicates outlining shapes with color.
- */
-export enum DrawMethod {
-  FILL = "fill",
-  STROKE = "stroke",
-}
-
-/**
- * Enum representing the options for drawing modes.
- * - BOTH indicates that both fill and stroke should be applied.
- * - NONE indicates that neither fill nor stroke should be applied.
- */
-export enum DrawOptions {
-  BOTH = "both",
-  NONE = "none",
-}
-
-/**
- * Enum representing the type of drawing.
- * - COLOR indicates that the drawing is done using color.
- * - IMAGE indicates that the drawing is done using an image.
- */
-enum DrawType {
-  COLOR = "color",
-  IMAGE = "image",
+export interface DrawTextOptionsInitializedReturns {
+  /** The x-coordinate of the start of the text. */
+  x1: number;
+  /** The x-coordinate of the end of the text. */
+  x2: number;
+  /** The y-coordinate of the text. */
+  y: number;
+  /** The translation amount on the x-axis. */
+  x_translate?: number;
+  /** The internal text representation. */
+  iText: string;
+  /** The displayed text. */
+  text: StringNumber;
+  /** Indicates if the text is left-aligned. */
+  leftText: boolean;
+  /** Indicates if the text is center-aligned. */
+  centerText: boolean;
+  /** The maximum width of the text. */
+  maxWidth: number;
+  /** The width of the ellipsis. */
+  ellipsisWidth: number;
+  /** The width of the dash. */
+  dashWidth: number;
+  /** An array of words in the text. */
+  words: string[];
+  /** An array of lines in the text. */
+  lines: string[];
+  /** The metrics of the text. */
+  textMetric: {
+    /** The width of the text. */
+    width: number;
+    /** The height of the text. */
+    height: number;
+  };
+  /** Additional text rendering options. */
+  options: {
+    /** Indicates if clipping is enabled. */
+    isClip: boolean;
+    /** Indicates if dynamic rendering is enabled. */
+    dynamic: boolean;
+    /** A correction factor for dynamic rendering. */
+    dynamicCorrector: number;
+    /** The spacing between lines. */
+    lineSpacing: number;
+    /** The number of lines to render. */
+    linesNext: number;
+  };
 }
 
 /**
@@ -1434,14 +1732,9 @@ enum DrawType {
 export type StringNumber = string | number;
 
 /**
- * Enumeration for render types.
+ * Excludes the "full" option from DrawBGPosition.
  */
-export enum RenderType {
-  /** PNG format for rendering. */
-  PNG = "image/png",
-  /** JPEG format for rendering. */
-  JPEG = "image/jpeg",
-}
+export type PDImagePosition = Exclude<DrawBGPosition, "full">;
 
 /**
  * Options for drawing with background types and color.
