@@ -97,20 +97,22 @@ model LocalLevel {
 }
 
 model Guild {
-  id          BigInt       @id @unique
-  prefix      Json         @default("{ \"default\": \"++\", \"now\": \"++\" }") @db.JsonB
-  addInBD     Boolean      @default(false) @db.Boolean
-  logModule   Boolean      @default(false) @db.Boolean
-  levelModule Boolean      @default(false) @db.Boolean
-  logIntents  Int          @default(0) @db.Integer
-  message     Json         @default("{}") @db.JsonB
-  channel     Json         @default("{}") @db.JsonB
-  guild       Json         @default("{}") @db.JsonB
-  member      Json         @default("{}") @db.JsonB
-  emoji       Json         @default("{}") @db.JsonB
-  role        Json         @default("{}") @db.JsonB
-  localLevels LocalLevel[] @relation("GuildLocalLevels")
-  LocalLevel  LocalLevel[]
+  id            BigInt       @id @unique
+  prefix        Json         @default("{ \"default\": \"++\", \"now\": \"++\" }") @db.JsonB
+  voiceChannel  BigInt       @db.BigInt
+  voiceCategory BigInt       @db.BigInt
+  addInBD       Boolean      @default(false) @db.Boolean
+  logModule     Boolean      @default(false) @db.Boolean
+  levelModule   Boolean      @default(false) @db.Boolean
+  logIntents    Int          @default(0) @db.Integer
+  message       Json         @default("{}") @db.JsonB
+  channel       Json         @default("{}") @db.JsonB
+  guild         Json         @default("{}") @db.JsonB
+  member        Json         @default("{}") @db.JsonB
+  emoji         Json         @default("{}") @db.JsonB
+  role          Json         @default("{}") @db.JsonB
+  localLevels   LocalLevel[] @relation("GuildLocalLevels")
+  LocalLevel    LocalLevel[]
 }
 
 model PrivateVoice {

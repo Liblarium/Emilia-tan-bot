@@ -16,14 +16,16 @@
     "unde",
     "voluptatem"
   ],
-  "cSpell.language": "en,ru,ru-RU",
+  "cSpell.language": "en,ru,ru-RU,uk",
   "typescript.validate.enable": true,
   "editor.formatOnSave": true,
   "sonarlint.exclude": [
     "./node_modules/**",
     "./srcTs/commands/**",
-    "./srcTs/events/interaction/**",
+    "./srcTs/events/**",
     "./srcJs/**",
     "./srcTs/util/commands/**"
-  ]
+  ],
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true
 }

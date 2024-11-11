@@ -10,7 +10,7 @@ export default class InteractionCreate extends BaseEvent {
     super({ name: "interactionCreate", category: "bot" });
   }
 
-  execute(interaction: Interaction, client: EmiliaClient): undefined {
+  execute(interaction: Interaction, client: EmiliaClient) {
     new InteractionHandler(interaction, client);
   }
 }

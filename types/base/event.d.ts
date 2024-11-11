@@ -2,7 +2,7 @@
  * Types for events
  */
 import type { Log } from "@log";
-import type { ChatInputCommandInteraction, Message } from "discord.js";
+import type { ChatInputCommandInteraction, Message, VoiceChannel } from "discord.js";
 
 /**
  * Categories for events
@@ -12,7 +12,7 @@ export type CategoryType = `bot` | `mongo`;
 /**
  * Possible returns of an event
  */
-export type EventReturns = void | Message | ChatInputCommandInteraction | Log;
+export type EventReturns = void | Message | VoiceChannel | ChatInputCommandInteraction | Log;
 
 /**
  * Base options for events

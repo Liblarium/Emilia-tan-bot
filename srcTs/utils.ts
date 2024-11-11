@@ -6,37 +6,22 @@
  * @license MIT
  */
 
+import { db } from "@client";
 import { Log } from "@log";
 import type { JsonValue } from "@prisma/client/runtime/library";
 import {
+  type APIModalInteractionResponseCallbackData,
   type ActionRow,
   type AnyComponent,
   type ChatInputCommandInteraction,
   GuildMember,
   type InteractionReplyOptions,
+  type Message,
   type MessageActionRowComponent,
   MessageComponentInteraction,
-  type ModalComponentData,
+  type PartialMessage,
   type RepliableInteraction,
 } from "discord.js";
-
-/**
- * Guild log permission flags
- * @enum {number}
- * @property {number} CREATE - 1. Log create channel/role
- * @property {number} DELETE - 2. Log delete channel/role/message
- * @property {number} UPDATE - 4. log update channel/role/message/guild (?)
- * @property {number} JOIN - 8. Log to join in voice channel or guild
- * @property {number} LEAVE - 16. Log to leave from voice channel or guild
- */
-const GUILD_PERMISSIONS = {
-  //guild logs in db. Maybe - i rewrite this bit's later
-  CREATE: 1 << 0, // 1
-  DELETE: 1 << 1, // 2
-  UPDATE: 1 << 2, // 4
-  JOIN: 1 << 3, // 8
-  LEAVE: 1 << 4, // 16
-};
 
 /**
  * Get time in format "HH:MM:SS"
@@ -122,7 +107,7 @@ const isReply = async ({
  * Show modal
  * @param {object} args - arguments
  * @param {MessageComponentInteraction | ChatInputCommandInteraction} args.interaction - interaction to show modal to
- * @param {ModalComponentData} args.modal - modal to show
+ * @param {APIModalInteractionResponseCallbackData} args.modal - modal to show
  * @returns {Promise<void>}
  */
 const isModal = async ({
@@ -130,10 +115,42 @@ const isModal = async ({
   modal,
 }: {
   interaction: MessageComponentInteraction | ChatInputCommandInteraction;
-  modal: ModalComponentData;
+  modal: APIModalInteractionResponseCallbackData;
 }): Promise<void> => {
   await interaction.showModal(modal);
 };
+
+/**
+ * Return "первом", "втором" or "обеих" depending on which of `a` and `b` are numbers.
+ * @param {number} [a] - first argument
+ * @param {number} [b] - second argument
+ * @returns {string} - "первом", "втором" or "обеих"
+ */
+function isComponentErrorMessage(a: number, b?: number): string {
+  return typeof a === "number"
+    ? "первом"
+    : typeof b === "number"
+      ? "втором"
+      : "обеих";
+}
+
+/**
+ * Return error string if `a` or `b` are not numbers in range from 0 to 4.
+ * @param {number} [a] - first argument
+ * @param {number} [b] - second argument
+ * @returns {string | undefined} - error string if `a` or `b` are not numbers in range from 0 to 4, otherwise - undefined
+ */
+function isComponentsLogic(a: number, b?: number): string | undefined {
+  if (typeof a !== "number" || (b !== undefined && typeof b !== "number")) {
+    return `Вы ввели не числовое значение в ${isComponentErrorMessage(a, b)} аргумент${typeof a !== "number" && typeof b !== "number" ? "ах" : "е"} components!`;
+  }
+  if (a < 0 || a >= 5) {
+    return "Вы ввели значение меньше 0 или больше 4 в первом аргументе components!";
+  }
+  if (b !== undefined && (b < 0 || b >= 5)) {
+    return "Вы ввели значение меньше 0 или больше 4 в втором аргументе components!";
+  }
+}
 
 /**
  * Get components from message
@@ -155,16 +172,9 @@ function isComponents({
 
   const comps = interaction.message.components;
   const { a, b } = components;
+  const errors = isComponentsLogic(a, b);
 
-  if (typeof a !== "number" || (b !== undefined && typeof b !== "number")) {
-    return `Вы ввели не числовое значение в ${typeof a === "number" ? "первом" : typeof b === "number" ? "втором" : "обеих"} аргумент${typeof a !== "number" && typeof b !== "number" ? "ах" : "е"} components!`;
-  }
-  if (a < 0 || a >= 5) {
-    return "Вы ввели значение меньше 0 или больше 4 в первом аргументе components!";
-  }
-  if (b !== undefined && (b < 0 || b >= 5)) {
-    return "Вы ввели значение меньше 0 или больше 4 в втором аргументе components!";
-  }
+  if (errors) return errors;
 
   return b !== undefined ? comps[a].components[b].data : comps[a];
 }
@@ -298,9 +308,13 @@ function hexToDecimal(hex: string): number {
  * @param {number|string} replacedColor - The color to replace with. It can be a number or a hexadecimal string.
  * @returns {number} - The replaced color if the color is 0, or the original color if it is not 0.
  */
-function displayColor(color: number | string, replacedColor: number | string): number {
+function displayColor(
+  color: number | string,
+  replacedColor: number | string,
+): number {
   if (typeof color === "string") color = hexToDecimal(color);
-  if (typeof replacedColor === "string") replacedColor = hexToDecimal(replacedColor);
+  if (typeof replacedColor === "string")
+    replacedColor = hexToDecimal(replacedColor);
 
   return color === 0 ? replacedColor : color;
 }
@@ -314,6 +328,146 @@ function isGuildMember(member: unknown): member is GuildMember {
   return member instanceof GuildMember;
 }
 
+type GuildLogSelect = {
+  message?: boolean;
+  channel?: boolean;
+  role?: boolean;
+  emoji?: boolean;
+  member?: boolean;
+  guild?: boolean;
+};
+
+/**
+ * Finds a guild in the database and returns the selected log setting columns.
+ *
+ * @param {bigint} guildId - The ID of the guild to find.
+ * @param {GuildLogSelect} select - The columns to select from the database.
+ * @returns - The selected columns from the guild log setting if the guild is found, otherwise false.
+ */
+async function getGuildLogSettingFromDB(
+  guildId: bigint,
+  select: GuildLogSelect,
+  intents: number,
+) {
+  const guild = await db.guild.findFirst({
+    where: { id: guildId },
+    select: { logModule: true, logIntents: true, ...select },
+  });
+
+  if (!guild || !guild.logModule || !(guild.logIntents & intents)) return false;
+
+  return guild;
+}
+
+/**
+ * Clip a message content to a given limit, append an ellipsis if the content is longer than the limit.
+ * If the message doesn't have content, return a string indicating that there were attachments or stickers.
+ * @param {Message} message - The message to clip.
+ * @param {number} [limit=4000] - The maximum length of the content to clip to.
+ * @returns {string} The clipped content.
+ */
+function clipMessageLog(
+  message: Message | PartialMessage,
+  limit?: number,
+): string {
+  if (!limit) limit = 4000;
+
+  if (message.content)
+    return message.content.length > limit
+      ? `${message.content.slice(0, limit - 3)}...`
+      : message.content;
+  return message.attachments.size > 0 || message.stickers.size > 0
+    ? "[Тут было вложение]"
+    : "[Пустое сообщение]";
+}
+
+//Enums
+
+/**
+ * Event actions
+ * @enum {number}
+ */
+enum EventActions {
+  /**
+   * Someone joins the guild/voice
+   */
+  JOIN = 1 << 0,
+  /**
+   * Someone leaves the guild/voice
+   */
+  LEAVE = 1 << 1,
+  /**
+   * A new channel/role/emoji is created
+   */
+  CREATE = 1 << 2,
+  /**
+   * A channel/role/emoji/guild/member is updated
+   */
+  UPDATE = 1 << 3,
+  /**
+   * A channel/role/emoji is deleted
+   */
+  DELETE = 1 << 4,
+}
+
+/**
+ * Guild logs intents
+ * @enum {number}
+ */
+enum GuildLogsIntents {
+  /**
+   * Guild update event
+   */
+  GUILD = (1 << 0) | EventActions.UPDATE, // 8
+
+  /**
+   * Guild member join/leave event
+   */
+  GUILD_MEMBER = (1 << 1) | (EventActions.JOIN | EventActions.LEAVE), // 3
+
+  /**
+   * Channel create/update/delete event
+   */
+  CHANNEL = (1 << 2) |
+  EventActions.CREATE |
+  EventActions.UPDATE |
+  EventActions.DELETE, // 28
+
+  /**
+   * Role create/update/delete event
+   */
+  ROLE = (1 << 5) |
+  (EventActions.CREATE | EventActions.UPDATE | EventActions.DELETE), // 60
+
+  /**
+   * Emoji create/update/delete event
+   */
+  EMOJI = (1 << 6) |
+  (EventActions.CREATE | EventActions.UPDATE | EventActions.DELETE), // 92
+
+  /**
+   * Voice state update event
+   */
+  VOICE_STATE = (1 << 7) | (EventActions.JOIN | EventActions.LEAVE), // 131
+
+  /**
+   * Message update/delete event
+   */
+  MESSAGE = (1 << 8) |
+  (EventActions.CREATE | EventActions.UPDATE | EventActions.DELETE), // 284
+
+  /**
+   * All events
+   */
+  ALL = (1 << 9) |
+  GUILD |
+  GUILD_MEMBER |
+  CHANNEL |
+  ROLE |
+  EMOJI |
+  VOICE_STATE |
+  MESSAGE, //1023
+}
 
 export {
   time,
@@ -333,8 +487,11 @@ export {
   hexToDecimal,
   displayColor,
   isGuildMember,
+  getGuildLogSettingFromDB,
+  clipMessageLog,
   EmiliaTypeError,
   EmiliaError,
+  EventActions,
+  GuildLogsIntents,
   prefix,
-  GUILD_PERMISSIONS,
 };
