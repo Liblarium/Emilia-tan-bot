@@ -9,18 +9,26 @@
 import { db } from "@client";
 import { Log } from "@log";
 import type { JsonValue } from "@prisma/client/runtime/library";
+import type { MessageOrPartialMessage } from "@type/event";
 import {
   type APIModalInteractionResponseCallbackData,
   type ActionRow,
   type AnyComponent,
   type ChatInputCommandInteraction,
+  Guild,
+  type GuildEmoji,
   GuildMember,
   type InteractionReplyOptions,
   type Message,
   type MessageActionRowComponent,
   MessageComponentInteraction,
+  type NonThreadGuildBasedChannel,
+  type OmitPartialGroupDMChannel,
   type PartialMessage,
   type RepliableInteraction,
+  type Role,
+  TextChannel,
+  type VoiceState,
 } from "discord.js";
 
 /**
@@ -328,35 +336,77 @@ function isGuildMember(member: unknown): member is GuildMember {
   return member instanceof GuildMember;
 }
 
-type GuildLogSelect = {
-  message?: boolean;
-  channel?: boolean;
-  role?: boolean;
-  emoji?: boolean;
-  member?: boolean;
-  guild?: boolean;
-};
+type GuildLogSelect =
+  | {
+    message: boolean;
+  }
+  | {
+    channel: boolean;
+  }
+  | {
+    role: boolean;
+  }
+  | {
+    emoji: boolean;
+  }
+  | {
+    member: boolean;
+  }
+  | {
+    guild: boolean;
+  }
+  | {
+    voice: boolean;
+  };
+
+type logCategories = "create" | "delete" | "update" | "join" | "leave";
 
 /**
  * Finds a guild in the database and returns the selected log setting columns.
- *
  * @param {bigint} guildId - The ID of the guild to find.
- * @param {GuildLogSelect} select - The columns to select from the database.
- * @returns - The selected columns from the guild log setting if the guild is found, otherwise false.
+ * @returns {Promise<TextChannel | false>} - The selected columns from the guild log setting if the guild is found, otherwise false.
  */
-async function getGuildLogSettingFromDB(
-  guildId: bigint,
-  select: GuildLogSelect,
-  intents: number,
-) {
+async function getGuildLogSettingFromDB({
+  guildId,
+  select,
+  messageType,
+  intents,
+  message,
+}: {
+  guildId: string;
+  select: GuildLogSelect;
+  intents: number;
+  messageType: logCategories;
+  message:
+  | OmitPartialGroupDMChannel<MessageOrPartialMessage>
+  | GuildMember
+  | GuildEmoji
+  | Guild
+  | Role
+  | VoiceState
+  | NonThreadGuildBasedChannel
+  | MessageOrPartialMessage;
+}): Promise<TextChannel | false> {
   const guild = await db.guild.findFirst({
-    where: { id: guildId },
+    where: { id: stringToBigInt(guildId) },
     select: { logModule: true, logIntents: true, ...select },
   });
+  const mesGuild = message instanceof Guild ? message : message.guild;
 
-  if (!guild || !guild.logModule || !(guild.logIntents & intents)) return false;
+  if (!guild || !mesGuild || !guild.logModule || !(guild.logIntents & intents))
+    return false;
+  const selectName = Object.keys(select)[0] as logCategories;
+  const guildSelect = (guild as unknown as Record<logCategories, JsonValue>)[selectName];
+  const logChannel = parseJsonValue<Record<logCategories, string>>(guildSelect);
+  const logCategory = logChannel[messageType];
 
-  return guild;
+  if (!logCategory || logCategory.length <= 17) return false; //более вероятно он просто не указан. id имеет длину
+
+  const channel = mesGuild.channels.cache.get(logCategory);
+
+  if (!(channel instanceof TextChannel)) return false;
+
+  return channel;
 }
 
 /**
@@ -376,7 +426,7 @@ function clipMessageLog(
     return message.content.length > limit
       ? `${message.content.slice(0, limit - 3)}...`
       : message.content;
-  return message.attachments.size > 0 || message.stickers.size > 0
+  return (message.attachments.size ?? -1) > 0 || (message.stickers.size ?? -1) > 0
     ? "[Тут было вложение]"
     : "[Пустое сообщение]";
 }
@@ -418,7 +468,7 @@ enum GuildLogsIntents {
   /**
    * Guild update event
    */
-  GUILD = (1 << 0) | EventActions.UPDATE, // 8
+  GUILD = (1 << 0) | EventActions.UPDATE, // 9
 
   /**
    * Guild member join/leave event
@@ -453,8 +503,7 @@ enum GuildLogsIntents {
   /**
    * Message update/delete event
    */
-  MESSAGE = (1 << 8) |
-  (EventActions.CREATE | EventActions.UPDATE | EventActions.DELETE), // 284
+  MESSAGE = (1 << 8) | (EventActions.UPDATE | EventActions.DELETE), // 280
 
   /**
    * All events

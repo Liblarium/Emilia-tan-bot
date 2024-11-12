@@ -1,8 +1,6 @@
 import { BaseEvent } from "@base/event";
 import type { EmiliaClient } from "@client";
-import type { GuildLogOption } from "@type";
 import type { MessageOrPartialMessage } from "@type/event";
-import { stringToBigInt } from "@type/util/utils";
 import { modFilter } from "@util/logFilter";
 import {
   EventActions,
@@ -10,9 +8,7 @@ import {
   clipMessageLog,
   getGuildLogSettingFromDB,
   hexToDecimal,
-  parseJsonValue
 } from "@util/s";
-import { TextChannel } from "discord.js";
 
 export default class MessageUpdate extends BaseEvent {
   constructor() {
@@ -22,19 +18,16 @@ export default class MessageUpdate extends BaseEvent {
   async execute(oldMessage: MessageOrPartialMessage, newMessage: MessageOrPartialMessage, client: EmiliaClient) {
     if (!oldMessage.guild || !newMessage.guild || modFilter.includes(oldMessage.channelId) || modFilter.includes(newMessage.channelId) || oldMessage.content === newMessage.content) return;
 
-    const dbGuild = await getGuildLogSettingFromDB(
-      stringToBigInt(newMessage.guild.id),
-      { message: true },
-      GuildLogsIntents.MESSAGE & EventActions.UPDATE,
-    );
+    const channel = await getGuildLogSettingFromDB({
+      guildId: newMessage.guild.id,
+      select: { message: true },
+      intents: GuildLogsIntents.MESSAGE | EventActions.UPDATE,
+      messageType: "update",
+      message: newMessage
+    });
 
-    if (!dbGuild) return; //Мне не зачем включать логи, если они выключены или не были добавлены в интенты
+    if (!channel) return; //Мне не зачем включать логи, если они выключены или не были добавлены в интенты
 
-    const logChannel = parseJsonValue<GuildLogOption>(dbGuild.message);
-
-    if (!logChannel.update || logChannel.update.length <= 17) return; //более вероятно он просто не указан. id имеет длину не менее 18 символов
-
-    const channel = newMessage.guild.channels.cache.get(logChannel.update);
     const color = hexToDecimal("#ffa600");
     const timestamp = new Date().toISOString();
     const fields = [
@@ -50,9 +43,7 @@ export default class MessageUpdate extends BaseEvent {
       },
     ];
 
-    if (!(channel instanceof TextChannel)) return;
-
-    if ((oldMessage.content?.length ?? 0 <= 1500) || (newMessage.content?.length ?? 0 <= 1500)) return await channel.send({
+    if ((oldMessage.content?.length ?? 0) <= 1500 && (newMessage.content?.length ?? 0) <= 1500) return await channel.send({
       embeds: [
         {
           title: "Измененное сообщение",

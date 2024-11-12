@@ -1,9 +1,10 @@
 import { BaseEvent } from "@base/event";
-import { db, type EmiliaClient } from "@client";
+import { type EmiliaClient, db } from "@client";
 import { Log } from "@log";
-import { ChannelType, type VoiceState, PermissionsBitField, type GuildMember } from "discord.js";
-import { stringToBigInt } from "@type/util/utils";
 import type { ArrayNotEmpty } from "@type";
+import { stringToBigInt } from "@type/util/utils";
+import { EventActions, GuildLogsIntents, getGuildLogSettingFromDB, hexToDecimal } from "@util/s";
+import { ChannelType, type GuildMember, PermissionsBitField, type VoiceState } from "discord.js";
 
 const { SendMessages, Speak, ViewChannel, Connect } = PermissionsBitField.Flags;
 const { GuildVoice } = ChannelType;
@@ -19,6 +20,7 @@ export default class VoiceStateUpdate extends BaseEvent {
   }
 
   async execute(oldState: VoiceState, newState: VoiceState, client: EmiliaClient): Promise<any> {
+    this.log(oldState, newState);
 
     if (!newState.guild || !newState.member || !oldState.member || oldState.channelId === newState.channelId) return;
 
@@ -52,7 +54,7 @@ export default class VoiceStateUpdate extends BaseEvent {
                     await db.privateVoice.delete({ where: { id: stringToBigInt(vc.id) } });
                     return await vc.delete();
                   } catch (err) {
-                    return console.error(err);
+                    return new Log({ text: err, type: 2, categories });
                   }
                 }, 100);
               }
@@ -215,7 +217,7 @@ export default class VoiceStateUpdate extends BaseEvent {
       if (vc.members.size < 1) {
         jointocreatemap.delete(`tempvoicechannel_${oldState.guild.id}_${oldState.channelId}`);
         await db.privateVoice.delete({ where: { id: stringToBigInt(vc.id) } });
-        return vc.delete().catch(err => console.error(err));
+        return vc.delete().catch(err => new Log({ text: err, type: 2, categories }));
       }
     }
 
@@ -228,7 +230,7 @@ export default class VoiceStateUpdate extends BaseEvent {
         if (vc.members.size < 1) {
           jointocreatemap.delete(`tempvoicechannel_${oldState.guild.id}_${oldState.channelId}`);
           await db.privateVoice.delete({ where: { id: stringToBigInt(vc.id) } });
-          return vc.delete().catch(err => console.error(err));
+          return vc.delete().catch(err => new Log({ text: err, type: 2, categories }));
         }
       }
     }
@@ -293,4 +295,32 @@ export default class VoiceStateUpdate extends BaseEvent {
     }
   }
 
+  async log(oldState: VoiceState, newState: VoiceState) {
+    if (oldState.channel === newState.channel) return;
+
+    const channel = await getGuildLogSettingFromDB({
+      guildId: newState.guild.id,
+      select: { voice: true },
+      intents: GuildLogsIntents.VOICE_STATE & EventActions.JOIN & EventActions.LEAVE,
+      messageType: "join",
+      message: newState
+    });
+
+    if (!channel) return;
+
+    const status = {
+      join: oldState.channel === null && newState.channel !== null,
+      leave: oldState.channel !== null && newState.channel === null,
+      jump: oldState.channel !== null && newState.channel !== null
+    };
+
+    channel.send({
+      embeds: [{
+        title: "Голосовой канал",
+        description: `${newState.member} ${status.join ? "присоединился" : status.leave ? "покинул" : "перешел в"} канал ${status.leave ? oldState.channel : newState.channel} ${status.jump ? `с ${oldState.channel}` : ""}`,
+        color: hexToDecimal("#0206ff"),
+        timestamp: new Date().toISOString()
+      }]
+    });
+  }
 }

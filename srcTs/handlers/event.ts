@@ -18,7 +18,13 @@ export class EventHandler extends BaseHandler {
   setLogic(event: BaseEvent): null | undefined {
     const client = this.client;
     try {
-      const eventExecute = async (...args: unknown[]) => { await event.execute(...args, client); };
+      const eventExecute = async (...args: unknown[]) => {
+        try {
+          await event.execute(...args, client);
+        } catch (e) {
+          new Log({ text: e, type: 2, categories: ["global", "handler", "event"] });
+        }
+      };
 
       if (!event.category) {
         new Log({ text: `Похоже ${event?.name ?? "Ошибка"} не имеет категории.`, type: "error", categories: ["global", "handler", "event"] });
@@ -28,7 +34,7 @@ export class EventHandler extends BaseHandler {
       client.events.set(event.name, event.category);
 
       const eventMap: EventMapType = {
-        bot: () => client[event.once ? "once" : "on"](event.name, (e: unknown[]) => { eventExecute(e).catch(catchs); })
+        bot: () => client[event.once ? "once" : "on"](event.name, eventExecute)
       };
 
       if (!(event.category in eventMap)) {

@@ -31,6 +31,7 @@ export default class Ready extends BaseEvent {
       "Занимается чаепитием со своей женой",
     ];
     const time_upd = 1000 * 60 * 60 * 1;
+
     /**
      * Updates the client's status with a random activity from the predefined list.
      * Logs the updated status and its index in the list.

@@ -1,16 +1,36 @@
 import { BaseEvent } from "@base/event";
 import type { EmiliaClient } from "@client";
-import { Log } from "@log";
-import type { GuildChannel } from "discord.js";
+import { EventActions, GuildLogsIntents, getGuildLogSettingFromDB, hexToDecimal } from "@util/s";
+import type { DMChannel, NonThreadGuildBasedChannel } from "discord.js";
 
-export class ChannelUpdate extends BaseEvent {
-  execute(channel: GuildChannel, client: EmiliaClient) {
-    new Log({
-      // TODO: Release this event
-      text: "This event not released",
-      type: "error",
-      categories: ["global", "event"],
+export default class ChannelUpdate extends BaseEvent {
+  constructor() {
+    super({
+      name: "channelUpdate",
+      category: "bot",
     });
-    return undefined;
+  }
+
+  async execute(oldChannel: DMChannel | NonThreadGuildBasedChannel, newChannel: DMChannel | NonThreadGuildBasedChannel, client: EmiliaClient) {
+    if (oldChannel.isDMBased() || newChannel.isDMBased() || oldChannel.name === newChannel.name) return;
+
+    const channel = await getGuildLogSettingFromDB({
+      guildId: newChannel.guild.id,
+      select: { channel: true },
+      intents: GuildLogsIntents.CHANNEL | EventActions.UPDATE,
+      messageType: "update",
+      message: newChannel
+    });
+
+    if (!channel) return;
+
+    channel.send({
+      embeds: [{
+        title: "Изменение канала",
+        color: hexToDecimal("#ffa600"),
+        description: `${oldChannel.name} -> ${newChannel.name} (${newChannel.id})`,
+        timestamp: new Date().toISOString(),
+      }]
+    });
   }
 }

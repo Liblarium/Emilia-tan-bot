@@ -1,16 +1,38 @@
 import { BaseEvent } from "@base/event";
 import type { EmiliaClient } from "@client";
-import { Log } from "@log";
-import type { GuildChannel } from "discord.js";
+import { EventActions, GuildLogsIntents, getGuildLogSettingFromDB, hexToDecimal } from "@util/s";
+import type { DMChannel, NonThreadGuildBasedChannel } from "discord.js";
 
-export class ChannelDelete extends BaseEvent {
-  execute(channel: GuildChannel, client: EmiliaClient) {
-    new Log({
-      // TODO: Release this event
-      text: "This event not released",
-      type: "error",
-      categories: ["global", "event"],
+export default class ChannelDelete extends BaseEvent {
+  constructor() {
+    super({
+      name: "channelDelete",
+      category: "bot",
     });
-    return undefined;
+  }
+
+  async execute(channel: DMChannel | NonThreadGuildBasedChannel, client: EmiliaClient) {
+    if (channel.isDMBased()) return;
+
+    const chan = await getGuildLogSettingFromDB({
+      guildId: channel.guild.id,
+      select: { channel: true },
+      intents: GuildLogsIntents.CHANNEL | EventActions.DELETE,
+      messageType: "delete",
+      message: channel
+    });
+
+    if (!chan) return;
+
+    chan.send({
+      embeds: [
+        {
+          title: "Удален канал",
+          color: hexToDecimal("#ff2500"),
+          description: `${channel.name} | ${channel.id}`,
+          timestamp: new Date().toISOString(),
+        }
+      ]
+    });
   }
 }

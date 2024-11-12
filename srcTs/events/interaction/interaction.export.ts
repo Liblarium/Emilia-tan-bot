@@ -6,8 +6,6 @@ import { ButtonComponent } from "./components/button";
 import { MenuComponent } from "./components/menu";
 import { ModalComponent } from "./components/modal";
 
-
-
 class InteractionHandler {
   constructor(interaction: Interaction, client: EmiliaClient) {
     this.run(interaction, client);
@@ -17,7 +15,7 @@ class InteractionHandler {
     new AddInDB(interaction);
 
     if (interaction.isChatInputCommand()) {
-      new SlashCommand(interaction, client); //переписать позже
+      new SlashCommand(interaction, client); // TODO: переписать позже. И нижние тоже
     }
 
     if (interaction.isButton()) {

@@ -111,6 +111,7 @@ model Guild {
   member        Json         @default("{}") @db.JsonB
   emoji         Json         @default("{}") @db.JsonB
   role          Json         @default("{}") @db.JsonB
+  voice         Json         @default("{}") @db.JsonB
   localLevels   LocalLevel[] @relation("GuildLocalLevels")
   LocalLevel    LocalLevel[]
 }
