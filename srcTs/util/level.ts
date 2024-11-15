@@ -81,13 +81,15 @@ export class Levels {
     if (!user || !user.globalLevel) {
       if (guildDB.addInBD !== true) return; //addInBD: boolean | null
 
+      const levelModule = guildDB.levelModule;
+
       errs++;
       return this.addUser(
         {
           userId,
           username,
-          guildId: guildDB.levelModule === true ? guildId : undefined,
-          localLevelId: -1n
+          guildId: levelModule === true ? guildId : undefined,
+          localLevelId: levelModule === true ? (user?.LocalLevel[0].id ?? 0n) : 0n,
         }
       );
     }
@@ -95,7 +97,7 @@ export class Levels {
     errs = 0;
 
     const localLevel = user.LocalLevel;
-    this.level({ args: user.globalLevel, userId, dbType: "global", localLevelId: localLevel.length === 0 ? undefined : localLevel[0].id });
+    this.level({ args: user.globalLevel, userId, dbType: "global", localLevelId: localLevel.length === 0 ? 0n : localLevel[0].id ?? 0n });
     const local_level = user?.LocalLevel;
 
     if (
@@ -108,10 +110,10 @@ export class Levels {
         userId,
         guildId,
         dbType: "local",
-        localLevelId: local_level[0].id,
+        localLevelId: local_level[0].id ?? 0n,
       });
 
-    return this.addUser({ userId, username, guildId, localLevelId: local_level?.length === 0 ? undefined : local_level[0].id });
+    return this.addUser({ userId, username, guildId, localLevelId: local_level?.length === 0 ? 0n : local_level[0].id ?? 0n });
   }
 
   @logCaller
@@ -120,7 +122,7 @@ export class Levels {
     dbType,
     userId,
     guildId,
-    localLevelId = -1n
+    localLevelId = 0n
   }: LevelOptions) {
     if (
       !args ||
@@ -160,7 +162,7 @@ export class Levels {
     if (dbType === "local") {
       if (!guildId) return new Log({ text: `Похоже - в Levels.level не был передан guildId ${guildId}`, type: "error", categories: ["global", "pg"] });
 
-      return result = await db.localLevel.update({ where: { id: localLevelId }, data: { ...values }, select: { xp: true, level: true, maxXp: true } });
+      return await db.localLevel.update({ where: { id: localLevelId }, data: { ...values }, select: { xp: true, level: true, maxXp: true } });
     }
 
     return result;
@@ -184,8 +186,10 @@ export class Levels {
         },
         select: { id: true }
       }),
-      db.globalLevel.create({
-        data: {
+      db.globalLevel.upsert({
+        where: { id: userId },
+        update: {},
+        create: {
           id: userId,
           userId,
           nextXp: this.nextXp
@@ -195,7 +199,7 @@ export class Levels {
     ]);
 
     if (guildId !== undefined) {
-      if (!localLevelId) throw new EmiliaError("Where is localLevelId?");
+      if (localLevelId === undefined) throw new EmiliaError("Where is localLevelId?");
 
       const localLevel = await db.localLevel.findFirst({
         where: { id: localLevelId },

@@ -473,7 +473,7 @@ enum GuildLogsIntents {
   /**
    * Guild member join/leave event
    */
-  GUILD_MEMBER = (1 << 1) | (EventActions.JOIN | EventActions.LEAVE), // 3
+  GUILD_MEMBER = (1 << 1) | (EventActions.JOIN | EventActions.LEAVE | EventActions.UPDATE), // 11
 
   /**
    * Channel create/update/delete event
