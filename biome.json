@@ -1,0 +1,82 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "ignoreUnknown": true,
+    "include": [
+      "srcTs/**/*.ts",
+      "srcTs/**/*.js",
+      "srcTs/**/*.d.ts",
+      "types/**/*.d.ts",
+      "abyss/src/guild.tests.*"
+    ],
+    "ignore": [
+      "srcJs/*",
+      "abyss/*.js",
+      "abyss/src/img.tests.ts",
+      "abyss/src/img.ts",
+      "drizzle",
+      "package.json",
+      "node_modules/**"
+    ]
+  },
+  "javascript": {
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "linter": {
+    "include": [
+      "srcTs/**/*.ts",
+      "srcTs/**/*.js",
+      "srcTs/**/*.d.ts",
+      "types/**/*.d.ts",
+      "abyss/src/guild.tests.*"
+    ],
+    "ignore": [
+      "srcJs/*",
+      "abyss/*.js",
+      "abyss/src/img.tests.ts",
+      "abyss/src/img.ts",
+      "package.json",
+      "node_modules/*",
+      "node_modules/*.*"
+    ],
+    "rules": {
+      "complexity": {
+        "noForEach": "off"
+      },
+      "style": {
+        "noCommaOperator": "off",
+        "noParameterAssign": "off",
+        "useDefaultParameterLast": "off",
+        "useLiteralEnumMembers": "off"
+      },
+      "suspicious": {
+        "noConfusingVoidType": "off",
+        "noAssignInExpressions": "off",
+        "noExplicitAny": "off"
+      }
+    }
+  },
+  "formatter": {
+    "include": [
+      "srcTs/**/*.ts",
+      "srcTs/**/*.js",
+      "srcTs/**/*.d.ts",
+      "types/**/*.d.ts",
+      "abyss/src/guild.tests.*"
+    ],
+    "indentWidth": 2,
+    "ignore": [
+      "srcJs/*",
+      "abyss/*.js",
+      "abyss/src/img.tests.ts",
+      "abyss/src/img.ts",
+      "package.json",
+      "node_modules/*"
+    ]
+  },
+  "organizeImports": {
+    "enabled": true
+  }
+}

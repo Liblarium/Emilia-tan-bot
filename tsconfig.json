@@ -1,0 +1,56 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "mapRoot": "srcJs",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "srcJs",
+    "baseUrl": "./",
+    "paths": {
+      "@type": [
+        "types"
+      ],
+      "@type/*": [
+        "types/*"
+      ],
+      "@client": [
+        "srcTs/client"
+      ],
+      "@base/*": [
+        "srcTs/base/*"
+      ],
+      "@util/*": [
+        "srcTs/util/*"
+      ],
+      "@util/s": [
+        "srcTs/utils.ts"
+      ],
+      "@log": [
+        "srcTs/log"
+      ],
+      "@handlers/*": [
+        "srcTs/handlers/*"
+      ]
+    }
+  },
+  "include": [
+    "./srcTs",
+    "node_modules/@types",
+    "./types",
+  ],
+  "exclude": [
+    "./node_modules",
+    "./srcJs",
+    "./target",
+    "./pg.client.js",
+    "./abyss",
+    "./graphql",
+    "srcTs/log",
+    "./drizzle",
+    "drizzle.config.ts"
+  ]
+}
