@@ -89,7 +89,7 @@ export class Levels {
           userId,
           username,
           guildId: levelModule === true ? guildId : undefined,
-          localLevelId: levelModule === true ? (user?.LocalLevel[0].id ?? 0n) : 0n,
+          localLevelId: levelModule === true ? (user?.LocalLevel[0]?.id ?? 0n) : 0n,
         }
       );
     }
@@ -97,7 +97,7 @@ export class Levels {
     errs = 0;
 
     const localLevel = user.LocalLevel;
-    this.level({ args: user.globalLevel, userId, dbType: "global", localLevelId: localLevel.length === 0 ? 0n : localLevel[0].id ?? 0n });
+    this.level({ args: user.globalLevel, userId, dbType: "global", localLevelId: localLevel.length === 0 ? 0n : localLevel[0]?.id ?? 0n });
     const local_level = user?.LocalLevel;
 
     if (
@@ -110,10 +110,10 @@ export class Levels {
         userId,
         guildId,
         dbType: "local",
-        localLevelId: local_level[0].id ?? 0n,
+        localLevelId: local_level[0]?.id ?? 0n,
       });
 
-    return this.addUser({ userId, username, guildId, localLevelId: local_level?.length === 0 ? 0n : local_level[0].id ?? 0n });
+    return this.addUser({ userId, username, guildId, localLevelId: local_level?.length === 0 ? 0n : local_level[0]?.id ?? 0n });
   }
 
   @logCaller
