@@ -17,3 +17,5 @@ package-lock.json
 /abyss/res1.png
 /abyss/res.png
 all_changes.diff
+*.7z
+*.zip

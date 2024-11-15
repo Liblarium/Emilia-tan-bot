@@ -20,7 +20,7 @@ export default class MessageDelete extends BaseEvent {
     message: OmitPartialGroupDMChannel<MessageOrPartialMessage>,
     client: EmiliaClient,
   ) {
-    if (!message.guild || modFilter.includes(message.channelId)) return;
+    if (!message.guild || message.guildId === "451103537527783455" && modFilter.includes(message.channelId)) return;
 
     const channel = await getGuildLogSettingFromDB({
       guildId: message.guild.id,

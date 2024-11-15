@@ -361,7 +361,7 @@ export class Profile {
         return this;
       }
 
-      const sortBadges = args.sort(
+      const sortBadges = args.toSorted(
         (a, b) => (a?.priority ?? 1) - (b?.priority ?? 0),
       );
       const badges: typeof sortBadges = [];

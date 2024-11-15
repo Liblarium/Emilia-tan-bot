@@ -16,7 +16,7 @@ export default class MessageUpdate extends BaseEvent {
   }
 
   async execute(oldMessage: MessageOrPartialMessage, newMessage: MessageOrPartialMessage, client: EmiliaClient) {
-    if (!oldMessage.guild || !newMessage.guild || modFilter.includes(oldMessage.channelId) || modFilter.includes(newMessage.channelId) || oldMessage.content === newMessage.content) return;
+    if (!oldMessage.guild || !newMessage.guild || [oldMessage.guildId, newMessage.guildId].includes("451103537527783455") && (modFilter.includes(oldMessage.channelId) || modFilter.includes(newMessage.channelId)) || oldMessage.content === newMessage.content) return;
 
     const channel = await getGuildLogSettingFromDB({
       guildId: newMessage.guild.id,
