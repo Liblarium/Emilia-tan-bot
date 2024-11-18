@@ -423,10 +423,13 @@ function clipMessageLog(
   if (!limit) limit = 4000;
 
   if (message.content)
-    return message.content.length > limit
+    return message.content.length > 0 ? message.content.length > limit
       ? `${message.content.slice(0, limit - 3)}...`
-      : message.content;
-  return (message.attachments.size ?? -1) > 0 || (message.stickers.size ?? -1) > 0
+      : `${message.content}\u200b` : "[Пустое сообщение]";
+  return (message.attachments?.size ?? -1) > 0 ||
+    (message.stickers?.size ?? -1) > 0 ||
+    (message.embeds?.length ?? -1) > 0 ||
+    (message.components?.length ?? -1) > 0
     ? "[Тут было вложение]"
     : "[Пустое сообщение]";
 }
