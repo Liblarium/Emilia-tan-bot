@@ -1,13 +1,13 @@
 import { BaseEvent } from "@base/event";
 import type { EmiliaClient } from "@client";
 import type { MessageOrPartialMessage } from "@type/event";
-import { modFilter } from "@util/logFilter";
 import {
   EventActions,
   GuildLogsIntents,
   clipMessageLog,
   getGuildLogSettingFromDB,
   hexToDecimal,
+  logFilterCheck,
 } from "@util/s";
 import type { OmitPartialGroupDMChannel } from "discord.js";
 
@@ -20,7 +20,7 @@ export default class MessageDelete extends BaseEvent {
     message: OmitPartialGroupDMChannel<MessageOrPartialMessage>,
     client: EmiliaClient,
   ) {
-    if (!message.guild || message.guildId === "451103537527783455" && modFilter.includes(message.channelId)) return;
+    if (!message.guild || message.channel.isDMBased() || logFilterCheck(message.channel)) return;
 
     const channel = await getGuildLogSettingFromDB({
       guildId: message.guild.id,

@@ -4,6 +4,8 @@ import { ActivityLevel, BadgeFillType, FontStyle, XTemplatePosition, DrawBGPosit
 import * as types from "../types";
 import * as enum_ from "./src/enum";
 export * from "../types";
+import { TextAlignment, FontStyleTypeEnum } from "./src/clan.enum.tests";
+import { FontStyleOptions } from "./clan.types.tests";
 /**
  * Represents the options for drawing a clan profile.
  */
@@ -721,7 +723,7 @@ export interface TextBase {
   /**
    * Options for font styling.
    */
-  fontOptions?: SetFontStyleOptions;
+  fontOptions?: FontStyleOptions;
 
   /**
    * Indicates whether to clip the number when rendering.

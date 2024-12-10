@@ -10,6 +10,8 @@ import { db } from "@client";
 import { Log } from "@log";
 import type { JsonValue } from "@prisma/client/runtime/library";
 import type { MessageOrPartialMessage } from "@type/event";
+import type { GuildChannels, GuildLogSelect, logCategories } from "@type/util/utils";
+import { modFilter } from "@util/logFilter";
 import {
   type APIModalInteractionResponseCallbackData,
   type ActionRow,
@@ -336,31 +338,6 @@ function isGuildMember(member: unknown): member is GuildMember {
   return member instanceof GuildMember;
 }
 
-type GuildLogSelect =
-  | {
-    message: boolean;
-  }
-  | {
-    channel: boolean;
-  }
-  | {
-    role: boolean;
-  }
-  | {
-    emoji: boolean;
-  }
-  | {
-    member: boolean;
-  }
-  | {
-    guild: boolean;
-  }
-  | {
-    voice: boolean;
-  };
-
-type logCategories = "create" | "delete" | "update" | "join" | "leave";
-
 /**
  * Finds a guild in the database and returns the selected log setting columns.
  * @param {bigint} guildId - The ID of the guild to find.
@@ -433,6 +410,19 @@ function clipMessageLog(
     ? "[Тут было вложение]"
     : "[Пустое сообщение]";
 }
+
+/**
+ * Checks if the given ID is present in the log filter Map.
+ * @param {GuildChannels} channel - The ID to check.
+ * @returns {boolean} Whether the ID is present in the log filter Map.
+ */
+function logFilterCheck(channel: GuildChannels): boolean {
+  if (channel.guildId !== "451103537527783455") return false;
+
+  return modFilter.has(channel.id) ? true : modFilter.has(channel.parentId ?? "0");
+}
+
+
 
 //Enums
 
@@ -541,6 +531,7 @@ export {
   isGuildMember,
   getGuildLogSettingFromDB,
   clipMessageLog,
+  logFilterCheck,
   EmiliaTypeError,
   EmiliaError,
   EventActions,

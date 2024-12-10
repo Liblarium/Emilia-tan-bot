@@ -173,6 +173,7 @@ export class Levels {
     const dostup = await db.dostup.findFirst({ where: { id: userId }, select: { id: true } });
 
     if (!dostup) await db.dostup.create({ data: { id: userId }, select: { id: true } });
+    if (userId === 0n || !userId) throw new EmiliaError("Where is userId?");
 
     //const user = await db.user.findFirst({ where: { id: userId }, select: { id: true } });
 
