@@ -102,9 +102,9 @@ class WrapText {
     text,
     maxChars,
     maxLines,
-    lineBreak,
-    customEllipsis,
-    charsAdjuster,
+    lineBreak = "\n",
+    customEllipsis = "...",
+    charsAdjuster = 0,
     lineProcessor = (line: string) => line,
     sliceOverflow
   }: SliceTextOptions): string[] {
@@ -209,66 +209,86 @@ function sliceText({
   text,
   maxChars,
   maxLines,
-  lineBreak,
-  customEllipsis,
-  charsAdjuster,
+  lineBreak = "\n",
+  customEllipsis = "...",
+  charsAdjuster = 0,
   lineProcessor = (line: string) => line,
-  sliceOverflow
+  sliceOverflow = false
 }: SliceTextOptions): string[] {
   maxChars += charsAdjuster; // Корекція максимальної кількості символів
   const lineBreakIndex = (txt: string) => txt.indexOf(lineBreak);
 
-  if (maxLines === 1 || sliceOverflow === true) {
-    let res = text.slice(0, maxChars);
-    const resBreakIndex = lineBreakIndex(res);
-
-    if (resBreakIndex !== -1) res = res.slice(0, resBreakIndex);
-    if (lineProcessor) res = lineProcessor(res);
-
-    return [res.slice(0, res.length - customEllipsis.length) + customEllipsis];
-  }
-
   const lines: string[] = [];
   let cacheLine = text;
+  let currentLine = 0;
+  let isCacheLineChanged = false; // Флаг, що вказує на зміни
+  let prevCacheLine = cacheLine; // Запам'ятовуємо попередній стан cacheLine
+  let unchangedCount = 0; // Лічильник незмінних циклів
 
-  for (let i = 0; i < maxLines; i++) {
-    if (cacheLine.length === 0) break; // У нас закінчився текст раніше, чим максимальна кількість рядків
+  while (cacheLine.length > 0 && (sliceOverflow || currentLine < maxLines)) {
+    // Перевірка на нескінченний цикл
+    if (unchangedCount >= 3) {
+      console.warn("SliceText Warning: Possible infinite loop detected.");
+      break;
+    }
 
     const cacheLineBreakIndex = lineBreakIndex(cacheLine);
 
-    if (cacheLineBreakIndex !== -1) {
+    if (cacheLineBreakIndex !== -1) { //TODO: Додати перевірку на перевищення максимальної кількості символів
       let line = cacheLine.slice(0, cacheLineBreakIndex);
 
       if (lineProcessor) line = lineProcessor(line);
 
       lines.push(line);
-      // Використовуємо line, бо тут працюємо із змінною рядка, а не cacheLine
-      cacheLine = cacheLine.slice(lineBreakIndex(line) + 1);
-      continue; // переходимо до іншого рядку. Це не для виходу з циклу
-    }
+      cacheLine = cacheLine.slice(cacheLineBreakIndex + 1); // Рухаємося до наступного рядка
+      currentLine++;
+      isCacheLineChanged = true; // Встановлюємо флаг про зміну
+    } else if (!sliceOverflow && currentLine >= maxLines - 1) {
+      let line = cacheLine.slice(0, maxChars);
+      const slicedCacheLine = cacheLine.slice(maxChars);
 
-    if (lines.length >= maxLines) {
-      let line =
-        cacheLine.slice(0, maxChars - customEllipsis.length) + customEllipsis;
-
+      if (sliceOverflow === false && slicedCacheLine.length > 0 && currentLine >= maxLines - 1) line = line.slice(0, -customEllipsis.length) + customEllipsis;
       if (lineProcessor) line = lineProcessor(line);
 
       lines.push(line);
-      cacheLine = "";
-      break; // вихід з циклу
+      break; // Завершуємо цикл, бо досягли ліміту рядків
+    } else {
+      let line = cacheLine.slice(0, maxChars);
+
+      // Якщо слово не вміщується, додаємо дефіс
+      if (cacheLine.length > maxChars) {
+        const wordEndIndex = cacheLine.lastIndexOf(" ", maxChars); // Знаходимо останній пробіл до maxChars
+
+        // Якщо після останнього пробілу слово все одно не вміщується, додаємо дефіс
+        line = wordEndIndex === -1 || cacheLine.slice(wordEndIndex + 1).length > maxChars ? `${cacheLine.slice(0, maxChars - 1)}-` : cacheLine.slice(0, wordEndIndex);
+      }
+
+      if (lineProcessor) line = lineProcessor(line);
+
+      const isDashEnd = line.endsWith("-"); // Перевірка на дефіс в кінці рядка
+      const isDashStart = cacheLine.startsWith("-");
+      lines.push(line);
+      cacheLine = cacheLine.slice(isDashEnd ? line.length - 1 : line.length);
+
+      currentLine++;
+      isCacheLineChanged = true; // Встановлюємо флаг про зміну
     }
 
-    let line = cacheLine.slice(0, maxChars);
+    // Якщо cacheLine не змінився - пропускаємо порівняння
+    if (isCacheLineChanged) {
+      unchangedCount = 0;
+      isCacheLineChanged = false; // Скидаємо флаг
+    } else {
+      unchangedCount++;
+    }
 
-    if (lineProcessor) line = lineProcessor(line);
-
-    lines.push(line);
-
-    cacheLine = cacheLine.slice(line.length, cacheLine.length);
+    prevCacheLine = cacheLine; // Оновлюємо попередній стан
   }
 
   return lines;
 }
+
+console.log(sliceText({ text: "Hello, world! Я-дуже-велике-слово-яке-потрібно-перенести\n-а це перевірка роботи функції", maxChars: 21, maxLines: 2, sliceOverflow: true }));
 
 /**
  * Validates and truncates the given ellipsis string if it exceeds the specified maximum length.
@@ -568,17 +588,17 @@ interface SliceTextOptions {
   /**
    * The line break character.
    */
-  lineBreak: string;
+  lineBreak?: string;
 
   /**
    * The custom ellipsis character.
    */
-  customEllipsis: string;
+  customEllipsis?: string;
 
   /**
    * The adjustment value for maximum characters count.
    */
-  charsAdjuster: number;
+  charsAdjuster?: number;
 
   /**
    * If true, trim the text, if false, wrap it.
