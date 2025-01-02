@@ -13,15 +13,13 @@ export default [
       "biome.json",
       "tsconfig.json",
       "package.json",
-      ".{js,json,cjs,yaml,yml,*}",
+      ".{js,json,cjs,yaml,yml}",
       "abyss/*",
       "abyss",
       "canvas",
-      "vitest.config.ts",
       "*/**/*.deprecation",
       "tsconfig.*.json",
-      "drizzle/*",
-      "drizzle.config.ts",
+      "prisma/*",
       "eslint.config.mjs",
       "pg.client.js"
     ]
