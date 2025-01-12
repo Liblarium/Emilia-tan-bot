@@ -1,6 +1,6 @@
 import { createCanvas, loadImage, type Canvas, type SKRSContext2D, Image } from "@napi-rs/canvas";
 import sharp from "sharp";
-//import textWrap from "./textWrap";
+import textWrap from "./textWrap";
 
 const imagePath = `./abyss/images`;
 
@@ -1473,8 +1473,8 @@ const someTest: () => Promise<void> = async () => {
     })*/
     .drawBadge([{ badge: icon }, { badge: icon }, { badge: icon }, { badge: icon }, { badge: icon }], { x: -20, y: 155 })
 
-  /*const tests = textWrap({ ctx: test.ctx, text: "Обробка довгих слів: дужедовгесловобезпробелівяхочупобачитиобрізанняцьогослова Якщо слово, яке потрібно розбити, має довжину більше ніж 100 символів, ми передаємо його в sliceText, який відповідає за розбиття на частини за допомогою ширини (замінюючи стандартний підхід для бінарного пошуку). Це дозволяє розбивати дуже довгі слова, що не вміщуються в рядок, і правильно форматувати їх.", maxWidth: 150, maxChars: 150, addHyphen: true });
-  console.log(tests);*/
+  const tests = textWrap({ ctx: test.ctx, text: "Обробка довгих слів: дужедовгесловобезпробелівяхочупобачитиобрізанняцьогослова Якщо слово, яке потрібно розбити, має довжину більше ніж 100 символів, ми передаємо його в sliceText, який відповідає за розбиття на частини за допомогою ширини (замінюючи стандартний підхід для бінарного пошуку). Це дозволяє розбивати дуже довгі слова, що не вміщуються в рядок, і правильно форматувати їх.", maxWidth: 300, maxChars: 20, maxLines: 5, sliceOverflow: false, addHyphen: true });
+  console.log(tests);
 
   //full = x: 780, w: 200, one = w: 40, x: 940 - координаты под "значки"
   sharp(test.render()).toFile(`./abyss/res2.tests.png`);
