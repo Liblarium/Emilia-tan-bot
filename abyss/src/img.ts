@@ -1,5 +1,6 @@
 import { createCanvas, loadImage, type Canvas, type SKRSContext2D, Image } from "@napi-rs/canvas";
 import sharp from "sharp";
+import textWrap from "./textWrap";
 
 const imagePath = `./abyss/images`;
 
@@ -16,6 +17,7 @@ class Profile {
    * Или на саму документацию библиотеки `sharp.js` (это библиотека для работы с изображениями)
    */
   _sharp = sharp;
+
 
   constructor() {
     this.canvas = createCanvas(1000, 700);
@@ -227,7 +229,7 @@ class Profile {
         return this;
       }
 
-      const sortBadges = args.sort((a, b) => (a?.priority ?? 1) - (b?.priority ?? 0));
+      const sortBadges = args.toSorted((a, b) => (a?.priority ?? 1) - (b?.priority ?? 0));
       const badges: typeof sortBadges = [];
 
       let x = 0;
@@ -366,7 +368,7 @@ class Profile {
     return this;
   }
 
-  async drawText({ x1, x2 = 0, y, text, textDirect = `normal`, dynamicOptions, fontOptions, clipNumber = false, timeFormat = false, x_translate }: DrawTextOptions): Promise<Profile> {
+  async drawText({ x1, x2 = 0, y, text, textDirect = `left`, dynamicOptions, fontOptions, clipNumber = false, timeFormat = false, x_translate }: DrawTextOptions): Promise<Profile> {
     const ctx = this.ctx;
 
     if (clipNumber) text = this.numberClip(text);
@@ -523,7 +525,7 @@ class Profile {
         if (i >= start && i <= end) data = { ...data, ...cache };
         if (i === end && dynamic) index++;
       }
-
+      //drawFormattedText(this.ctx, data);
       await this.drawText(data);
     });
 
@@ -1208,7 +1210,7 @@ const main: () => Promise<void> = async () => {
     }
   }
 
-  const drawText = async ({ x1, x2 = 0, y, text, textDirect = `normal`, dynamicOptions, fontOptions, clipNumber = false, timeFormat = false }: DrawTextOptions) => {
+  const drawText = async ({ x1, x2 = 0, y, text, textDirect = `left`, dynamicOptions, fontOptions, clipNumber = false, timeFormat = false }: DrawTextOptions) => {
     if (clipNumber) text = numberClip(text);
     if (timeFormat) text = timeFormatter(Number(text));
 
@@ -1448,12 +1450,16 @@ const someTest: () => Promise<void> = async () => {
       { text: `Позиция: Участник`, x1: 763, x2: 965, y: 630, dynamicOptions: { dynamic: true }, fontOptions: { size: 20 } },*/
       //уровень
       { text: `Сфера Полубога`, x1: 772, x2: 970, y: 258, textDirect: `center`, dynamicOptions: { dynamic: true, dynamicCorrector: -2, lines: 0 }, fontOptions: { size: 15, color: `white` } },
+      {
+        text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1", x1: 20, x2: 710, y: 370, dynamicOptions: { dynamic: true }, fontOptions: { size: 25 }
+      }
+
     ])
     .drawTemplateBlock({
       bioCenter: {}
     })
     //.drawGuildIcon({ x1: 775, y1: 370, r: 40, x2: 735, y2: 330, w: 80, h: 80, icon: guildIcon })
-    .drawTemplateText({
+    /*.drawTemplateText({
       bioCenter: {
         text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem-accusantium-doloremque-laudantium.-accusantium-doloremque-laudantium.-voluptatem-accusantium-doloremque-laudantium.1`
       },
@@ -1463,12 +1469,15 @@ const someTest: () => Promise<void> = async () => {
         members: { text: `Участники: 100/100` },
         perms: { text: `Позиция: Участник` },
         guildIcon: true
-      }*/
-    })
+      }*\/
+    })*/
     .drawBadge([{ badge: icon }, { badge: icon }, { badge: icon }, { badge: icon }, { badge: icon }], { x: -20, y: 155 })
 
+  const tests = textWrap({ ctx: test.ctx, text: "Обробка довгих слів: дужедовгесловобезпробелівяхочупобачитиобрізанняцьогослова Якщо слово, яке потрібно розбити, має довжину більше ніж 100 символів, ми передаємо його в sliceText, який відповідає за розбиття на частини за допомогою ширини (замінюючи стандартний підхід для бінарного пошуку). Це дозволяє розбивати дуже довгі слова, що не вміщуються в рядок, і правильно форматувати їх.", maxWidth: 300, maxChars: 20, maxLines: 5, sliceOverflow: false, addHyphen: true });
+  console.log(tests);
+
   //full = x: 780, w: 200, one = w: 40, x: 940 - координаты под "значки"
-  sharp(test.render()).toFile(`./abyss/res.png`);
+  sharp(test.render()).toFile(`./abyss/res2.tests.png`);
 };
 
 const guildProfile = async () => {
@@ -1553,8 +1562,8 @@ const guildProfile = async () => {
 
   sharp(canvas.toBuffer(`image/png`)).toFile(`./abyss/guild.png`);
 }
-guildProfile();
-//someTest();
+//guildProfile();
+someTest();
 
 interface DrawBadgeOptionalOptions extends X_And_Y {
   bgColor?: StringOrGradient | FillOrStrokeOption<string>;
@@ -1835,14 +1844,14 @@ interface SetFontStyleOptions {
 
 interface DrawTextOptions extends TextBase {
   x1: number;
-  x2?: number;
+  x2: number;
   y: number;
   x_translate?: number;
 }
 
 interface TextBase {
   text: string | number;
-  textDirect?: "normal" | "center" | "left";
+  textDirect?: 'left' | "center" | "left";
   fontOptions?: SetFontStyleOptions;
   clipNumber?: boolean;
   timeFormat?: boolean;

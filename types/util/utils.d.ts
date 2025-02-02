@@ -1,12 +1,29 @@
+import type { JsonValue } from "@prisma/client/runtime/library";
+import type { MessageOrPartialMessage } from "@type/event";
 import type {
+  APIModalInteractionResponseCallbackData,
   ActionRow,
   AnyComponent,
   ChatInputCommandInteraction,
+  Guild,
+  GuildEmoji,
+  GuildMember,
   InteractionReplyOptions,
+  Message,
   MessageActionRowComponent,
   MessageComponentInteraction,
-  ModalComponentData,
+  NewsChannel,
+  NonThreadGuildBasedChannel,
+  OmitPartialGroupDMChannel,
+  PartialMessage,
+  PrivateThreadChannel,
+  PublicThreadChannel,
   RepliableInteraction,
+  Role,
+  StageChannel,
+  TextChannel,
+  VoiceChannel,
+  VoiceState
 } from "discord.js";
 
 declare const prefix: string;
@@ -35,5 +52,59 @@ declare function log(message?: unknown, ...optionalParams: unknown[]): void;
 declare function error(message?: unknown, ...optionalParams: unknown[]): void;
 declare function random(min: number, max: number): number;
 declare function stringToBigInt(str: string): bigint;
+declare function parseJsonValue<T>(jsonValue: JsonValue): T;
+declare function hexToDecimal(hex: string): number;
+declare function displayColor(color: number | string, replacedColor: number | string): number;
+declare function isGuildMember(member: unknown): member is GuildMember;
+declare function getGuildLogSettingFromDB({
+  guildId,
+  select,
+  messageType,
+  intents,
+  message,
+}: {
+  guildId: string;
+  select: GuildLogSelect;
+  intents: number;
+  messageType: logCategories;
+  message:
+  | OmitPartialGroupDMChannel<MessageOrPartialMessage>
+  | GuildMember
+  | GuildEmoji
+  | Guild
+  | Role
+  | VoiceState
+  | NonThreadGuildBasedChannel
+  | MessageOrPartialMessage;
+}): Promise<TextChannel | false>;
+declare function clipMessageLog(message: Message | PartialMessage, limit?: number): string;
+declare function logFilterCheck(channel: GuildChannels): boolean;
 declare class EmiliaTypeError extends Error { }
 declare class EmiliaError extends Error { }
+
+export type GuildChannels = NewsChannel | StageChannel | TextChannel | PublicThreadChannel<boolean> | PrivateThreadChannel | VoiceChannel;
+
+export type GuildLogSelect =
+  | {
+    message: boolean;
+  }
+  | {
+    channel: boolean;
+  }
+  | {
+    role: boolean;
+  }
+  | {
+    emoji: boolean;
+  }
+  | {
+    member: boolean;
+  }
+  | {
+    guild: boolean;
+  }
+  | {
+    voice: boolean;
+  };
+
+export type logCategories = "create" | "delete" | "update" | "join" | "leave";

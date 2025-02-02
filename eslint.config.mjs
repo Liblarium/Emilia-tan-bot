@@ -13,15 +13,13 @@ export default [
       "biome.json",
       "tsconfig.json",
       "package.json",
-      ".{js,json,cjs,yaml,yml,*}",
+      ".{js,json,cjs,yaml,yml}",
       "abyss/*",
       "abyss",
       "canvas",
-      "vitest.config.ts",
       "*/**/*.deprecation",
       "tsconfig.*.json",
-      "drizzle/*",
-      "drizzle.config.ts",
+      "prisma/*",
       "eslint.config.mjs",
       "pg.client.js"
     ]
@@ -68,7 +66,8 @@ export default [
       "@typescript-eslint/no-unnecessary-condition": "off",
       "@typescript-eslint/no-invalid-void-type": "off",
       "@typescript-eslint/require-await": "off",
-      "@typescript-eslint/no-unused-expressions": "off"
+      "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
     }
   }
 ];

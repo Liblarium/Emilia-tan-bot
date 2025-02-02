@@ -1,0 +1,1 @@
+require("./srcJs"); //run for pm2
