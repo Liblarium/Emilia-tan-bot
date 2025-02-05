@@ -9,19 +9,17 @@ export default [
     ignores: [
       "node_modules",
       "srcJs/*",
-      "target",
       "biome.json",
       "tsconfig.json",
       "package.json",
       ".{js,json,cjs,yaml,yml}",
-      "abyss/*",
-      "abyss",
-      "canvas",
       "*/**/*.deprecation",
       "tsconfig.*.json",
       "prisma/*",
       "eslint.config.mjs",
-      "pg.client.js"
+      "pg.client.js",
+      "oldCode",
+      "dist"
     ]
   },
   pluginJs.configs.recommended,
@@ -30,7 +28,7 @@ export default [
     plugins: {
       "@typescript-eslint": tsplugin,
     },
-    files: ["srcTs/**/*.ts", "types/**/*.d.ts", "abyss/src/guild.tests.ts"],
+    files: ["src/**/*.ts", "types/**/*.d.ts"],
     languageOptions: {
       parser: tsparser,
       parserOptions: {

@@ -19,3 +19,5 @@ package-lock.json
 all_changes.diff
 *.7z
 *.zip
+/oldCode
+/dist

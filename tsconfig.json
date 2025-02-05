@@ -4,11 +4,11 @@
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "mapRoot": "srcJs",
+    "mapRoot": "dist",
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-    "outDir": "srcJs",
+    "outDir": "dist",
     "baseUrl": "./",
     "paths": {
       "@type": [
@@ -17,40 +17,36 @@
       "@type/*": [
         "types/*"
       ],
+      "@client/pg": [
+        "src/client/postgres.ts"
+      ],
       "@client": [
-        "srcTs/client"
+        "src/client/index.ts"
       ],
-      "@base/*": [
-        "srcTs/base/*"
+      "@constants/*": [
+        "src/constants/*"
       ],
-      "@util/*": [
-        "srcTs/util/*"
-      ],
-      "@util/s": [
-        "srcTs/utils.ts"
+      "@utils": [
+        "src/utils/index.ts"
       ],
       "@log": [
-        "srcTs/log"
+        "src/log/index.ts"
       ],
       "@handlers/*": [
-        "srcTs/handlers/*"
+        "src/handlers/*"
       ]
     }
   },
   "include": [
-    "./srcTs",
+    "src",
     "node_modules/@types",
-    "./types",
+    "types",
   ],
   "exclude": [
     "./node_modules",
-    "./srcJs",
-    "./target",
-    "./pg.client.js",
-    "./abyss",
-    "./graphql",
-    "srcTs/log",
-    "./drizzle",
-    "drizzle.config.ts"
+    "./dist",
+    "./oldCode",
+    "./sandbox",
+    "./prisma"
   ]
 }

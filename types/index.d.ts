@@ -1,4 +1,12 @@
 /**
+ * Type for array with limited length and that cannot be empty.
+ * @example
+ * const arr: PathArgsLimit<string, 2> = ["a", "b"];
+ * const arr2: PathArgsLimit<string, 3> = ["a", "b", "c"];
+ */
+export type ArrayPathLimit = PathArgsLimit<string, 2>;
+
+/**
  * Utility types for array handling.
  */
 
@@ -31,31 +39,3 @@ export type ArrayNotEmpty<T> = [T, ...T[]] | [T];
  * const arr3: LimitedArrayArgs<number, 2> = [1]; // Invalid, error
  */
 export type LimitedArrayArgs<T, N extends number = 1> = ArrayNotEmpty<T> & { length: N };
-
-/**
- * Options for guild log.
- * 
- * This interface is used to specify the channel IDs for guild logs.
- */
-export interface GuildLogOption {
-  /**
-   * delete channelId
-   */
-  delete?: string;
-  /**
-   * create channelId
-   */
-  create?: string;
-  /**
-   * update channelId
-   */
-  update?: string;
-  /** 
-   * join channelId
-   */
-  join?: string;
-  /**
-   * leave channelId
-   */
-  leave?: string;
-}
