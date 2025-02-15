@@ -1,9 +1,8 @@
-import { AbstractLog } from "@constants/abstract/AbstractLog";
-import { LogType } from "@constants/enum/log";
+import { Abstract, Enums } from "@constants";
 import { FileHandler } from "@handlers/FileHandler";
 import type { ArrayMaybeEmpty } from "@type";
 import { LogOptions } from "@type/log";
-import { LogFormatter, time } from "@utils";
+import { Formatters } from "@utils";
 
 /**
  * A function to catch any errors that may occur in the code
@@ -33,7 +32,7 @@ const catchs = (e: unknown) => {
 * });
 *
 */
-export class Log extends AbstractLog {
+export class Log extends Abstract.AbstractLog {
   /**
    * Other categories to write logs to, excluding the main one
    * @type {ArrayMaybeEmpty<string>}
@@ -63,7 +62,7 @@ export class Log extends AbstractLog {
 
     super({ text, type, event, logs, inline });
 
-    if (typeof type === "number") type = LogFormatter.formatterType(type) ?? LogType.Error;
+    if (typeof type === "number") type = Formatters.LogFormatter.formatterType(type) ?? Enums.LogType.Error;
     if (!categories.length) categories = ["other"];
 
     this.setCategory(uniqueCategories[0]);
@@ -90,9 +89,9 @@ export class Log extends AbstractLog {
 
       if (folderCheckResult.error) {
         const errorText = `Не удалось создать папку ${categoryName}!`;
-        console.error(`[${time()}][Log._addLogs | error]:`, errorText);
+        console.error(`[${Formatters.time()}][Log._addLogs | error]:`, errorText);
         this.setCategory("global");
-        this.addLog(errorText, LogType.Error).catch(catchs);
+        this.addLog(errorText, Enums.LogType.Error).catch(catchs);
         continue;
       }
 

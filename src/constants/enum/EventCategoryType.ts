@@ -3,7 +3,7 @@
  * @name EventCagetoryType
  * @description This enum to define the category of the event
  */
-export enum EventCagetoryType {
+export enum EventCategoryType {
   /**
    * Discord.js event. Default category.
    */

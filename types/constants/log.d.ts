@@ -1,6 +1,6 @@
 export type LineType = { news: "" | "\n"; last: "" | "\n" };
 export type LogTypeNumber = 1 | 2 | 3 | 4 | 5;
-import type { LogType } from "@constants/enum/log";
+import type { Enums } from "@constants";
 export interface BaseLogOptions {
   /**
    * Text which will be written to log
@@ -27,7 +27,7 @@ export interface BaseLogOptions {
 /**
  * Type of log. It is a union of LogType and LogTypeNumber
  */
-export type TypeLog = LogType | LogTypeNumber;
+export type TypeLog = Enums.LogType | LogTypeNumber;
 
 /**
  * Type of text

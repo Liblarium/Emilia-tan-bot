@@ -2,7 +2,7 @@ import { readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { EmiliaClient } from "@client";
 import type { ArrayMaybeEmpty, ArrayPathLimit } from "@type";
-import { isClass } from "@utils";
+import { isClass, Decorators } from "@utils";
 import { ModuleType } from "@type/handler";
 import { Log } from "@log";
 
@@ -78,6 +78,7 @@ export abstract class AbstractHandler {
    * 
    * If any errors occur during the build process, it will log the error.
    */
+  @Decorators.logCaller
   protected async build(): Promise<void> {
     const foldersScan = await this.scanFolder();
 

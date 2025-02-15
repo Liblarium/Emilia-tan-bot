@@ -11,7 +11,7 @@ import { emiliaError } from "@utils";
  * ## Example usage:
  * @example
  * class MyClass {
- *   @logCaller
+ *   *@logCaller* //not use **
  *   myMethod() {
  *     // your code
  *   }

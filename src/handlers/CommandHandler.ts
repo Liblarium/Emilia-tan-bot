@@ -1,9 +1,9 @@
-import { AbstractHandler } from "../constants/abstract/AbstractHandler";
 import type { EmiliaClient } from "@client";
-import { AbstractBaseCommand } from "@constants/abstract/AbstractBaseCommand";
+import { Abstract } from "@constants";
 import { Log } from "@log";
+import { logCaller } from "src/utils/decorators/logCaller";
 
-export class CommandHandler extends AbstractHandler {
+export class CommandHandler extends Abstract.AbstractHandler {
   /**
    * Initializes a new instance of the CommandHandler class.
    * Clears the existing commands in the client and sets up the folder path for commands.
@@ -34,7 +34,8 @@ export class CommandHandler extends AbstractHandler {
    * 
    * @throws Catches any errors that occur during the process and passes them to the error handling function.
    */
-  setLogic(command: AbstractBaseCommand): void | Promise<void> {
+  @logCaller
+  setLogic(command: Abstract.AbstractBaseCommand): void | Promise<void> {
     const client = this.client;
 
     try {

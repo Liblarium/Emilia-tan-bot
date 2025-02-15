@@ -1,8 +1,9 @@
-import { LogFormatter, date, time } from "@utils";
+import { Formatters } from "@utils";
 import { AddLogResult, BaseLogOptions, TypeLog, TypeText } from "@type/constants/log";
-import { InlineType, LogType } from "@constants/enum/log";
+import { InlineType, LogType } from "../enum";
 import { FileHandler } from "@handlers/FileHandler";
 
+const { LogFormatter, date, time } = Formatters;
 const baseLogPath = process.env.BASE_LOG_PATH ?? "logs";
 const error: (...e: unknown[]) => void = (...e: unknown[]) => console.error([time()], e);
 /**

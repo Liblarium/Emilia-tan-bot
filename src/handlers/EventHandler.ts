@@ -1,13 +1,13 @@
 import type { EmiliaClient } from "@client";
 import { Log } from "@log";
-import { AbstractHandler } from "../constants/abstract/AbstractHandler";
-import { AbstractEvent } from "@constants/abstract/AbstractEvent";
+import { Abstract } from "@constants";
+import { Decorators } from "@utils";
 
 const catchs = (e: unknown) => {
-  console.error(e);
+  new Log({ text: e, categories: ["global", "handler", "event"], type: 2 });
 };
 
-export class EventHandler extends AbstractHandler {
+export class EventHandler extends Abstract.AbstractHandler {
   /**
    * The constructor for the handler class.
    * @param client - The client which the handler is attached to.
@@ -34,7 +34,8 @@ export class EventHandler extends AbstractHandler {
    * 
    * @throws Will log errors but not throw them, returning null instead.
    */
-  setLogic(event: AbstractEvent): null | void {
+  @Decorators.logCaller
+  setLogic(event: Abstract.AbstractEvent): null | void {
     const client = this.client;
 
     try {
@@ -42,13 +43,13 @@ export class EventHandler extends AbstractHandler {
         try {
           await event.execute(...args, client);
         } catch (e) {
-          new Log({ text: e, type: 2, categories: ["global", "handler", "event"] });
+          catchs(e);
           return null;
         }
       };
 
       if (!event.category) {
-        new Log({ text: `It seems like ${event?.name ?? "error"} doesn't have a category.`, type: 2, categories: ["global", "handler", "event"] });
+        catchs(`It seems like ${event?.name ?? "error"} doesn't have a category.`);
         return null;
       }
 
@@ -59,13 +60,13 @@ export class EventHandler extends AbstractHandler {
       };
 
       if (!(event.category in eventMap)) {
-        new Log({ text: `The specified category (${event.category}) is not among the available categories. Available: bot and mongo`, type: 2, categories: ["global", "handler", "event"] });
+        catchs(`The specified category (${event.category}) is not among the available categories. Available: bot and mongo`);
         return null;
       }
 
       eventMap[event.category]();
-    } catch (e: unknown) {
-      new Log({ text: e, type: 2, categories: ["global", "handler", "event"] });
+    } catch (e) {
+      catchs(e);
       return null;
     }
   }

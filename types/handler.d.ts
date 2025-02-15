@@ -1,7 +1,6 @@
-import type { AbstractBaseCommand } from "@constants/abstract/AbstractBaseCommand";
-import type { AbstractEvent } from "@constants/abstract/AbstractEvent";
+import type { Abstract } from "@constants";
 
-export type ModuleType = AbstractEvent | AbstractBaseCommand;
+export type ModuleType = Abstract.AbstractEvent | Abstract.AbstractBaseCommand;
 
 /**
  * Result of creating a folder

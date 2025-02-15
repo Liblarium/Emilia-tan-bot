@@ -1,11 +1,11 @@
-import { AbstractBaseCommand } from '@constants/abstract/AbstractBaseCommand';
+import { Abstract } from '@constants';
 import { Client, Collection, type ClientOptions } from 'discord.js';
 
 export class EmiliaClient extends Client {
   /**
-   * @type {Collection<string, AbstractBaseCommand>} - The collection of commands
+   * @type {Collection<string, Abstract.AbstractBaseCommand>} - The collection of commands
    */
-  public commands: Collection<string, AbstractBaseCommand> = new Collection();
+  public commands: Collection<string, Abstract.AbstractBaseCommand> = new Collection();
   /**
    * @type {Collection<string, string>} - The collection of events
    */

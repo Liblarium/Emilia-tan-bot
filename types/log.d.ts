@@ -1,4 +1,4 @@
-import type { InlineType } from "@constants/enum/log";
+import type { Enums } from "@constants";
 import type { ArrayNotEmpty } from "@type";
 import type { TypeLog, TypeText } from "./constants/log";
 
@@ -17,7 +17,7 @@ import type { TypeLog, TypeText } from "./constants/log";
  *   categories: ["category1", "category2"],
  *   event: false,
  *   logs: true,
- *   inline: InlineType.Before,
+ *   inline: Enums.InlineType.Before,
  * };
  * 
  * new Log(options); // [time]: Hello from LogOptions
@@ -51,7 +51,7 @@ export interface LogOptions {
   logs?: boolean;
   /**
    * Affects only the text in the console. 0 - No change, 1 - wrap from top to bottom, 2 - from bottom, 3 - both.
-   * @default InlineType.None = 0
+   * @default Enums.InlineType.None = 0
    */
-  inline?: InlineType;
+  inline?: Enums.InlineType;
 }

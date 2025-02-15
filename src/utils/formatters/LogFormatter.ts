@@ -1,8 +1,7 @@
-import { LogType } from "@constants/enum/log";
+import { Enums } from "@constants";
 import { inspect } from "node:util";
-import { emiliaError } from "../error/EmiliaError";
 import { LineType, TypeLog } from "@type/constants/log";
-import { time, dateAndTime } from "@utils";
+import { Formatters, emiliaError, Decorators } from "@utils";
 
 export class LogFormatter {
 
@@ -16,7 +15,7 @@ export class LogFormatter {
    */
   static formatterLog(text: unknown, type: string, category: string, date?: boolean): string {
     const formattedText = typeof text === "object" ? inspect(text) : String(text);
-    return `[${date ? dateAndTime() : time()}][${category.toUpperCase()} | ${type}]: ${formattedText}\n`;
+    return `[${date ? Formatters.dateAndTime() : Formatters.time()}][${category.toUpperCase()} | ${type}]: ${formattedText}\n`;
   }
 
   /**
@@ -29,11 +28,15 @@ export class LogFormatter {
    * setType(5); // "test"
    * setType(0); // EmiliaError: Невідомий тип логу: 0
    */
+  @Decorators.logCaller
   static formatterType(type: TypeLog & number | string): TypeLog | undefined {
     // Якщо тип уже є рядком і відповідає одному з допустимих значень:
-    if (typeof type === "string" && Object.values(LogType).includes(type as LogType)) {
+    if (typeof type === "string" && Object.values(Enums.LogType).includes(type as Enums.LogType)) {
       return type as TypeLog;
     }
+
+    // Щоб не повторювати Enums.LogType кожного разу
+    const { LogType } = Enums;
 
     // Якщо надається число, можна зробити перетворення за допомогою мапи:
     const typeMap: Record<number, TypeLog> = {
@@ -60,11 +63,11 @@ export class LogFormatter {
    * @param {string} params.category - The category of the log.
    * @param {boolean} [params.event] - Whether to format the log as an event. Default is `false`.
    * @param {boolean} [params.logs] - Whether to log the formatted message. Default is `true`.
-   * @param {() => string} [params.getTime] - A function to get the current time. Default is the `time` function from the `@utils` module.
+   * @param {() => string} [params.getTime=Formatters.time] - A function to get the current time. Default is the `time` function from the `@utils` module.
    *
    * @returns {void}
    */
-  static formattingConsole({ message, line, type, category, event, logs, getTime = time }: { message: unknown, line: LineType, type: TypeLog, category: string, logs?: boolean, event?: boolean, getTime?: () => string }): void {
+  static formattingConsole({ message, line, type, category, event, logs, getTime = Formatters.time }: { message: unknown, line: LineType, type: TypeLog, category: string, logs?: boolean, event?: boolean, getTime?: () => string }): void {
     const logText = this.formatLogText(message);
     const editText = this.formatEventText(logText.in, event, type);
 

@@ -1,4 +1,4 @@
-import type { EventCagetoryType } from "@constants/enum/EventCagetoryType";
+import type { Enums } from "@constants";
 import type { ActionArguments } from "./action";
 
 export interface EventArguments extends ActionArguments {
@@ -10,8 +10,8 @@ export interface EventArguments extends ActionArguments {
   once?: boolean;
   /**
    * The category of the event
-   * @default EventCagetoryType.BOT - the event is a discord.js
-   * @type {EventCagetoryType} if the event is a custom - you can add new type on this enum
+   * @default Enums.EventCagetoryType.BOT - the event is a discord.js
+   * @type {Enums.EventCagetoryType} if the event is a custom - you can add new type on this enum
    */
-  category?: EventCagetoryType;
+  category?: Enums.EventCagetoryType;
 }

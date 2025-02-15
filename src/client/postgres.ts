@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { resolve } from "node:path";
+import { offNewLine } from "../utils/formatters/offNewLine";
 
 /**
  * @file postgres.ts
@@ -26,9 +27,9 @@ function run_pg() {
     spawn("pg_ctl", ["stop", "-D", pgdata_path, "-U", process.env.DB_USER, "-P", process.env.DB_PASS]);
     const pgStart = spawn("pg_ctl", ["start", "-D", pgdata_path, "-U", process.env.DB_USER, "-P", process.env.DB_PASS]);
 
-    pgStart.stdout.on("data", (data) => console.info(`PG_SQL процесс dtdout: ${data}`));
+    pgStart.stdout.on("data", (data) => console.info(`PG_SQL процесс dtdout: ${offNewLine(data)}`));
 
-    pgStart.stderr.on("data", (data) => console.info(`PG_SQL процесс stderr: ${data}`));
+    pgStart.stderr.on("data", (data) => console.info(`PG_SQL процесс stderr: ${offNewLine(data)}`));
 
     pgStart.on("close", (code) => {
       return console.info(code === 0 ? "PostgreSQL process finished successfully." : `PostgreSQL process finished with code ${code}`);

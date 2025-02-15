@@ -4,9 +4,14 @@
  * 
  * Functions for formatting strings, text, time and dates
  */
-export { date, time, dateAndTime, logTime } from "./formatters/timeAndDate";
-export { offNewLine } from "./formatters/offNewLine";
-export { LogFormatter } from "./formatters/LogFormatter";
+export * as Formatters from "./formatters";
+
+/**
+ * Decorators
+ * 
+ * Decorators for Logs
+ */
+export * as Decorators from "./decorators";
 
 /**
  * Error
@@ -20,8 +25,7 @@ export { emiliaError } from "./error/EmiliaError";
  * 
  * Functions for transforming values between types
  */
-export { stringToBigInt } from "./transform/stringToBigInt";
-export { parseJsonValue } from "./transform/parseJsonValue";
+export * as Transforms from "./transform";
 
 /**
  * Checkers
