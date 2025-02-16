@@ -12,6 +12,7 @@ addAliases({ //aliases
   "@constants": `${__dirname}/constants`,
   "@utils": `${__dirname}/utils`,
   "@log": `${__dirname}/log`,
+  "@interaction": `${__dirname}/interaction`,
 });
 
 // Register the aliases

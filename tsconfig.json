@@ -32,6 +32,9 @@
       "@log": [
         "src/log/index.ts"
       ],
+      "@interaction": [
+        "src/interaction/index.ts"
+      ],
       "@handlers/*": [
         "src/handlers/*"
       ]

@@ -22,5 +22,7 @@ class EmiliaError {
     })(message); // Instantiate the anonymous class with the provided message
   }
 }
-
+/**
+ * Singleton instance of EmiliaError
+ */
 export const emiliaError = new EmiliaError().createError;

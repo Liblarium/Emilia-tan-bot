@@ -1,7 +1,7 @@
 import type { EmiliaClient } from "@client";
-import { Abstract } from "@constants";
+import { Abstract, Enums } from "@constants";
 import { Log } from "@log";
-import { logCaller } from "src/utils/decorators/logCaller";
+import { Decorators } from "@utils";
 
 export class CommandHandler extends Abstract.AbstractHandler {
   /**
@@ -15,10 +15,18 @@ export class CommandHandler extends Abstract.AbstractHandler {
 
   constructor(client: EmiliaClient) {
     super(client);
-    this.client = client;
-    this.client.commands.clear();
 
+    // Clear existing commands and slash commands in the client.
+    client.command.clear();
+    client.slashCommand.clear();
+
+    // Associate the client with this handler.
+    this.client = client;
+
+    // Set up the folder path for commands.
     this.setFolderPath(["dist", "commands"]);
+
+    // Build the commands from the specified directory.
     this.build().catch(error);
   }
 
@@ -34,15 +42,18 @@ export class CommandHandler extends Abstract.AbstractHandler {
    * 
    * @throws Catches any errors that occur during the process and passes them to the error handling function.
    */
-  @logCaller
+  @Decorators.logCaller()
   setLogic(command: Abstract.AbstractBaseCommand): void | Promise<void> {
     const client = this.client;
 
     try {
-      client.commands.set(command.name, command);
+      // Add the command to the client's command or slashCommand collection
+      if (command.type !== Enums.CommandType.Slash) client.command.set(command.name, command);
+      if (command.type === Enums.CommandType.Slash) client.slashCommand.set(command.name, command);
 
+      // Set up aliases for the command. Adds the command to the client's command collection with the alias.
       command.aliases.forEach((alias) =>
-        client.commands.set(alias, command)
+        client.command.set(alias, command)
       );
     } catch (e) {
       error(e);

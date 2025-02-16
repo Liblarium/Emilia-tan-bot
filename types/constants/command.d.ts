@@ -1,3 +1,4 @@
+import type { Enums } from "@constants";
 import type { ActionArguments } from "./action";
 
 export interface CommandOptions {
@@ -49,5 +50,14 @@ export interface CommandArguments extends ActionArguments {
    * Command description
    */
   description: string;
+  /**
+   * Command Aliases (message command only)
+   */
+  aliases?: string[];
+  /**
+   * Command type (both, messsage or slash command)
+   * @default Enums.CommandType.Both
+   */
+  type?: Enums.CommandType;
 }
 

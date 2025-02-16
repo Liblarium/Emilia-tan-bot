@@ -1,8 +1,8 @@
 import { CommandArguments, CommandOptions } from "@type/constants/command";
-import { AbstractAction } from "../abstract/AbstractAction";
+import { Abstract, Enums } from "@constants";
 import { SlashCommandBuilder } from "discord.js";
 
-export abstract class AbstractBaseCommand extends AbstractAction {
+export abstract class AbstractBaseCommand extends Abstract.AbstractAction {
   /**
    * @see {@link https://discord.com/developers/docs/interactions/application-commands#application-command-object official Discord API documentation}. If you need more information about Discord API
    *
@@ -22,6 +22,11 @@ export abstract class AbstractBaseCommand extends AbstractAction {
   public aliases: string[] = [];
 
   /**
+   * The command type. Default is CommandType.Both
+   */
+  public type: Enums.CommandType;
+
+  /**
    * Constructor for the AbstractBaseCommand class
    *
    * @param {CommandArguments} options - Command arguments
@@ -37,8 +42,10 @@ export abstract class AbstractBaseCommand extends AbstractAction {
    * @param {string[]} [options.option.dUsers=[]] - IDs of users who cannot use the command
    * @param {number} [options.option.perms=0] - Permissions required to use the command
    * @param {boolean} [options.option.delete=false] - Whether the command should delete the message it was sent in response to. Only message command
+   * @param {Enums.CommandType} [options.type=Enums.CommandType.Both] - The type of the command
+   * @param {string[]} [options.aliases=[]] - Alternative names for the command (aliases for message commands)
    */
-  constructor({ name, description, option = {} }: CommandArguments) {
+  constructor({ name, description, option = {}, type, aliases }: CommandArguments) {
     super(name);
     this.data
       .setName(name)
@@ -55,6 +62,12 @@ export abstract class AbstractBaseCommand extends AbstractAction {
       perms: option.perms ?? 0,
       delete: option.delete ?? false
     };
+
+    // If command have aliases. Only message command versions
+    if (aliases && aliases.length > 0) this.aliases = aliases;
+
+    // I have 3 versions of commands (both and only message or slash command)
+    this.type = type ?? Enums.CommandType.Both;
   }
 }
 

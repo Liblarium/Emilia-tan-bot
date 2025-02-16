@@ -119,7 +119,7 @@ export abstract class AbstractLog {
     const type = editType.toString().toLowerCase();
     const category = this.category.toLowerCase();
 
-    const appendFile = await FileHandler.appendFile(`${baseLogPath}/${category}/${category}-${date()}.log`, LogFormatter.formatterLog(text, type, category));
+    const appendFile = await FileHandler.appendFile(`${baseLogPath}/${category}/${category}-${date()}.log`, LogFormatter.formatterLog({ text, type, category }));
 
     if (appendFile.error) {
       error(appendFile.error);

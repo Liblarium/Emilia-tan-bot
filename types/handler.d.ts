@@ -79,3 +79,8 @@ export interface CheckFormatFileResult {
    */
   error?: string;
 }
+
+/**
+ * Type for guild prefix in database
+ */
+export type GuildPrefix = { now: string, default: string }

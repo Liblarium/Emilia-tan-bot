@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @description This file exports all utility functions and decorators.
+ */
 
 /**
  * Formatters
@@ -16,7 +20,7 @@ export * as Decorators from "./decorators";
 /**
  * Error
  * 
- * Some error category files
+ * Some error function (ErrorFactory)
  */
 export { emiliaError } from "./error/EmiliaError";
 
@@ -32,12 +36,12 @@ export * as Transforms from "./transform";
  * 
  * Functions for checking the type of a given value
  */
-export { isClass } from "./isClass";
+export * as Checkers from "./checkers";
 
 /**
- * Random
+ * I just don’t know how to “name them” correctly, so they will be in `Other`. 
  * 
- * Function a random values from a given range
+ * Here are those utilities that I could not send to a certain group (new ones may be added)
  */
-export { random } from "./random";
+export * as Other from "./other";
 

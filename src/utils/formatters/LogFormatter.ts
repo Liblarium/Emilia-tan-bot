@@ -2,20 +2,23 @@ import { Enums } from "@constants";
 import { inspect } from "node:util";
 import { LineType, TypeLog } from "@type/constants/log";
 import { Formatters, emiliaError, Decorators } from "@utils";
+import { FormatterLogOption, FormattingConsoleOptions } from "@type/utils/logFormatter";
 
 export class LogFormatter {
-
   /**
    * Formats a log message with the given text, type and category.
-   * @param {unknown} text - The text to log. Can be an object or a string.
-   * @param {string} type - The type of the log. I.e. 'info', 'error', 'warning', 'debug' or 'test'.
-   * @param {string} category - The category of the log. I.e. 'global', 'database' or any other category.
-   * @param {boolean} [date=false] - If true, adds the date to the log message with date and time with `dateAndTime()`. If false or undefined, only adds the time with `time()`.
+   * @param {FormatterLogOption} options - Options for formatting the log message.
+   * @param {unknown} options.text - The text to log. Can be an object or a string.
+   * @param {string} options.type - The type of the log. I.e. 'info', 'error', 'warning', 'debug' or 'test'.
+   * @param {string} options.category - The category of the log. I.e. 'global', 'database' or any other category.
+   * @param {boolean} [options.date=false] - If true, adds the date to the log message with date and time with `dateAndTime()`. If false or undefined, only adds the time with `time()`.
+   * @param {(...args: unknown[]) => string} [options.processingLine] - A function to process the log message before logging.
    * @returns {string} The formatted log message as a string.
    */
-  static formatterLog(text: unknown, type: string, category: string, date?: boolean): string {
+  static formatterLog({ text, type, category, date = false, processingLine }: FormatterLogOption): string {
     const formattedText = typeof text === "object" ? inspect(text) : String(text);
-    return `[${date ? Formatters.dateAndTime() : Formatters.time()}][${category.toUpperCase()} | ${type}]: ${formattedText}\n`;
+    const result = `[${date ? Formatters.dateAndTime() : Formatters.time()}][${category.toUpperCase()} | ${type}]: ${formattedText}\n`;
+    return processingLine ? processingLine(result) : result;
   }
 
   /**
@@ -28,17 +31,17 @@ export class LogFormatter {
    * setType(5); // "test"
    * setType(0); // EmiliaError: Невідомий тип логу: 0
    */
-  @Decorators.logCaller
+  @Decorators.logCaller()
   static formatterType(type: TypeLog & number | string): TypeLog | undefined {
-    // Якщо тип уже є рядком і відповідає одному з допустимих значень:
+    // If the type is already a string and matches one of the allowed values:
     if (typeof type === "string" && Object.values(Enums.LogType).includes(type as Enums.LogType)) {
       return type as TypeLog;
     }
 
-    // Щоб не повторювати Enums.LogType кожного разу
+    // To avoid repeating Enums.LogType every time
     const { LogType } = Enums;
-
-    // Якщо надається число, можна зробити перетворення за допомогою мапи:
+    // thanks to 
+    // If a number is provided, you can convert it using a map:
     const typeMap: Record<number, TypeLog> = {
       1: LogType.Info,
       2: LogType.Error,
@@ -52,11 +55,10 @@ export class LogFormatter {
     throw emiliaError(`Невідомий тип логу: ${type}`, "TypeError");
   }
 
-
   /**
    * Formats and logs a console message with the given parameters.
    *
-   * @param {object} params - The parameters for formatting and logging.
+   * @param {FormattingConsoleOptions} params - The parameters for formatting and logging.
    * @param {unknown} params.message - The log message. Can be an object or a string.
    * @param {LineType} params.line - The line type for formatting the log message.
    * @param {TypeLog} params.type - The type of the log.
@@ -67,15 +69,12 @@ export class LogFormatter {
    *
    * @returns {void}
    */
-  static formattingConsole({ message, line, type, category, event, logs, getTime = Formatters.time }: { message: unknown, line: LineType, type: TypeLog, category: string, logs?: boolean, event?: boolean, getTime?: () => string }): void {
+  static formattingConsole({ message, line, type, category, event, logs, getTime = Formatters.time }: FormattingConsoleOptions): void {
     const logText = this.formatLogText(message);
     const editText = this.formatEventText(logText.in, event, type);
 
-    if (logs) {
-      console.log(`${line.news}[${getTime()}][${category} | ${typeof type === "number" ? type.toString() : type}]: ${editText}`, logText.out, line.last);
-    }
+    if (logs) console.log(`${line.news}[${getTime()}][${category} | ${typeof type === "number" ? type.toString() : type}]: ${editText}`, logText.out, line.last);
   }
-
 
   /**
    * Formats the log text based on the message type.
