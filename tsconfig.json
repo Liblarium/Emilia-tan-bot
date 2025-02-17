@@ -26,6 +26,9 @@
       "@constants": [
         "src/constants/index.ts"
       ],
+      "@db": [
+        "src/database/index.ts"
+      ],
       "@utils": [
         "src/utils/index.ts"
       ],

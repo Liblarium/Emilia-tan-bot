@@ -5,7 +5,7 @@
 import { addAliases } from "module-alias";
 
 // Define the aliases for the folders in your codebase
-addAliases({ //aliases
+addAliases({ //aliases 
   "@handlers": `${__dirname}/handlers`,
   "@type": `../${__dirname}/types`,
   "@client": `${__dirname}/client`,
@@ -13,6 +13,7 @@ addAliases({ //aliases
   "@utils": `${__dirname}/utils`,
   "@log": `${__dirname}/log`,
   "@interaction": `${__dirname}/interaction`,
+  "@db": `${__dirname}/database`,
 });
 
 // Register the aliases
