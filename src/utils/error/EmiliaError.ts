@@ -24,5 +24,9 @@ class EmiliaError {
 }
 /**
  * Singleton instance of EmiliaError
+ * @param {string} message - Error message
+ * @param {string} [errorType] - Error type
+ * @param {() => string} [getTime] - Function to get the time
+ * @returns {EmiliaAbstractError} - Error object
  */
 export const emiliaError = new EmiliaError().createError;
