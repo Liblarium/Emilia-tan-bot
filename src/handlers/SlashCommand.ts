@@ -32,7 +32,7 @@ export class SlashCommand {
     if (slash_command.option.developer && interaction.user.id !== "211144644891901952") {
       return interaction.reply({ content: "Эта команда доступна только разработчику бота.", ephemeral: true });
     }
-    interaction.member?.user;
+
     await slash_command.execute(interaction, client);
   }
 }

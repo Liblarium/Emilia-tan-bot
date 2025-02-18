@@ -2,7 +2,7 @@ import { readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { EmiliaClient } from "@client";
 import type { ArrayMaybeEmpty, ArrayPathLimit } from "@type";
-import { isClass, Decorators } from "@utils";
+import { Checkers, Decorators } from "@utils";
 import { ModuleType } from "@type/handler";
 import { Log } from "@log";
 
@@ -78,7 +78,7 @@ export abstract class AbstractHandler {
    * 
    * If any errors occur during the build process, it will log the error.
    */
-  @Decorators.logCaller
+  @Decorators.logCaller()
   protected async build(): Promise<void> {
     const foldersScan = await this.scanFolder();
 
@@ -89,7 +89,7 @@ export abstract class AbstractHandler {
         for (const file of fileScan) {
           const FileModule = (await this.importModule(folder, file)).default.default;
 
-          if (!isClass(FileModule)) {
+          if (!Checkers.isClass(FileModule)) {
             new Log({ text: `Файл ${file} не является классом!`, type: 2, categories: ["global", "handler"] });
             continue;
           }

@@ -103,7 +103,8 @@ model Guild {
   voiceCategory BigInt       @db.BigInt
   addInBD       Boolean      @default(false) @db.Boolean
   logModule     Boolean      @default(false) @db.Boolean
-  levelModule   Boolean      @default(false) @db.Boolean
+  levelModule   Boolean      @default(false) @db.Boolean // locaLevel on server. Has no effect on the global level
+  globalLevel   Boolean      @default(false) @db.Boolean // global level. Has no effect on the local level
   logIntents    Int          @default(0) @db.Integer
   message       Json         @default("{}") @db.JsonB
   channel       Json         @default("{}") @db.JsonB

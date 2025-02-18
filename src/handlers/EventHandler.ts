@@ -34,7 +34,7 @@ export class EventHandler extends Abstract.AbstractHandler {
    * 
    * @throws Will log errors but not throw them, returning null instead.
    */
-  @Decorators.logCaller
+  @Decorators.logCaller()
   setLogic(event: Abstract.AbstractEvent): null | void {
     const client = this.client;
 
@@ -70,5 +70,4 @@ export class EventHandler extends Abstract.AbstractHandler {
       return null;
     }
   }
-
 }
