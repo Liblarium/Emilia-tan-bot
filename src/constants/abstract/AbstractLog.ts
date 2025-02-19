@@ -1,7 +1,9 @@
-import { Formatters } from "@utils";
-import { AddLogResult, BaseLogOptions, TypeLog, TypeText } from "@type/constants/log";
+import { Decorators, Formatters } from "@utils";
+import { AddLogResult, BaseLogOptions, LogEntry, TypeLog, TypeText } from "@type/constants/log";
 import { InlineType, LogType } from "../enum";
 import { FileHandler } from "@handlers/FileHandler";
+import { resolve } from "node:path";
+import fs from "node:fs/promises";
 
 const { LogFormatter, date, time } = Formatters;
 const baseLogPath = process.env.BASE_LOG_PATH ?? "logs";
@@ -39,6 +41,24 @@ export abstract class AbstractLog {
    * @default "other"
    */
   protected category: string;
+  /**
+   * Metadata of log
+   * @default undefined
+   */
+  protected metadata?: object;
+  /**
+   * Context of log
+   * @default {}
+   */
+  protected context?: object = {};
+  /**
+   * Timestamp of log. Used on metadata for logs. Default is current timestamp
+   */
+  protected timestamp = new Date().toISOString();
+  /**
+   * Tags of log. Used on metadata for logs. Default is empty array)
+   */
+  protected tags: string[];
 
 
   /**
@@ -50,14 +70,19 @@ export abstract class AbstractLog {
    * @param {boolean} [options.event=false] - Indicates if the log entry is an event.
    * @param {boolean} [options.logs=true] - Indicates if logging is enabled.
    * @param {number} [options.inline=0] - The inline level of the log entry.
+   * @param {object} [options.metadata=undefined] - The metadata object for the log entry.
+   * @param {object} [options.context={}] - The context object for the log entry (optional if no context is provided).
    */
-  constructor({ text = "{Nothing specified}", type = LogType.Info, event = false, logs = true, inline = 0 }: BaseLogOptions) {
+  constructor({ text = "{Nothing specified}", type = LogType.Info, event = false, logs = true, inline = 0, metadata, context = {}, tags = [] }: BaseLogOptions) {
     this.text = text;
     this.logs = logs;
     this.type = type;
     this.inline = inline;
     this.event = event;
     this.category = "other";
+    this.metadata = metadata;
+    this.context = context;
+    this.tags = tags;
 
     // The method is asynchronous, so it must be called in the constructor using `.catch()`
     this.initialize().catch(error);
@@ -67,6 +92,7 @@ export abstract class AbstractLog {
    * Initialize the log by checking and creating the base log folder if necessary.
    * @returns {Promise<void>}
    */
+  @Decorators.logCaller()
   private async initialize(): Promise<void> {
     try {
       // Check if base log folder exists
@@ -87,7 +113,9 @@ export abstract class AbstractLog {
    * Method for change category of log
    * @param category - Category of log
    */
-  protected setCategory(category: string): void { if (typeof category === "string") this.category = category; }
+  protected setCategory(category: string): void {
+    if (typeof category === "string") this.category = category;
+  }
 
   /**
    * Method for adding a log to a file.
@@ -119,17 +147,116 @@ export abstract class AbstractLog {
     const type = editType.toString().toLowerCase();
     const category = this.category.toLowerCase();
 
-    const appendFile = await FileHandler.appendFile(`${baseLogPath}/${category}/${category}-${date()}.log`, LogFormatter.formatterLog({ text, type, category }));
+    const logFilePath = `${baseLogPath}/${category}/${category}-${date()}.log`;
+    let fullText = "";
 
-    if (appendFile.error) {
-      error(appendFile.error);
-      return {
-        success: false,
-        error: "Failed to write log to file",
-      };
+    [text, this.metadataMerge()].forEach((data, ind) => {
+      fullText += LogFormatter.formatterLog({ text: data, type: ind === 0 ? type : "metadata", category });
+    });
+
+    try {
+      const appendFile = await FileHandler.appendFile(logFilePath, fullText);
+
+      if (appendFile.error) {
+        error(appendFile.error);
+        return {
+          success: false,
+          error: "Failed to write log to file",
+        };
+      }
+
+      return { success: true };
+    } catch (e) {
+      error(`AbstractLog.addLog: ${e instanceof Error ? e.message : 'Unknown error'}`);
+
+      return { success: false, error: "Failed to write log to file" };
+    }
+  }
+
+  /**
+ * Method for searching logs by tags.
+ * @param tags - The tags to search by.
+ * @returns {Promise<LogEntry[]>} - A promise that resolves with an array of log entries matching the tags.
+ */
+  public async searchLogsByTags(tags: string[]): Promise<LogEntry[]> {
+    const logEntries: LogEntry[] = [];
+    const logFiles = await this.getLogFiles();
+
+    for (const file of logFiles) {
+      const logs = await this.readLogFile(file);
+      for (const log of logs) {
+        if (tags.every(tag => log.tags.includes(tag))) {
+          logEntries.push(log);
+        }
+      }
     }
 
-    return { success: true };
+    return logEntries;
+  }
+
+  /**
+   * Method for filtering logs by tags.
+   * @param tags - The tags to filter by.
+   * @returns {Promise<LogEntry[]>} - A promise that resolves with an array of log entries matching the tags.
+   */
+  public async filterLogsByTags(tags: string[]): Promise<LogEntry[]> {
+    const logEntries: LogEntry[] = [];
+    const logFiles = await this.getLogFiles();
+
+    for (const file of logFiles) {
+      const logs = await this.readLogFile(file);
+      for (const log of logs) {
+        if (tags.some(tag => log.tags.includes(tag))) {
+          logEntries.push(log);
+        }
+      }
+    }
+
+    return logEntries;
+  }
+
+  /**
+   * Helper method to get all log files.
+   * @returns {Promise<string[]>} - A promise that resolves with an array of log file paths.
+   */
+  private async getLogFiles(): Promise<string[]> {
+    const logDir = resolve(baseLogPath);
+    const files = await fs.readdir(logDir);
+    return files.filter(file => file.endsWith('.log')).map(file => resolve(logDir, file));
+  }
+
+  /**
+   * Helper method to read a log file and parse its entries.
+   * @param filePath - The path to the log file.
+   * @returns {Promise<LogEntry[]>} - A promise that resolves with an array of log entries.
+   */
+  private async readLogFile(filePath: string): Promise<LogEntry[]> {
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    const logEntries: LogEntry[] = fileContent.split('\n').filter(line => line.trim()).map(line => JSON.parse(line));
+
+    return logEntries;
+  }
+
+  /**
+   * Merges metadata, timestamp, tags, and context into a single object.
+   * 
+   * This private method combines various properties of the class instance
+   * into a single metadata object. It ensures that the timestamp is always
+   * included, and conditionally adds tags and context if they are present.
+   * 
+   * @returns {object} An object containing the merged metadata under the 'metadata' key.
+   *                   The returned object has the following structure:
+   *                   { metadata: { ...mergedProperties } }
+   */
+  private metadataMerge(): { metadata: object } {
+    const { metadata, timestamp, tags, context } = this;
+
+    let metadataResult: object = metadata ? { ...metadata, timestamp } : { timestamp };
+
+    if (tags.length > 0) metadataResult = { ...metadataResult, tags };
+    if (context && Object.keys(context).length > 0) metadataResult = { ...metadataResult, context };
+
+    return { metadata: { ...metadataResult } };
   }
 
   /**

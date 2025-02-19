@@ -1,7 +1,6 @@
 import { Enums } from "@constants";
-import { inspect } from "node:util";
 import { LineType, TypeLog } from "@type/constants/log";
-import { Formatters, emiliaError, Decorators } from "@utils";
+import { Formatters, Checkers, emiliaError, Decorators } from "@utils";
 import { FormatterLogOption, FormattingConsoleOptions } from "@type/utils/logFormatter";
 
 export class LogFormatter {
@@ -16,8 +15,9 @@ export class LogFormatter {
    * @returns {string} The formatted log message as a string.
    */
   static formatterLog({ text, type, category, date = false, processingLine }: FormatterLogOption): string {
-    const formattedText = typeof text === "object" ? inspect(text) : String(text);
+    const formattedText = Checkers.isObject(text) ? ObjectToString(text) : typeof text === "string" ? text : String(text);
     const result = `[${date ? Formatters.dateAndTime() : Formatters.time()}][${category.toUpperCase()} | ${type}]: ${formattedText}\n`;
+
     return processingLine ? processingLine(result) : result;
   }
 
@@ -40,7 +40,7 @@ export class LogFormatter {
 
     // To avoid repeating Enums.LogType every time
     const { LogType } = Enums;
-    // thanks to 
+
     // If a number is provided, you can convert it using a map:
     const typeMap: Record<number, TypeLog> = {
       1: LogType.Info,
@@ -73,7 +73,7 @@ export class LogFormatter {
     const logText = this.formatLogText(message);
     const editText = this.formatEventText(logText.in, event, type);
 
-    if (logs) console.log(`${line.news}[${getTime()}][${category} | ${typeof type === "number" ? type.toString() : type}]: ${editText}`, logText.out, line.last);
+    if (logs) console.log(`${line.news}[${getTime()}][${category} | ${typeof type === "number" ? this.formatterType(type) : type}]: ${editText}`, logText.out, line.last);
   }
 
   /**
@@ -83,8 +83,8 @@ export class LogFormatter {
    */
   private static formatLogText(message: unknown): { in: string, out: unknown } {
     return {
-      in: typeof message === "object" ? "" : typeof message === "string" ? message : `${message}`,
-      out: typeof message === "object" ? message : "",
+      in: Checkers.isObject(message) ? "" : typeof message === "string" ? message : String(message),
+      out: Checkers.isObject(message) ? message : "",
     };
   }
 
@@ -98,10 +98,12 @@ export class LogFormatter {
   private static formatEventText(text: string, event?: boolean, type?: TypeLog): string {
     if (event && text.length > 0 && type !== "error") {
       const splits = text.split(":");
+
       if (splits.length > 0) {
         return text.slice(splits[0].length + 2);
       }
     }
+
     return text;
   }
 
@@ -120,4 +122,8 @@ export class LogFormatter {
       last: inline === 2 || inline === 3 ? "\n" : "",
     };
   }
+}
+
+function ObjectToString(context: object) {
+  throw new Error("Function not implemented.");
 }

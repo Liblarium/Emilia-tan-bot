@@ -1,7 +1,10 @@
 import { Decorators, emiliaError, Transforms } from "@utils";
 import { db } from "@client";
-import { CreateLevelOptions, UpdateGlobalLevelOptions, UpdateLevelLogicData, UpdateLevelOptions, UpdateLevelType, UpdateLocalLevelOptions } from "@type/database/levelManage";
+import { CreateLevelOptions, UpdateGlobalLevelOptions, UpdateLevelData, UpdateLevelType, UpdateLocalLevelOptions, IGlobalLevel, ILocalLevel } from "@type/database/levelManage";
 
+/**
+ * Handles the logic for managing levels in the database.
+ */
 export class LevelManager {
   /**
    * The next time (in milliseconds) that the user can gain experience points.
@@ -26,7 +29,7 @@ export class LevelManager {
 
     if (!guildCheck) return; // if not found or see in guildCheck method
 
-    const { globalLevel, localLevel } = await this.getLevelId(id, guildId);
+    const [globalLevel, localLevel] = await Promise.all([this.getGlobalLevelId(id), this.getLocalLevelId(id, guildId)]);
 
     // Create on Global/LocalLevel table new user if not found
     if (!globalLevel && guildCheck.globalLevel) await this.createGlobalLevel(Transforms.stringToBigInt(id));
@@ -36,46 +39,37 @@ export class LevelManager {
   }
 
   /**
-   * Updates the level information for a user, either globally or locally within a guild.
-   * 
-   * @param options - The options for updating the level.
-   * @param options.id - The unique identifier of the user.
-   * @param options.guildId - The unique identifier of the guild.
-   * @param options.data - The data to update in the level record.
-   * @param options.type - The type of level update, either "global" or "local".
+   * Updates the global level for a user. If the user does not exist in the
+   * global level table, a new entry is created. Otherwise, the existing
+   * entry is updated with the new data.
+   *
+   * @param {UpdateGlobalLevelOptions} options - The options for the update.
+   * @param {string} options.id - The unique identifier of the user.
+   * @param {UpdateGlobalLevelData} options.data - The data to be updated in the level record.
+   * @throws {Error} If the id is empty or data object is empty.
    * @returns A promise that resolves when the update operation is complete.
    */
-  public async updateLevel({ id, guildId, data, type }: UpdateGlobalLevelOptions): Promise<void>
-  public async updateLevel({ id, guildId, data, type }: UpdateLocalLevelOptions): Promise<void>;
   @Decorators.logCaller()
-  public async updateLevel({ id, guildId, data, type }: UpdateLevelOptions): Promise<void> {
-    const guildCheck = await this.guildCheck(guildId);
+  public async updateGlobalLevel({ id, data }: UpdateGlobalLevelOptions): Promise<void> {
+    const globalLevel = await this.getGlobalLevelId(id);
 
-    if (!guildCheck) return;
-
-    const { globalLevel, localLevel } = await this.getLevelId(id, guildId);
-
-    const tasks: unknown[] = [];
-
-    if (guildCheck.globalLevel && type === "global") {
-      if (globalLevel) {
-        tasks.push(this.updateLevelLogic(id, type, data));
-      } else {
-        tasks.push(this.createGlobalLevel(Transforms.stringToBigInt(id)));
-      }
+    if (globalLevel) {
+      await this.updateLevelLogic(id, "global", data);
+    } else {
+      await this.createGlobalLevel(Transforms.stringToBigInt(id));
     }
-
-    if (guildCheck.levelModule && type === "local") {
-      if (localLevel) {
-        tasks.push(this.updateLevelLogic(localLevel.id.toString(), type, data));
-      } else {
-        tasks.push(this.createLocalLevel(Transforms.stringToBigInt(id), Transforms.stringToBigInt(guildId)));
-      }
-    }
-
-    await Promise.all(tasks);
   }
 
+  @Decorators.logCaller()
+  public async updateLocalLevel({ id, guildId, data }: UpdateLocalLevelOptions): Promise<void> {
+    const localLevel = await this.getLocalLevelId(id, guildId);
+
+    if (localLevel) {
+      await this.updateLevelLogic(localLevel.id.toString(), "local", data);
+    } else {
+      await this.createLocalLevel(Transforms.stringToBigInt(id), Transforms.stringToBigInt(guildId));
+    }
+  }
 
   /**
    * Updates the level logic for a user, either globally or locally.
@@ -87,20 +81,20 @@ export class LevelManager {
    * @returns A promise that resolves when the update operation is complete.
    */
   @Decorators.logCaller()
-  private async updateLevelLogic(id: string, type: UpdateLevelType, data: UpdateLevelLogicData): Promise<void> {
+  private async updateLevelLogic(id: string, type: UpdateLevelType, data: UpdateLevelData): Promise<void> {
     if (!id || id.length === 0) throw emiliaError("[LevelManager.updateLevel(logic)]: Id is required!", "TypeError");
     if (!data || Object.keys(data).length === 0) throw emiliaError("[LevelManager.updateLevel(logic)]: Data is required!", "TypeError");
 
-    // There - is no need to update. Or DRY). I know about any. This any need there)
-    const updater = (type === "global" ? db.globalLevel : db.localLevel) as any;
+    // This is a place to "choose" which table with levels will be updated. In our case it is Global and Local
+    const updater: IGlobalLevel | ILocalLevel = type === "global" ? db.globalLevel : db.localLevel;
 
+    // Update the level in the chosen table, select only the id column to return it.
     await updater.update({
       where: { id: Transforms.stringToBigInt(id) },
       data,
       select: { id: true }
     });
   }
-
 
   /**
    * Deletes the global level information for a user.
@@ -116,7 +110,6 @@ export class LevelManager {
     await db.globalLevel.delete({ where: { id: Transforms.stringToBigInt(id) } });
   }
 
-
   /**
    * Deletes the local level information for a user in a specific guild.
    * 
@@ -130,7 +123,7 @@ export class LevelManager {
     if (!id || id.length === 0) throw emiliaError("[LevelManager.deleteLocalLevel]: Id is required!", "TypeError");
     if (!guildId || guildId.length === 0) throw emiliaError("[LevelManager.deleteLocalLevel]: GuildId is required!", "TypeError");
 
-    const { localLevel } = await this.getLevelId(id, guildId);
+    const localLevel = await this.getLocalLevelId(id, guildId);
 
     if (!localLevel) return;
 
@@ -138,28 +131,39 @@ export class LevelManager {
   }
 
   /**
-   * Retrieves the global and local level information for a user in a specific guild.
+   * Gets the global level ID for a user by their unique identifier.
+   * 
+   * @param id - The unique identifier of the user as a string.
+   * @throws {TypeError} If the id is empty or not provided.
+   * @returns A promise that resolves with the global level ID as a BigInt.
+   */
+  @Decorators.logCaller()
+  private async getGlobalLevelId(id: string) {
+    if (!id || id.length === 0) throw emiliaError("[LevelManager.getGlobalLevelId]: Id is required!", "TypeError");
+
+    const bigId = Transforms.stringToBigInt(id);
+
+    return db.globalLevel.findFirst({ where: { id: bigId }, select: { id: true } });
+  }
+
+  /**
+   * Gets the local level ID for a user in a specific guild by their unique identifier and guild ID.
    * 
    * @param id - The unique identifier of the user as a string.
    * @param guildId - The unique identifier of the guild as a string.
-   * @returns A Promise that resolves to an object containing:
-   *          - globalLevel: The global level information for the user (null if not found).
-   *          - localLevel: The local level information for the user in the specified guild (null if not found).
+   * @throws {TypeError} If the id or guildId is empty or not provided.
+   * @returns A promise that resolves with the local level ID as a BigInt.
    */
   @Decorators.logCaller()
-  private async getLevelId(id: string, guildId: string) {
-    const bigId = Transforms.stringToBigInt(id); // transform string id to bigint
-    const bigGuildId = Transforms.stringToBigInt(guildId); // transform string id to bigint
+  private async getLocalLevelId(id: string, guildId: string) {
+    if (!id || !guildId || id.length === 0 || guildId.length === 0) throw emiliaError("[LevelManager.getLocalLevelId]: id and guildId is required!", "TypeError");
 
-    const select = { id: true };
+    const bigId = Transforms.stringToBigInt(id);
+    const bigGuildId = Transforms.stringToBigInt(guildId);
+
     const AND: ({ userId: bigint } | { guildId: bigint })[] = [{ userId: bigId }, { guildId: bigGuildId }];
 
-    const [globalLevel, localLevel] = await Promise.all([
-      db.globalLevel.findFirst({ where: { id: bigId }, select }),
-      db.localLevel.findFirst({ where: { AND }, select })
-    ]);
-
-    return { globalLevel, localLevel };
+    return db.localLevel.findFirst({ where: { AND }, select: { id: true } });
   }
 
   /**

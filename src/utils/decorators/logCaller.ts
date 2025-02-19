@@ -20,6 +20,7 @@ import { LogCallerErrorLogicArgs, LogCallerOptions } from "@type/utils/logCaller
  * 
  * ## Example usage:
  * @example
+ * ```ts
  * class MyClass {
  *   *@logCaller()* // don't use **
  *   myMethod() {
@@ -36,6 +37,7 @@ import { LogCallerErrorLogicArgs, LogCallerOptions } from "@type/utils/logCaller
  * const myClass = new MyClass();
  * console.log(myClass.myMethods("5", 1)); // -> 51 or error lol
  * // (your formate log): "5" 1
+ * ```
  */
 export function logCaller(options?: LogCallerOptions): MethodDecorator {
   return (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
