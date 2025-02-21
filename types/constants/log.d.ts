@@ -71,20 +71,6 @@ export type TypeText = string | number | object | unknown[] | unknown;
 export type CheckFormatFileResult = { success: boolean; error?: string };
 
 /**
- * Result of adding a new log file
- */
-export interface AddLogResult {
-  /**
-   * Path to log file if added successfully
-   */
-  success: boolean;
-  /**
-   * If have a error
-   */
-  error?: string;
-};
-
-/**
  * Interface for a log entry
  */
 export interface LogEntry {

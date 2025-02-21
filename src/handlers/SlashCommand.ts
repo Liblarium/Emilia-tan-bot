@@ -1,8 +1,15 @@
-import { EmiliaClient } from "@client";
-import { emiliaError, Decorators } from "@utils";
-import { ChatInputCommandInteraction } from "discord.js";
+import type { EmiliaClient } from "@client";
+import type { ArrayNotEmpty } from "@type";
+import { Decorators, emiliaError } from "@utils";
+import type { ChatInputCommandInteraction } from "discord.js";
 
 export class SlashCommand {
+  /**
+   * The category of the log entry.
+   * @type {ArrayNotEmpty<string>}
+   */
+  logCategories: ArrayNotEmpty<string> = ["event", "handler"];
+
   constructor(interaction: ChatInputCommandInteraction, client: EmiliaClient) {
     this.execute(interaction, client);
   }
@@ -20,17 +27,29 @@ export class SlashCommand {
    * developers, it will reply with an appropriate message. Otherwise, it executes the command.
    */
   @Decorators.logCaller()
-  private async execute(interaction: ChatInputCommandInteraction, client: EmiliaClient): Promise<unknown> {
+  private async execute(
+    interaction: ChatInputCommandInteraction,
+    client: EmiliaClient,
+  ): Promise<unknown> {
     if (!client) throw emiliaError("Client must be initialized!");
     if (!interaction.isChatInputCommand()) return;
 
     const slash_command = client.slashCommand.get(interaction.commandName);
 
     if (!slash_command) {
-      return interaction.reply({ content: "Такой команды нет или она не попала в список команд.", ephemeral: true });
+      return interaction.reply({
+        content: "Такой команды нет или она не попала в список команд.",
+        ephemeral: true,
+      });
     }
-    if (slash_command.option.developer && interaction.user.id !== "211144644891901952") {
-      return interaction.reply({ content: "Эта команда доступна только разработчику бота.", ephemeral: true });
+    if (
+      slash_command.option.developer &&
+      interaction.user.id !== "211144644891901952"
+    ) {
+      return interaction.reply({
+        content: "Эта команда доступна только разработчику бота.",
+        ephemeral: true,
+      });
     }
 
     await slash_command.execute(interaction, client);

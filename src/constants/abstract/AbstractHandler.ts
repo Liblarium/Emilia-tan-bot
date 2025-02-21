@@ -1,12 +1,10 @@
 import { readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { EmiliaClient } from "@client";
-import type { ArrayMaybeEmpty, ArrayPathLimit } from "@type";
-import { Checkers, Decorators } from "@utils";
-import { ModuleType } from "@type/handler";
 import { Log } from "@log";
-
-
+import type { ArrayMaybeEmpty, ArrayNotEmpty, ArrayPathLimit } from "@type";
+import type { ModuleType } from "@type/handler";
+import { Checkers, Decorators } from "@utils";
 
 export abstract class AbstractHandler {
   /**
@@ -24,10 +22,12 @@ export abstract class AbstractHandler {
    */
   protected filterFile: RegExp;
 
+  public readonly logCategories: ArrayNotEmpty<string> = ["handler"];
+
   /**
    * The constructor for the handler class.
    * @param client - The client which the handler is attached to.
-   * 
+   *
    * The handler will look for files in the "dist/command" directory and will filter them by the regular expression `^[^.]+\.(js)$`.
    */
   constructor(client: EmiliaClient) {
@@ -51,31 +51,35 @@ export abstract class AbstractHandler {
    * @default ["dist","command"]
    * @returns {void}
    */
-  public setFolderPath(path: ArrayPathLimit): void | null | Promise<void | null> {
+  public setFolderPath(
+    path: ArrayPathLimit,
+  ): void | null | Promise<void | null> {
     if (path) this.folderPath = path;
   }
 
-  /** 
+  /**
    * Method for working with commands/events
    * @param folder
    * @param file
    * @returns {Promise<ModuleType>}
-  */
-  protected abstract setLogic(modules: ModuleType): void | null | Promise<void | null>;
+   */
+  protected abstract setLogic(
+    modules: ModuleType,
+  ): void | null | Promise<void | null>;
 
   /**
    * Build method for the handler class.
    *
    * This method will look for folders in the directory specified by the `folderPath` property.
-   * 
+   *
    * It will then look for files in each of those folders and filter them by the regular expression specified by the `filterFile` property.
-   * 
+   *
    * It will then import each of the filtered files and check if they are classes.
-   * 
+   *
    * If they are, it will create an instance of the class and pass it to the `setLogic` method.
-   * 
+   *
    * If the `setLogic` method returns `null`, it will skip the file.
-   * 
+   *
    * If any errors occur during the build process, it will log the error.
    */
   @Decorators.logCaller()
@@ -84,20 +88,31 @@ export abstract class AbstractHandler {
 
     try {
       for (const folder of foldersScan) {
-        const fileScan = (await this.scanFolder(folder)).filter((file) => this.filterFile.test(file));
+        const fileScan = (await this.scanFolder(folder)).filter((file) =>
+          this.filterFile.test(file),
+        );
 
         for (const file of fileScan) {
-          const FileModule = (await this.importModule(folder, file)).default.default;
+          const FileModule = (await this.importModule(folder, file)).default
+            .default;
 
           if (!Checkers.isClass(FileModule)) {
-            new Log({ text: `Файл ${file} не является классом!`, type: 2, categories: ["global", "handler"] });
+            new Log({
+              text: `Файл ${file} не является классом!`,
+              type: 2,
+              categories: ["global", "handler"],
+            });
             continue;
           }
 
           const modules: ModuleType = new FileModule();
           const logic = await this.setLogic(modules);
           // TODO: delete this Log later. Now - for debug
-          new Log({ text: `Модуль ${file} успешно загружен!`, type: 1, categories: ["global", "handler"] });
+          new Log({
+            text: `Модуль ${file} успешно загружен!`,
+            type: 1,
+            categories: ["global", "handler"],
+          });
 
           if (logic === null) continue;
         }
@@ -126,10 +141,10 @@ export abstract class AbstractHandler {
 
   /**
    * Imports a module from the specified folder and file.
-   * 
+   *
    * Constructs the full path to the module using the folderPath property,
    * and then dynamically imports the module.
-   * 
+   *
    * @param folder - The folder where the file is located.
    * @param file - The file to import from the specified folder.
    * @returns The default export of the imported module.

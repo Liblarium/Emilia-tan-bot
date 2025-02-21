@@ -1,8 +1,10 @@
-import { CommandArguments, CommandOptions } from "@type/constants/command";
 import { Abstract, Enums } from "@constants";
+import type { CommandArguments, CommandOptions } from "@type/constants/command";
 import { SlashCommandBuilder } from "discord.js";
 
-export abstract class AbstractBaseCommand extends Abstract.AbstractAction {
+const { AbstractAction } = Abstract;
+
+export abstract class AbstractBaseCommand extends AbstractAction {
   /**
    * @see {@link https://discord.com/developers/docs/interactions/application-commands#application-command-object official Discord API documentation}. If you need more information about Discord API
    *

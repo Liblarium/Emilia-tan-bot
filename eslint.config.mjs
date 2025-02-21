@@ -8,18 +8,20 @@ export default [
   {
     ignores: [
       "node_modules",
-      "srcJs/*",
+      "dist/*",
       "biome.json",
       "tsconfig.json",
       "package.json",
-      ".{js,json,cjs,yaml,yml}",
+      "jest.config.js",
       "*/**/*.deprecation",
       "tsconfig.*.json",
       "prisma/*",
       "eslint.config.mjs",
-      "pg.client.js",
       "oldCode",
-      "dist"
+      "dist",
+      "sanbox/*",
+      "__tests__/*",
+      "types"
     ]
   },
   pluginJs.configs.recommended,
@@ -28,7 +30,7 @@ export default [
     plugins: {
       "@typescript-eslint": tsplugin,
     },
-    files: ["src/**/*.ts", "types/**/*.d.ts"],
+    files: ["src/**/*.ts"],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
@@ -38,7 +40,7 @@ export default [
         ...globals.browser,
         ...globals.node,
         ...globals.builtin,
-        ...globals.es2020
+        ...globals.es2025
       }
     },
     rules: {

@@ -1,9 +1,9 @@
 
-import { Abstract, Enums, prefix } from "@constants";
-import { EmiliaClient } from "@client";
-import { REST, Routes } from "discord.js";
+import type { EmiliaClient } from "@client";
+import { Abstract, Config, Enums } from "@constants";
 import { Log } from "@log";
-import { Decorators, emiliaError, Other } from "@utils";
+import { Decorators, Other, emiliaError } from "@utils";
+import { REST, Routes } from "discord.js";
 
 let currentStatusIndex = 0;
 
@@ -25,7 +25,7 @@ export default class Ready extends Abstract.AbstractEvent {
 
     // Register slash commands
     rest.put(Routes.applicationCommands(client.user.id), { body: commands }).then(() => {
-      const text = [`Loaded ${client.command.size} commands`, `Registered ${commands.length} slash commands`, `Loaded ${client.events.size} events`, `Default prefix: ${prefix}`];
+      const text = [`Loaded ${client.command.size} commands`, `Registered ${commands.length} slash commands`, `Loaded ${client.events.size} events`, `Default prefix: ${Config.prefix}`];
 
       // Log the loaded commands and events
       for (const arr of text) {

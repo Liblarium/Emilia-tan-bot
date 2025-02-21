@@ -10,9 +10,6 @@ export * as Abstract from "./abstract";
 export * as Enums from "./enum";
 
 /**
- * Prefix
- * 
- * Defalt discord bot prefix
- * @type {"++"}
+ * Config properties. These properties are used to configure the bot (not use there bot token! Use .env file to configure bot token)
  */
-export const prefix: `++` = "++";
+export * as Config from "./config";

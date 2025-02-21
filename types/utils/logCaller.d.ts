@@ -1,10 +1,13 @@
+import type { ArrayNotEmpty } from "@type";
 import type { LogOptions } from "@type/log";
 
 export interface LogCallerErrorLogicArgs {
-  target: object;
+  target: ClassWithLogCategories;
   propertyKey: string | symbol;
   error: any;
 }
+
+export type ClassWithLogCategories = { logCategories: ArrayNotEmpty<string> };
 
 /**
  * Options for the `@logCaller` decorator.

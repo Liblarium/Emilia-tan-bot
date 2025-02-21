@@ -47,6 +47,7 @@
     "src",
     "node_modules/@types",
     "types",
+    "__tests__"
   ],
   "exclude": [
     "./node_modules",

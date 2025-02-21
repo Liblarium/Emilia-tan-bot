@@ -1,9 +1,11 @@
-import { Decorators, Formatters } from "@utils";
-import { AddLogResult, BaseLogOptions, LogEntry, TypeLog, TypeText } from "@type/constants/log";
-import { InlineType, LogType } from "../enum";
-import { FileHandler } from "@handlers/FileHandler";
+import { readFile, readdir } from "node:fs/promises";
 import { resolve } from "node:path";
-import fs from "node:fs/promises";
+import type { BaseLogOptions, LogEntry, TypeLog, TypeText } from "@type/constants/log";
+import type { ClassWithValidator, Result } from "@type/utils/file";
+import type { IFileManager } from "@type/utils/fileManager";
+import type { IFileValidator } from "@type/utils/fileValidator";
+import { Checkers, Decorators, Formatters, Managers } from "@utils";
+import { type InlineType, LogType } from "../enum";
 
 const { LogFormatter, date, time } = Formatters;
 const baseLogPath = process.env.BASE_LOG_PATH ?? "logs";
@@ -60,6 +62,12 @@ export abstract class AbstractLog {
    */
   protected tags: string[];
 
+  /** 
+   * Instance of file manager
+   */
+  protected readonly fileManager: IFileManager = new Managers.FileManager(new Checkers.FileValidator());
+
+  readonly fileValidator: IFileValidator = new Checkers.FileValidator();
 
   /**
    * Constructs an instance of the AbstractLog class.
@@ -92,15 +100,15 @@ export abstract class AbstractLog {
    * Initialize the log by checking and creating the base log folder if necessary.
    * @returns {Promise<void>}
    */
-  @Decorators.logCaller()
+  @Decorators.validateFileOperation<ClassWithValidator>()
   private async initialize(): Promise<void> {
     try {
       // Check if base log folder exists
-      const folderCheckResult = await FileHandler.checkFolder(baseLogPath);
+      const folderCheckResult = await this.fileManager.fileValidator.checkFolder(baseLogPath);
 
       // If it doesn't exist, create it
       if (!folderCheckResult.exists) {
-        await FileHandler.createFolder(baseLogPath, '');
+        await this.fileManager.createFolder(baseLogPath, '');
       }
 
       if (typeof this.type === "number") this.type = LogFormatter.formatterType(this.type) ?? LogType.Error;
@@ -127,6 +135,7 @@ export abstract class AbstractLog {
    *
    * @example
    * import { AbstractLog } from "path/to/log/AbstractLog";
+import { FileValidator } from '../../utils/checkers/FileValidator';
    * 
    * class Log extends AbstractLog {
    *   // your code here
@@ -136,7 +145,7 @@ export abstract class AbstractLog {
    * const result = await log.addLog("Log message", LogType.Warning);
    * console.log(result); // { success: true }
    */
-  protected async addLog(text: TypeText, logType: TypeLog): Promise<AddLogResult> {
+  protected async addLog(text: TypeText, logType: TypeLog): Promise<Result> {
     const editType = LogFormatter.formatterType(logType ?? this.type);
 
     if (!editType) return {
@@ -150,14 +159,14 @@ export abstract class AbstractLog {
     const logFilePath = `${baseLogPath}/${category}/${category}-${date()}.log`;
     let fullText = "";
 
-    [text, this.metadataMerge()].forEach((data, ind) => {
+    [text, this.metadata].forEach((data, ind) => {
       fullText += LogFormatter.formatterLog({ text: data, type: ind === 0 ? type : "metadata", category });
     });
 
     try {
-      const appendFile = await FileHandler.appendFile(logFilePath, fullText);
+      const appendFile = await this.fileManager.appendFile(logFilePath, fullText);
 
-      if (appendFile.error) {
+      if (!appendFile.success) {
         error(appendFile.error);
         return {
           success: false,
@@ -165,7 +174,7 @@ export abstract class AbstractLog {
         };
       }
 
-      return { success: true };
+      return appendFile;
     } catch (e) {
       error(`AbstractLog.addLog: ${e instanceof Error ? e.message : 'Unknown error'}`);
 
@@ -221,7 +230,7 @@ export abstract class AbstractLog {
    */
   private async getLogFiles(): Promise<string[]> {
     const logDir = resolve(baseLogPath);
-    const files = await fs.readdir(logDir);
+    const files = await readdir(logDir);
     return files.filter(file => file.endsWith('.log')).map(file => resolve(logDir, file));
   }
 
@@ -231,32 +240,10 @@ export abstract class AbstractLog {
    * @returns {Promise<LogEntry[]>} - A promise that resolves with an array of log entries.
    */
   private async readLogFile(filePath: string): Promise<LogEntry[]> {
-    const fileContent = await fs.readFile(filePath, 'utf-8');
+    const fileContent = await readFile(filePath, 'utf-8');
     const logEntries: LogEntry[] = fileContent.split('\n').filter(line => line.trim()).map(line => JSON.parse(line));
 
     return logEntries;
-  }
-
-  /**
-   * Merges metadata, timestamp, tags, and context into a single object.
-   * 
-   * This private method combines various properties of the class instance
-   * into a single metadata object. It ensures that the timestamp is always
-   * included, and conditionally adds tags and context if they are present.
-   * 
-   * @returns {object} An object containing the merged metadata under the 'metadata' key.
-   *                   The returned object has the following structure:
-   *                   { metadata: { ...mergedProperties } }
-   */
-  private metadataMerge(): { metadata: object } {
-    const { metadata, timestamp, tags, context } = this;
-
-    let metadataResult: object = metadata ? { ...metadata, timestamp } : { timestamp };
-
-    if (tags.length > 0) metadataResult = { ...metadataResult, tags };
-    if (context && Object.keys(context).length > 0) metadataResult = { ...metadataResult, context };
-
-    return { metadata: { ...metadataResult } };
   }
 
   /**
@@ -272,7 +259,7 @@ export abstract class AbstractLog {
     const text = this.text;
     const type: TypeLog = this.type;
     const category = this.category.toLowerCase();
-    const checkFolder = await FileHandler.checkFolder(category);
+    const checkFolder = await this.fileValidator.checkFolder(category);
     const logs = this.logs;
     const line = LogFormatter.formattingLineType(this.inline);
 

@@ -1,9 +1,18 @@
 import { Enums } from "@constants";
-import { LineType, TypeLog } from "@type/constants/log";
-import { Formatters, Checkers, emiliaError, Decorators } from "@utils";
-import { FormatterLogOption, FormattingConsoleOptions } from "@type/utils/logFormatter";
+import type { ArrayNotEmpty } from "@type";
+import type { LineType, TypeLog } from "@type/constants/log";
+import type {
+  FormatterLogOption,
+  FormattingConsoleOptions,
+} from "@type/utils/logFormatter";
+import { Checkers, Decorators, Formatters, emiliaError } from "@utils";
 
 export class LogFormatter {
+  static readonly logCategories: ArrayNotEmpty<string> = [
+    "utils",
+    "formatters",
+  ];
+
   /**
    * Formats a log message with the given text, type and category.
    * @param {FormatterLogOption} options - Options for formatting the log message.
@@ -14,8 +23,18 @@ export class LogFormatter {
    * @param {(...args: unknown[]) => string} [options.processingLine] - A function to process the log message before logging.
    * @returns {string} The formatted log message as a string.
    */
-  static formatterLog({ text, type, category, date = false, processingLine }: FormatterLogOption): string {
-    const formattedText = Checkers.isObject(text) ? ObjectToString(text) : typeof text === "string" ? text : String(text);
+  static formatterLog({
+    text,
+    type,
+    category,
+    date = false,
+    processingLine,
+  }: FormatterLogOption): string {
+    const formattedText = Checkers.isObject(text)
+      ? ObjectToString(text)
+      : typeof text === "string"
+        ? text
+        : String(text);
     const result = `[${date ? Formatters.dateAndTime() : Formatters.time()}][${category.toUpperCase()} | ${type}]: ${formattedText}\n`;
 
     return processingLine ? processingLine(result) : result;
@@ -32,9 +51,12 @@ export class LogFormatter {
    * setType(0); // EmiliaError: Невідомий тип логу: 0
    */
   @Decorators.logCaller()
-  static formatterType(type: TypeLog & number | string): TypeLog | undefined {
+  static formatterType(type: (TypeLog & number) | string): TypeLog | undefined {
     // If the type is already a string and matches one of the allowed values:
-    if (typeof type === "string" && Object.values(Enums.LogType).includes(type as Enums.LogType)) {
+    if (
+      typeof type === "string" &&
+      Object.values(Enums.LogType).includes(type as Enums.LogType)
+    ) {
       return type as TypeLog;
     }
 
@@ -69,11 +91,24 @@ export class LogFormatter {
    *
    * @returns {void}
    */
-  static formattingConsole({ message, line, type, category, event, logs, getTime = Formatters.time }: FormattingConsoleOptions): void {
+  static formattingConsole({
+    message,
+    line,
+    type,
+    category,
+    event,
+    logs,
+    getTime = Formatters.time,
+  }: FormattingConsoleOptions): void {
     const logText = this.formatLogText(message);
     const editText = this.formatEventText(logText.in, event, type);
 
-    if (logs) console.log(`${line.news}[${getTime()}][${category} | ${typeof type === "number" ? this.formatterType(type) : type}]: ${editText}`, logText.out, line.last);
+    if (logs)
+      console.log(
+        `${line.news}[${getTime()}][${category} | ${typeof type === "number" ? this.formatterType(type) : type}]: ${editText}`,
+        logText.out,
+        line.last,
+      );
   }
 
   /**
@@ -81,9 +116,13 @@ export class LogFormatter {
    * @param {unknown} message - The log message.
    * @returns {object} - Formatted log text.
    */
-  private static formatLogText(message: unknown): { in: string, out: unknown } {
+  private static formatLogText(message: unknown): { in: string; out: unknown } {
     return {
-      in: Checkers.isObject(message) ? "" : typeof message === "string" ? message : String(message),
+      in: Checkers.isObject(message)
+        ? ""
+        : typeof message === "string"
+          ? message
+          : String(message),
       out: Checkers.isObject(message) ? message : "",
     };
   }
@@ -95,7 +134,11 @@ export class LogFormatter {
    * @param {TypeLog} type - The type of the log.
    * @returns {string} - Formatted event text.
    */
-  private static formatEventText(text: string, event?: boolean, type?: TypeLog): string {
+  private static formatEventText(
+    text: string,
+    event?: boolean,
+    type?: TypeLog,
+  ): string {
     if (event && text.length > 0 && type !== "error") {
       const splits = text.split(":");
 

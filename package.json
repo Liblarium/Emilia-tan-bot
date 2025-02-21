@@ -1,11 +1,10 @@
 {
   "name": "emilia-tan-bot",
   "private": true,
-  "version": "8.0.5",
+  "version": "8.1.0",
   "description": "",
   "main": "srcJs/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "build:watch": "tsc-watch",
     "abyss:run": "tsc-watch --project abyss/tsconfig.json --onSuccess \"node ./abyss/dist/img.js\"",
@@ -14,14 +13,14 @@
     "generate": "prisma generate",
     "migrate": "prisma migrate",
     "push": "prisma push",
-    "dist:drop": "rm -rf srcJs",
+    "dist:drop": "rm -rf dist",
     "diff": "git diff > all_changes.diff"
   },
   "author": "RanHolly (Miia)",
   "license": "MIT",
   "dependencies": {
     "@napi-rs/canvas": "^0.1.67",
-    "@prisma/client": "^6.3.1",
+    "@prisma/client": "^6.4.1",
     "@resvg/resvg-js": "^2.6.2",
     "axios": "^1.7.9",
     "class-transformer": "^0.5.1",
@@ -32,7 +31,7 @@
     "module-alias": "^2.2.3",
     "mysql2": "^3.12.0",
     "pg": "^8.13.3",
-    "prisma": "^6.3.1",
+    "prisma": "^6.4.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "sharp": "^0.33.5"
@@ -44,14 +43,14 @@
     "@types/node": "^22.13.4",
     "@types/node-fetch": "^2.6.12",
     "@types/pg": "^8.11.11",
-    "@typescript-eslint/eslint-plugin": "^8.24.0",
-    "@typescript-eslint/parser": "^8.24.0",
-    "@typescript-eslint/types": "^8.24.0",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.24.1",
+    "@typescript-eslint/types": "^8.24.1",
     "eslint": "^9.20.1",
-    "globals": "^15.15.0",
+    "globals": "^16.0.0",
     "node-fetch": "^3.3.2",
     "tsc-watch": "^6.2.1",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.0"
+    "typescript-eslint": "^8.24.1"
   }
 }

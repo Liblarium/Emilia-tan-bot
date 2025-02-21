@@ -1,5 +1,5 @@
 import type { EmiliaClient } from "@client";
-import { prefix } from "@constants";
+import { Config } from "@constants";
 import { Log } from "@log";
 import type { GuildPrefix } from "@type/handler";
 import { Transforms } from "@utils";
@@ -35,7 +35,7 @@ export class MessageCommand {
 
     const guildDB = await client.prisma.guild.findFirst({ where: { id: Transforms.stringToBigInt(message.guildId) }, select: { prefix: true } });
 
-    const pref = guildDB === null ? prefix : Transforms.parseJsonValue<GuildPrefix>(guildDB.prefix).now;
+    const pref = guildDB === null ? Config.prefix : Transforms.parseJsonValue<GuildPrefix>(guildDB.prefix).now;
 
     if (!message.content.startsWith(pref)) return;
 

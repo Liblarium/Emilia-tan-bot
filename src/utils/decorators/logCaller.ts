@@ -2,10 +2,10 @@
  * This file contains decorators for any functions in the codebase.
  */
 
-import { Log } from "@log";
-import { emiliaError, Checkers } from "@utils";
 import { Enums } from "@constants";
-import { LogCallerErrorLogicArgs, LogCallerOptions } from "@type/utils/logCaller";
+import { Log } from "@log";
+import type { ClassWithLogCategories, LogCallerErrorLogicArgs, LogCallerOptions } from "@type/utils/logCaller";
+import { Checkers, emiliaError } from "@utils";
 
 /**
  * Decorator for logging method calls and handling errors.
@@ -39,15 +39,16 @@ import { LogCallerErrorLogicArgs, LogCallerOptions } from "@type/utils/logCaller
  * // (your formate log): "5" 1
  * ```
  */
-export function logCaller(options?: LogCallerOptions): MethodDecorator {
-  return (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
+export function logCaller(options?: LogCallerOptions) {
+  return (target: ClassWithLogCategories, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
     const originalMethod = descriptor.value;
     const categories = options ? options.categories ?? [] : [];
     descriptor.value = function (...args: unknown[]) {
-      if (options?.viewArgs) new Log({ text: args, type: Enums.LogType.Info, categories: ["global", "log_caller", ...categories] });
-
       // Add in logCategories new categories, if class have logCategories 
-      if ("logCategories" in target && Array.isArray(target.logCategories) && categories.length > 0) target.logCategories = [...target.logCategories, ...categories];
+      if (categories.length > 0) target.logCategories = [...target.logCategories, ...categories];
+
+
+      if (options?.viewArgs) new Log({ text: args, type: Enums.LogType.Info, categories: ["global", "log_caller", ...target.logCategories] });
 
       // Call the original method
       try {
@@ -90,7 +91,7 @@ export function logCaller(options?: LogCallerOptions): MethodDecorator {
  */
 function logCallerErrorLogic({ target, propertyKey, error }: LogCallerErrorLogicArgs): void {
   const className = target.constructor.name;
-  const logCategories = "logCategories" in target ? target.logCategories : [];
+  const logCategories = target.logCategories;
 
   // Convert propertyKey to string
   propertyKey = String(propertyKey);

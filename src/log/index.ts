@@ -1,8 +1,9 @@
 import { Abstract, Enums } from "@constants";
-import { FileHandler } from "@handlers/FileHandler";
 import type { ArrayMaybeEmpty } from "@type";
-import { LogOptions } from "@type/log";
-import { Formatters } from "@utils";
+import type { LogOptions } from "@type/log";
+import { Checkers, Formatters } from "@utils";
+
+const fileValidator = new Checkers.FileValidator();
 
 /**
  * A function to catch any errors that may occur in the code
@@ -83,7 +84,7 @@ export class Log extends Abstract.AbstractLog {
     if (categories.length === 0) return;
 
     for (const categoryName of categories) {
-      const folderCheckResult = await FileHandler.checkFolder(
+      const folderCheckResult = await fileValidator.checkFolder(
         categoryName.toLowerCase(),
       );
 

@@ -3,18 +3,18 @@
 	"files": {
 		"ignoreUnknown": true,
 		"include": [
-			"srcTs/**/*.ts",
-			"srcTs/**/*.js",
-			"srcTs/**/*.d.ts",
+			"src/**/*.ts",
+			"src/**/*.js",
+			"src/**/*.d.ts",
 			"types/**/*.d.ts",
-			"abyss/src/guild.tests.*"
+			"sanbox/**/*.ts",
+			"sanbox/**/*.js",
+			"sanbox/**/*.d.ts"
 		],
 		"ignore": [
-			"srcJs/*",
-			"abyss/*.js",
-			"abyss/src/img.tests.ts",
-			"abyss/src/img.ts",
-			"drizzle",
+			"dist/*",
+			"sanbox/*.js",
+			"prisma",
 			"package.json",
 			"node_modules/**",
 			"oldCode"
@@ -27,24 +27,27 @@
 	},
 	"linter": {
 		"include": [
-			"srcTs/**/*.ts",
-			"srcTs/**/*.js",
-			"srcTs/**/*.d.ts",
+			"src/**/*.ts",
+			"src/**/*.js",
+			"src/**/*.d.ts",
 			"types/**/*.d.ts",
-			"abyss/src/guild.tests.*"
+			"sanbox/**/*.ts",
+			"sanbox/**/*.js",
+			"sanbox/**/*.d.ts"
 		],
 		"ignore": [
-			"srcJs/*",
-			"abyss/*.js",
-			"abyss/src/img.tests.ts",
-			"abyss/src/img.ts",
+			"dist/*",
+			"sanbox/*.js",
+			"prisma",
 			"package.json",
-			"node_modules/*",
-			"node_modules/*.*"
+			"node_modules/**",
+			"oldCode"
 		],
 		"rules": {
 			"complexity": {
-				"noForEach": "off"
+				"noForEach": "off",
+				"noStaticOnlyClass": "off",
+				"noThisInStatic": "off"
 			},
 			"style": {
 				"noCommaOperator": "off",
@@ -62,20 +65,21 @@
 	},
 	"formatter": {
 		"include": [
-			"srcTs/**/*.ts",
-			"srcTs/**/*.js",
-			"srcTs/**/*.d.ts",
+			"src/**/*.ts",
+			"src/**/*.js",
+			"src/**/*.d.ts",
 			"types/**/*.d.ts",
-			"abyss/src/guild.tests.*"
+			"sanbox/**/*.ts",
+			"sanbox/**/*.js",
+			"sanbox/**/*.d.ts"
 		],
-		"indentWidth": 2,
 		"ignore": [
-			"srcJs/*",
-			"abyss/*.js",
-			"abyss/src/img.tests.ts",
-			"abyss/src/img.ts",
+			"dist/*",
+			"sanbox/*.js",
+			"prisma",
 			"package.json",
-			"node_modules/*"
+			"node_modules/**",
+			"oldCode"
 		]
 	},
 	"organizeImports": {
