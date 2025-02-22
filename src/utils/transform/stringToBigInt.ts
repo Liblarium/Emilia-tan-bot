@@ -1,3 +1,4 @@
+import { Enums } from "@constants";
 import { emiliaError } from "@utils";
 
 /**
@@ -10,9 +11,10 @@ import { emiliaError } from "@utils";
  */
 export const stringToBigInt = (str: string): bigint => {
   if (typeof str !== "string")
-    throw emiliaError("[utils.stringToBigInt]: str must be a string!", "SyntaxError");
+    throw emiliaError("[utils.stringToBigInt]: str must be a string!",
+      Enums.ErrorCode.INVALID_TYPE, "SyntaxError");
   if (!str || str.length === 0)
-    throw emiliaError("[utils.stringToBigInt]: str must not be empty!", "TypeError");
+    throw emiliaError("[utils.stringToBigInt]: str must not be empty!", Enums.ErrorCode.ARGS_REQUIRED, "TypeError");
 
   return BigInt(str);
 };

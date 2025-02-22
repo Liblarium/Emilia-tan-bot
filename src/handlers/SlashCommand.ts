@@ -1,4 +1,5 @@
 import type { EmiliaClient } from "@client";
+import { Enums } from "@constants";
 import type { ArrayNotEmpty } from "@type";
 import { Decorators, emiliaError } from "@utils";
 import type { ChatInputCommandInteraction } from "discord.js";
@@ -31,7 +32,7 @@ export class SlashCommand {
     interaction: ChatInputCommandInteraction,
     client: EmiliaClient,
   ): Promise<unknown> {
-    if (!client) throw emiliaError("Client must be initialized!");
+    if (!client) throw emiliaError("Client must be initialized!", Enums.ErrorCode.CLIENT_NOT_FOUND);
     if (!interaction.isChatInputCommand()) return;
 
     const slash_command = client.slashCommand.get(interaction.commandName);

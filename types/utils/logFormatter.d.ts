@@ -1,4 +1,6 @@
-import type { LineType, TypeLog } from "../constants/log";
+import type { Enums } from '@constants';
+import type { LineType, TypeLog } from "@type/constants/log";
+
 /**
  * Formats a log message with the given text, type and category.
  */
@@ -14,12 +16,28 @@ export interface FormatterLogOption {
   /**
    * The category of the log. I.e. 'global', 'database' or any other category.
    */
-  category: string;
+  categories: string[];
   /**
    * If true, adds the date to the log message with date and time with `dateAndTime()`. If false or undefined, only adds the time with `time()`.
    * @default false
    */
   date?: boolean;
+  /**
+   * The tags to add to the log message.
+   */
+  tags: string[];
+  /**
+   * The error code to add to the log message.
+   */
+  errorCode: Enums.ErrorCode;
+  /**
+   * The metadata to add to the log message.
+   */
+  metadata: object;
+  /**
+   * The context to add to the log message.
+   */
+  context: object;
   /**
    * If specified, calls this function to process the log line before writing it
    * to the console. It takes the arguments that are passed to console.log as

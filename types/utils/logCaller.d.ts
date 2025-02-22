@@ -4,7 +4,7 @@ import type { LogOptions } from "@type/log";
 export interface LogCallerErrorLogicArgs {
   target: ClassWithLogCategories;
   propertyKey: string | symbol;
-  error: any;
+  error: Error;
 }
 
 export type ClassWithLogCategories = { logCategories: ArrayNotEmpty<string> };

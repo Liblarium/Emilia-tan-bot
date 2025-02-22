@@ -103,3 +103,12 @@ export interface LogEntry {
    */
   tags: string[];
 }
+
+export interface AddLogOptions {
+  text: TypeText;
+  logType: TypeLog;
+  tags?: string[];
+  metadata?: object;
+  context?: object;
+  errorCode: Enums.ErrorCode
+}

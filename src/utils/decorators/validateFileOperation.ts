@@ -1,5 +1,7 @@
 import { resolve } from "node:path";
+import { Enums } from "@constants";
 import type { ClassWithValidator } from "@type/utils/file";
+import { emiliaError } from "@utils";
 
 /**
  * Decorator for validating file operations.
@@ -29,12 +31,15 @@ export function validateFileOperation<T extends ClassWithValidator>() {
     const originalMethod = descriptor.value;
     descriptor.value = async function (...args: [string, ...unknown[]]) {
       const filePath = resolve(args[0]);
+
+      if (!target.fileValidator) throw emiliaError("FileValidator is not initialized!", Enums.ErrorCode.ARGS_REQUIRED, "InternalError");
+
       const validation =
         await target.fileValidator.validateFileOperation(filePath);
 
       if (!validation.success) return validation;
 
-      return originalMethod.apply(this, args);
+      return await originalMethod.apply(this, args);
     };
   };
 }

@@ -1,4 +1,5 @@
 import { db } from "@client";
+import { Enums } from "@constants";
 import type { ArrayNotEmpty } from "@type";
 import type {
   CreateLevelOptions,
@@ -118,11 +119,13 @@ export class LevelManager {
     if (!id || id.length === 0)
       throw emiliaError(
         "[LevelManager.updateLevel(logic)]: Id is required!",
+        Enums.ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
     if (!data || Object.keys(data).length === 0)
       throw emiliaError(
         "[LevelManager.updateLevel(logic)]: Data is required!",
+        Enums.ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
@@ -150,6 +153,7 @@ export class LevelManager {
     if (!id || id.length === 0)
       throw emiliaError(
         "[LevelManager.deleteGlobalLevel]: Id is required!",
+        Enums.ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
@@ -171,11 +175,13 @@ export class LevelManager {
     if (!id || id.length === 0)
       throw emiliaError(
         "[LevelManager.deleteLocalLevel]: Id is required!",
+        Enums.ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
     if (!guildId || guildId.length === 0)
       throw emiliaError(
         "[LevelManager.deleteLocalLevel]: GuildId is required!",
+        Enums.ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
@@ -198,6 +204,7 @@ export class LevelManager {
     if (!id || id.length === 0)
       throw emiliaError(
         "[LevelManager.getGlobalLevelId]: Id is required!",
+        Enums.ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
@@ -222,6 +229,7 @@ export class LevelManager {
     if (!id || !guildId || id.length === 0 || guildId.length === 0)
       throw emiliaError(
         "[LevelManager.getLocalLevelId]: id and guildId is required!",
+        Enums.ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
@@ -291,11 +299,9 @@ export class LevelManager {
   @Decorators.logCaller()
   private async createLocalLevel(id: bigint, guildId: bigint) {
     if (!id)
-      throw emiliaError("[LevelManager.createLevel(local)]: Id is required!");
+      throw emiliaError("[LevelManager.createLevel(local)]: Id is required!", Enums.ErrorCode.ARGS_REQUIRED);
     if (!guildId)
-      throw emiliaError(
-        "[LevelManager.createLevel(local)]: GuildId is required!",
-      );
+      throw emiliaError("[LevelManager.createLevel(local)]: GuildId is required!", Enums.ErrorCode.ARGS_REQUIRED);
 
     await db.localLevel.create({
       data: {

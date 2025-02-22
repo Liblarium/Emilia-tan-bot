@@ -1,30 +1,33 @@
-import { Abstract } from "@constants";
+import { Abstract, type Enums } from "@constants";
 import { Formatters } from "@utils";
 
 class EmiliaError {
   /**
-   * Creates a new error of type EmiliaAbstractError
-   * @param {string} message - Error message
-   * @param {string} [errorType] - Error type
-   * @param {() => string} [getTime] - Function to get the time
-   * @returns {EmiliaAbstractError} - Error object
+   * Creates a custom error with code, type, and timestamp
+   * @param message - Error message
+   * @param code - Error code from ErrorCode enum
+   * @param errorType - Error type (optional)
+   * @param getTime - Time formatter (optional)
    */
-  public createError(message: string, errorType?: string, getTime?: () => string): Abstract.EmiliaAbstractError {
-    // Create a new anonymous class that extends EmiliaAbstractError
+  public createError(
+    message: string,
+    code: Enums.ErrorCode, // required argument
+    errorType?: string,
+    getTime?: () => string,
+  ): Abstract.EmiliaAbstractError {
     return new (class extends Abstract.EmiliaAbstractError {
-      // Constructor of the anonymous class
       constructor(message: string) {
-        // Call the parent constructor with the message and either the provided getTime function or the default time function
-        super(message, getTime ?? Formatters.time);
-        // Set the errorType property of the class
+        super(message, code, getTime ?? Formatters.time);
         this.errorType = errorType ?? "Error";
       }
-    })(message); // Instantiate the anonymous class with the provided message
+    })(message);
   }
 }
+
 /**
  * Singleton instance of EmiliaError
  * @param {string} message - Error message
+ * @param {Enums.ErrorCode} - Error code
  * @param {string} [errorType] - Error type
  * @param {() => string} [getTime] - Function to get the time
  * @returns {EmiliaAbstractError} - Error object

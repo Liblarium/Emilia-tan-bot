@@ -1,7 +1,7 @@
-import { EmiliaClient } from "@client";
+import type { EmiliaClient } from "@client";
 import { Abstract } from "@constants";
-import { Interaction } from "discord.js";
 import { SlashCommand } from "@handlers/SlashCommand";
+import type { Interaction } from "discord.js";
 
 export default class InteractionCreate extends Abstract.AbstractEvent {
   constructor() {

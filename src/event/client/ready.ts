@@ -13,7 +13,7 @@ export default class Ready extends Abstract.AbstractEvent {
   }
 
   public execute(client: EmiliaClient): void {
-    if (!client || !client.user || !process.env.TOKEN) throw emiliaError("`client` not found or `TOKEN` empty in .env file!");
+    if (!client || !client.user || !process.env.TOKEN) throw emiliaError("`client` not found or `TOKEN` empty in .env file!", process.env.TOKEN ? Enums.ErrorCode.CLIENT_NOT_FOUND : Enums.ErrorCode.ENV_REQUIRED);
 
     const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
 

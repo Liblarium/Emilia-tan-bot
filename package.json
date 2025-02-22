@@ -1,7 +1,7 @@
 {
   "name": "emilia-tan-bot",
   "private": true,
-  "version": "8.1.0",
+  "version": "8.2.0a",
   "description": "",
   "main": "srcJs/index.js",
   "scripts": {

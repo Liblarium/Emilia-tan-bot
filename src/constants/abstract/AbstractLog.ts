@@ -1,12 +1,16 @@
 import { readFile, readdir } from "node:fs/promises";
 import { resolve } from "node:path";
-import type { BaseLogOptions, LogEntry, TypeLog, TypeText } from "@type/constants/log";
-import type { ClassWithValidator, Result } from "@type/utils/file";
+import { Enums } from "@constants";
+import type { ArrayNotEmpty } from "@type";
+import type { AddLogOptions, BaseLogOptions, LogEntry, TypeLog, TypeText } from "@type/constants/log";
+import type { ClassWithFileManager, ClassWithValidator, Result } from "@type/utils/file";
 import type { IFileManager } from "@type/utils/fileManager";
 import type { IFileValidator } from "@type/utils/fileValidator";
-import { Checkers, Decorators, Formatters, Managers } from "@utils";
+import { Checkers, Decorators, Formatters, Managers, emiliaError } from "@utils";
 import { type InlineType, LogType } from "../enum";
 
+const fileValidator = new Checkers.FileValidator();
+const fileManager = new Managers.FileManager(fileValidator);
 const { LogFormatter, date, time } = Formatters;
 const baseLogPath = process.env.BASE_LOG_PATH ?? "logs";
 const error: (...e: unknown[]) => void = (...e: unknown[]) => console.error([time()], e);
@@ -42,7 +46,7 @@ export abstract class AbstractLog {
    * Category of log
    * @default "other"
    */
-  protected category: string;
+  protected categories: ArrayNotEmpty<string>;
   /**
    * Metadata of log
    * @default undefined
@@ -65,9 +69,19 @@ export abstract class AbstractLog {
   /** 
    * Instance of file manager
    */
-  protected readonly fileManager: IFileManager = new Managers.FileManager(new Checkers.FileValidator());
-
-  readonly fileValidator: IFileValidator = new Checkers.FileValidator();
+  protected readonly fileManager: IFileManager = fileManager;
+  /** 
+   * Instance of file manager. Static version
+   */
+  protected static fileManager: IFileManager;
+  /**
+   * Instance of file validator
+   */
+  protected readonly fileValidator: IFileValidator = fileValidator;
+  /**
+   * Instance of file validator. Static version
+   */
+  public static fileValidator: IFileValidator;
 
   /**
    * Constructs an instance of the AbstractLog class.
@@ -81,19 +95,19 @@ export abstract class AbstractLog {
    * @param {object} [options.metadata=undefined] - The metadata object for the log entry.
    * @param {object} [options.context={}] - The context object for the log entry (optional if no context is provided).
    */
-  constructor({ text = "{Nothing specified}", type = LogType.Info, event = false, logs = true, inline = 0, metadata, context = {}, tags = [] }: BaseLogOptions) {
+  constructor({ text = "{Nothing specified}", type = LogType.Info, event = false, logs = true, inline = 0, metadata, context = {}, tags = [] }: BaseLogOptions & ClassWithValidator & ClassWithFileManager) {
     this.text = text;
     this.logs = logs;
     this.type = type;
     this.inline = inline;
     this.event = event;
-    this.category = "other";
+    this.categories = ["global"];
     this.metadata = metadata;
     this.context = context;
     this.tags = tags;
 
-    // The method is asynchronous, so it must be called in the constructor using `.catch()`
-    this.initialize().catch(error);
+    this.fileManager = fileManager;
+    this.fileValidator = fileValidator;
   }
 
   /**
@@ -101,28 +115,33 @@ export abstract class AbstractLog {
    * @returns {Promise<void>}
    */
   @Decorators.validateFileOperation<ClassWithValidator>()
-  private async initialize(): Promise<void> {
+  static async initialize(): Promise<void> {
     try {
       // Check if base log folder exists
-      const folderCheckResult = await this.fileManager.fileValidator.checkFolder(baseLogPath);
+      const folderCheckResult = await this.fileValidator.checkFolder(baseLogPath);
 
       // If it doesn't exist, create it
       if (!folderCheckResult.exists) {
-        await this.fileManager.createFolder(baseLogPath, '');
-      }
+        const folder = await this.fileManager.createFolder(baseLogPath, '');
 
-      if (typeof this.type === "number") this.type = LogFormatter.formatterType(this.type) ?? LogType.Error;
+        if (!folder.success) throw emiliaError(folder.error.message, folder.error.code, "InternalError");
+      }
     } catch (e) {
       error(`AbstractLog.initialize: ${e instanceof Error ? e.message : 'Unknown error'}`);
     }
   }
 
+  public static setFileDependencies(manager: IFileManager, validator: IFileValidator): void {
+    this.fileManager = manager;
+    this.fileValidator = validator;
+  }
+
   /**
-   * Method for change category of log
-   * @param category - Category of log
+   * Method for change categories of log
+   * @param categoies - Categories of log
    */
-  protected setCategory(category: string): void {
-    if (typeof category === "string") this.category = category;
+  protected setCategories(categories: ArrayNotEmpty<string>): void {
+    if (categories.length > 0) this.categories = categories.map(cat => cat.toLowerCase()) as ArrayNotEmpty<string>;
   }
 
   /**
@@ -133,11 +152,10 @@ export abstract class AbstractLog {
    *
    * @returns A promise that resolves with an object containing the success status and an optional error message.
    *
-   * @example
-   * import { AbstractLog } from "path/to/log/AbstractLog";
-import { FileValidator } from '../../utils/checkers/FileValidator';
+   * @example 
+   * import { Enums, Abstract } from '@constants';
    * 
-   * class Log extends AbstractLog {
+   * class Log extends Abstract.AbstractLog {
    *   // your code here
    * }
    * 
@@ -145,40 +163,29 @@ import { FileValidator } from '../../utils/checkers/FileValidator';
    * const result = await log.addLog("Log message", LogType.Warning);
    * console.log(result); // { success: true }
    */
-  protected async addLog(text: TypeText, logType: TypeLog): Promise<Result> {
+  protected async addLog({ text, logType, metadata = {}, context = {}, tags = [], errorCode }: AddLogOptions): Promise<Result> {
     const editType = LogFormatter.formatterType(logType ?? this.type);
 
     if (!editType) return {
       success: false,
-      error: "Invalid log type",
+      error: {
+        code: Enums.ErrorCode.INVALID_LOG_TYPE,
+        message: "Invalid log type. Please use a valid log type from the LogType enum.",
+      },
     };
 
     const type = editType.toString().toLowerCase();
-    const category = this.category.toLowerCase();
+    const categories = this.categories.map(cat => cat.toLowerCase());
 
-    const logFilePath = `${baseLogPath}/${category}/${category}-${date()}.log`;
-    let fullText = "";
-
-    [text, this.metadata].forEach((data, ind) => {
-      fullText += LogFormatter.formatterLog({ text: data, type: ind === 0 ? type : "metadata", category });
-    });
+    const logFilePath = this.getCurrentLogPath();
+    const fullText = LogFormatter.formatterLog({ text, type, categories, tags, metadata, context, errorCode });
 
     try {
-      const appendFile = await this.fileManager.appendFile(logFilePath, fullText);
-
-      if (!appendFile.success) {
-        error(appendFile.error);
-        return {
-          success: false,
-          error: "Failed to write log to file",
-        };
-      }
-
-      return appendFile;
+      return await this.fileManager.appendFile(logFilePath, fullText);
     } catch (e) {
       error(`AbstractLog.addLog: ${e instanceof Error ? e.message : 'Unknown error'}`);
 
-      return { success: false, error: "Failed to write log to file" };
+      return { success: false, error: { code: Enums.ErrorCode.APPEND_FILE_ERROR, message: "Failed to write log to file" } };
     }
   }
 
@@ -264,7 +271,7 @@ import { FileValidator } from '../../utils/checkers/FileValidator';
     const line = LogFormatter.formattingLineType(this.inline);
 
     if (checkFolder.error) {
-      error(`AbstractLog.log: ${checkFolder.error}`);
+      error(`AbstractLog.log: ${checkFolder.error.message}`);
     }
 
     try {
@@ -277,6 +284,24 @@ import { FileValidator } from '../../utils/checkers/FileValidator';
       error("BaseLog.log:", e);
       await this.addLog(e, LogType.Error);
     }
+  }
+
+
+
+
+
+  /**
+   * Helper method to get the current log file path based on the current date.
+   * The path is in the format of `${baseLogPath}/${month}.${year}/${day}.log`.
+   * @returns {string} The current log file path.
+   * @private
+   */
+  private getCurrentLogPath(): string {
+    const now = new Date();
+    const monthYear = `${(now.getMonth() + 1).toString().padStart(2, "0")}.${now.getFullYear()}`;
+    const сurrentDay = `${now.getDate()}`.padStart(2, "0");
+
+    return `${baseLogPath}/${monthYear}/${сurrentDay}.log`;
   }
 
 }

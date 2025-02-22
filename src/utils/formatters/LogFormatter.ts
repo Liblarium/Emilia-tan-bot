@@ -26,18 +26,22 @@ export class LogFormatter {
   static formatterLog({
     text,
     type,
-    category,
+    categories,
+    tags = [],
+    metadata = {},
+    context = {},
     date = false,
     processingLine,
-  }: FormatterLogOption): string {
-    const formattedText = Checkers.isObject(text)
-      ? ObjectToString(text)
-      : typeof text === "string"
-        ? text
-        : String(text);
-    const result = `[${date ? Formatters.dateAndTime() : Formatters.time()}][${category.toUpperCase()} | ${type}]: ${formattedText}\n`;
-
-    return processingLine ? processingLine(result) : result;
+  }: FormatterLogOption) {
+    return {
+      text: processingLine ? processingLine(text) : text,
+      type,
+      categories,
+      tags,
+      metadata,
+      context,
+      date,
+    }
   }
 
   /**
@@ -74,7 +78,7 @@ export class LogFormatter {
 
     if (typeof type === "number" && typeMap[type]) return typeMap[type];
 
-    throw emiliaError(`Невідомий тип логу: ${type}`, "TypeError");
+    throw emiliaError(`Unknown log type: ${type}`, Enums.ErrorCode.INVALID_TYPE, "TypeError");
   }
 
   /**

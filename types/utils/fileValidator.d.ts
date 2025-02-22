@@ -1,4 +1,5 @@
-import type { Result } from "./file";
+import type { ErrorDetails, Result } from "./file";
+import type { ClassWithLogCategories } from "./logCaller";
 
 export interface IFormatValidator {
   checkFormatFile(filePath: string): Result;
@@ -21,7 +22,13 @@ export interface IJSONFile {
   isJSONFile(path: string): boolean;
 }
 
-export interface IFileValidator extends IFormatValidator, IFileAccessValidator, ICheckFolder, IValidPath, IJSONFile { }
+export interface IFileValidator
+  extends IFormatValidator,
+  IFileAccessValidator,
+  ICheckFolder,
+  IValidPath,
+  IJSONFile,
+  ClassWithLogCategories { }
 
 /**
  * Result of checking a folder
@@ -38,5 +45,5 @@ export interface FolderCheckResult {
   /**
    * The error message if the check failed
    */
-  error: string | undefined;
+  error: ErrorDetails | undefined;
 }

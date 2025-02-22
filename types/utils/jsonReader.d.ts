@@ -1,4 +1,4 @@
-import type { Result } from "./file";
+import type { ClassWithValidator, Result } from "./file";
 
 export interface IJSONReadFile {
   readFile<T extends object>(filePath: string): Promise<Result<T>>;
@@ -12,7 +12,11 @@ export interface IJSONReadLine {
 }
 
 export interface IJSONParse {
-  parse<T extends object>(jsonParse: string): Result<T>;
+  parse<T = unknown>(jsonParse: string): Result<T>;
 }
 
-export interface IJSONReader extends IJSONReadFile, IJSONReadLine, IJSONParse { }
+export interface IJSONReader
+  extends IJSONReadFile,
+  IJSONReadLine,
+  IJSONParse,
+  ClassWithValidator { }

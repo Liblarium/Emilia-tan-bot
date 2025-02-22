@@ -43,7 +43,7 @@ export function logCaller(options?: LogCallerOptions) {
   return (target: ClassWithLogCategories, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
     const originalMethod = descriptor.value;
     const categories = options ? options.categories ?? [] : [];
-    descriptor.value = function (...args: unknown[]) {
+    descriptor.value = async function (...args: unknown[]) {
       // Add in logCategories new categories, if class have logCategories 
       if (categories.length > 0) target.logCategories = [...target.logCategories, ...categories];
 
@@ -52,7 +52,7 @@ export function logCaller(options?: LogCallerOptions) {
 
       // Call the original method
       try {
-        const result = originalMethod.apply(this, args);
+        const result = await originalMethod.apply(this, args);
 
         // If the result is a promise, handle it
         if (Checkers.isPromise(result)) {
@@ -99,7 +99,7 @@ function logCallerErrorLogic({ target, propertyKey, error }: LogCallerErrorLogic
   // Check if error is an instance of Error and convert it if not
   if (!(error instanceof Error)) error = new Error(String(error));
   // Check if logCategories is an array. If not, throw an error.
-  if (!Array.isArray(logCategories)) throw emiliaError(`[${className}.@logCaller.${propertyKey}]: logCategories must be an array!`, "TypeError");
+  if (!Array.isArray(logCategories)) throw emiliaError(`[${className}.@logCaller.${propertyKey}]: logCategories must be an array!`, Enums.ErrorCode.INVALID_TYPE, "TypeError");
 
   // Log error message. P.S. ind - Index, val - Value.
   [`[${propertyKey}]: ${error.message}`, error].forEach((val, ind) => new Log({

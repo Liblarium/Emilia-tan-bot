@@ -1,7 +1,7 @@
-import { EmiliaClient } from "@client";
+import type { EmiliaClient } from "@client";
 import { Abstract } from "@constants";
-import { Message } from "discord.js";
 import { MessageCommand } from "@handlers/MessageCommand";
+import type { Message } from "discord.js";
 
 export default class MessageCreate extends Abstract.AbstractEvent {
   constructor() {

@@ -1,4 +1,8 @@
+import { createReadStream } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { Transform } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import { Enums } from "@constants";
 import type { ArrayNotEmpty } from "@type";
 import type { ClassWithValidator, Result } from "@type/utils/file";
 import type { IFileValidator } from "@type/utils/fileValidator";
@@ -6,16 +10,12 @@ import type { IJSONReader } from "@type/utils/jsonReader";
 import { Decorators, Transforms, emiliaError } from "@utils";
 
 export class JSONReader implements IJSONReader {
-  public readonly fileValidator: IFileValidator;
   /**
    * The category of the log entry.
    */
-  public readonly logCategories: ArrayNotEmpty<string> = ["jsonReader"];
+  public logCategories: ArrayNotEmpty<string> = ["jsonReader"];
 
-  constructor(fileValidator: IFileValidator) {
-    this.fileValidator = fileValidator;
-  }
-
+  constructor(public fileValidator: IFileValidator) { }
 
   /**
    * Reads a file containing a single JSON object and parses it.
@@ -25,17 +25,23 @@ export class JSONReader implements IJSONReader {
    * @param filePath - The path to the JSON file.
    * @template T - The type of the JSON object to parse. Default is `unknown`.
    * @returns {Promise<Result<T>>} - A promise that resolves with a parsed JSON object. If the file is not a JSON file, returns an error.
+   * 
+   * @example
+   * ```ts
+   *  const filePath = "data.json"; //dont use at non .json file
+   *  const result = await JSONReader.readFile(filePath);
+   *  console.log(result); // { success: true, data: { name: "John", age: 30 } } if current file is a .json file
+   * ```
    */
   @Decorators.logCaller()
   @Decorators.validateFileOperation<ClassWithValidator>()
   async readFile<T extends object>(filePath: string): Promise<Result<T>> {
-    if (!this.fileValidator.isJSONFile(filePath)) return { success: false, error: "You use this method about non .json file. You mistake. Use readLines method." };
+    if (!this.fileValidator.isJSONFile(filePath)) return { success: false, error: { code: Enums.ErrorCode.FILE_FORMAT_ERROR, message: "You use this method about non .json file. You mistake. Use readLines method." } };
 
     const fileContent = await readFile(filePath, "utf-8");
 
     return this.parse<T>(fileContent);
   }
-
 
   /**
    * Reads a file containing JSON objects and parses its entries.
@@ -59,11 +65,27 @@ export class JSONReader implements IJSONReader {
     filePath: string,
     delimiter: string = "\n",
   ): Promise<Result<T>[]> {
-    if (this.fileValidator.isJSONFile(filePath)) return [{ success: false, error: "You use this method about .json file. You mistake. Use readFile method." }];
+    let buffer = "";
+    const lines: string[] = [];
 
-    const fileContent = await readFile(filePath, "utf-8");
+    const transformStream = new Transform({
+      transform(chunk, _encoding, callback) {
+        buffer += chunk.toString();
+        const parts = buffer.split(delimiter);
+        buffer = parts.pop() ?? ""; // We store the unfinished fragment
+        lines.push(...parts.filter(line => line.trim()));
+        callback();
+      },
+      flush(callback) {
+        if (buffer.trim()) lines.push(buffer.trim()); // Add the last fragment
+        callback();
+      },
+    });
 
-    const lines = fileContent.split(delimiter).filter(line => line.trim());
+    await pipeline(
+      createReadStream(filePath),
+      transformStream,
+    );
 
     return lines.map(line => this.parse<T>(line));
   }
@@ -77,17 +99,14 @@ export class JSONReader implements IJSONReader {
    * @throws {TypeError} - Throws an error if the jsonParse string is empty or not provided.
    */
   @Decorators.logCaller()
-  parse<T extends object>(jsonParse: string): Result<T> {
+  parse<T = unknown>(jsonParse: string): Result<T> {
     if (!jsonParse || jsonParse.length === 0)
       throw emiliaError(
         "[JSONReader.parse]: jsonParse is required!",
+        Enums.ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
-    const result = Transforms.objectFromString<T>(jsonParse);
-
-    return result
-      ? { success: true, data: result }
-      : { success: false, error: "Error parsing JSON" };
+    return Transforms.objectFromString<T>(jsonParse);
   }
 }

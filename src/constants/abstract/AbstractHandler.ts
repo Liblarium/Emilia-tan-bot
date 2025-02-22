@@ -127,8 +127,6 @@ export abstract class AbstractHandler {
    * @param folder
    * @returns
    */
-  private async scanFolder(): Promise<ArrayMaybeEmpty<string>>;
-  private async scanFolder(folder: string): Promise<ArrayMaybeEmpty<string>>;
   private async scanFolder(folder?: string): Promise<ArrayMaybeEmpty<string>> {
     const folderPach = this.folderPath;
 

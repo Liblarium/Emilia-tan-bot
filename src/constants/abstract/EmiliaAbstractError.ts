@@ -1,3 +1,5 @@
+import type { Enums } from "@constants";
+
 export abstract class EmiliaAbstractError extends Error {
   /**
    * Type of error
@@ -5,7 +7,10 @@ export abstract class EmiliaAbstractError extends Error {
    * @default "Error"
    */
   protected errorType?: string = "Error";
-
+  /**
+   * Errorcode 'ErrorCode' Errorcode Error Code.
+   */
+  protected code: Enums.ErrorCode;
   /**
    * Constructor for EmiliaAbstractError class
    * @param {string} message - Text of error
@@ -15,11 +20,12 @@ export abstract class EmiliaAbstractError extends Error {
    * console.log(error.name);
    * // [2022-09-07 12:00:00][Emilia | Error]
    */
-  constructor(message: string, getTime: () => string) {
+  constructor(message: string, code: Enums.ErrorCode, getTime: () => string) {
     super(message);
 
     if (!this.errorType) this.errorType = "Error";
 
+    this.code = code;
     this.name = `[${getTime ? `${getTime()}][` : ""}Emilia | ${this.errorType}]`;
   }
 }

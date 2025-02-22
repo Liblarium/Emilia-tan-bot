@@ -1,6 +1,6 @@
-import { Abstract } from '@constants';
-import { Client, Collection, type ClientOptions } from 'discord.js';
+import type { Abstract } from '@constants';
 import { PrismaClient } from "@prisma/client";
+import { Client, type ClientOptions, Collection } from 'discord.js';
 
 export const db = new PrismaClient();
 export class EmiliaClient extends Client {
@@ -22,12 +22,8 @@ export class EmiliaClient extends Client {
    * @see {@link https://www.prisma.io/docs/orm/prisma-client Prisma Client} - for more information. Official documentation.
    */
   public prisma: PrismaClient = db;
-  /**
-   * Creates an instance of EmiliaClient.
-   *
-   * @param {ClientOptions} options - The options for the Discord client.
-   */
-  public constructor(options: ClientOptions) {
+
+  constructor(options: ClientOptions) {
     super(options);
   }
 

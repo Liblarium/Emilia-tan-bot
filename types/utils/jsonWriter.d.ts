@@ -1,7 +1,7 @@
-import type { Result } from "./file";
+import type { ClassWithFileManager, ClassWithValidator, Result } from "./file";
 
 export interface IJSONWriteFile {
-  writeFile<T extends object>(filePath: string, data: T): Promise<Result<T>>;
+  writeFile<T extends object>(filePath: string, data: T): Promise<Result<void>>;
 }
 
 export interface IJSONAppendLine {
@@ -9,7 +9,7 @@ export interface IJSONAppendLine {
     filePath: string,
     data: T,
     delimiter: string = "\n",
-  ): Promise<Result>;
+  ): Promise<Result<void>>;
 }
 
 export interface IJSONStringify {
@@ -19,4 +19,6 @@ export interface IJSONStringify {
 export interface IJSONWriter
   extends IJSONWriteFile,
   IJSONAppendLine,
-  IJSONStringify { }
+  IJSONStringify,
+  ClassWithFileManager,
+  ClassWithValidator { }

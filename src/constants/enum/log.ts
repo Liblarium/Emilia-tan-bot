@@ -9,15 +9,15 @@ export enum InlineType {
   /**
    * Inline before text
    */
-  After,
+  After = 1,
   /**
    * Inline after text
    */
-  Before,
+  Before = 2,
   /**
    * Inline before and after text
    */
-  Both
+  Both = 3
 }
 
 /**
