@@ -1,6 +1,7 @@
 import { readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { EmiliaClient } from "@client";
+import { Abstract, Enums } from "@constants";
 import { Log } from "@log";
 import type { ArrayMaybeEmpty, ArrayNotEmpty, ArrayPathLimit } from "@type";
 import type { ModuleType } from "@type/handler";
@@ -64,7 +65,7 @@ export abstract class AbstractHandler {
    * @returns {Promise<ModuleType>}
    */
   protected abstract setLogic(
-    modules: ModuleType,
+    modules: ModuleType<unknown>,
   ): void | null | Promise<void | null>;
 
   /**
@@ -101,24 +102,32 @@ export abstract class AbstractHandler {
               text: `Файл ${file} не является классом!`,
               type: 2,
               categories: ["global", "handler"],
+              tags: ["handler"],
+              metadata: { file },
+              context: { file },
+              code: Enums.ErrorCode.INVALID_TYPE
             });
             continue;
           }
 
-          const modules: ModuleType = new FileModule();
+          const modules: ModuleType<Abstract.AbstractEvent<unknown[], void> | Abstract.AbstractBaseCommand<unknown[], void>> = new FileModule();
           const logic = await this.setLogic(modules);
           // TODO: delete this Log later. Now - for debug
           new Log({
             text: `Модуль ${file} успешно загружен!`,
             type: 1,
             categories: ["global", "handler"],
+            tags: ["handler"],
+            code: Enums.ErrorCode.OK,
+            metadata: { file },
+            context: { file },
           });
 
           if (logic === null) continue;
         }
       }
     } catch (e: unknown) {
-      new Log({ text: e, type: 2, categories: ["global", "handler"] });
+      new Log({ text: e, type: 2, categories: ["global", "handler"], tags: ["handler"], code: e instanceof Abstract.AbstractEmiliaError ? e.code : Enums.ErrorCode.UNKNOWN_ERROR });
     }
   }
 

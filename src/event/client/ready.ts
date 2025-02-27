@@ -7,7 +7,7 @@ import { REST, Routes } from "discord.js";
 
 let currentStatusIndex = 0;
 
-export default class Ready extends Abstract.AbstractEvent {
+export default class Ready extends Abstract.AbstractEvent<[EmiliaClient], void> {
   constructor() {
     super({ name: "ready" });
   }
@@ -29,12 +29,12 @@ export default class Ready extends Abstract.AbstractEvent {
 
       // Log the loaded commands and events
       for (const arr of text) {
-        new Log({ text: arr, type: Enums.LogType.Info, categories: ["global", "event"] });
+        new Log({ text: arr, type: Enums.LogType.Info, categories: ["global", "event"], tags: ["event", "ready"], code: Enums.ErrorCode.OK });
       }
 
       // Set bot status
       return this.myStatus(client);
-    }).catch(e => new Log({ text: e, type: 2, categories: ["global", "event"] }));
+    }).catch(e => new Log({ text: e, type: 2, categories: ["global", "event"], tags: ["event", "ready"], code: Enums.ErrorCode.UNKNOWN_ERROR }));
 
     // Update bot status every hour (or other time)
     setInterval(() => this.myStatus(client), time_upd);
@@ -75,7 +75,9 @@ export default class Ready extends Abstract.AbstractEvent {
     new Log({
       text: `Я обновила статус (${currentStatusIndex++}) [${status.indexOf(random_status)}]`,
       type: Enums.LogType.Info,
-      categories: ["global", "event"]
+      categories: ["global", "event"],
+      tags: ["event", "ready"],
+      code: Enums.ErrorCode.OK
     });
   }
 }

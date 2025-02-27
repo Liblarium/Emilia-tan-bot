@@ -1,4 +1,4 @@
-import type { ClassWithValidator, Result } from "./file";
+import type { ClassWithValidator, Result } from ".";
 
 export interface IFileManager extends ClassWithValidator {
   createFolder(

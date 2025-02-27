@@ -1,10 +1,10 @@
 import type { EmiliaClient } from "@client";
-import { Abstract } from "@constants";
+import { Abstract, Enums } from "@constants";
 import { Log } from "@log";
 import { Decorators } from "@utils";
 
 const catchs = (e: unknown) => {
-  new Log({ text: e, categories: ["global", "handler", "event"], type: 2 });
+  new Log({ text: e, categories: ["global", "handler", "event"], type: 2, tags: ["handler", "event"], code: Enums.ErrorCode.UNKNOWN_ERROR });
 };
 
 export class EventHandler extends Abstract.AbstractHandler {
@@ -35,7 +35,7 @@ export class EventHandler extends Abstract.AbstractHandler {
    * @throws Will log errors but not throw them, returning null instead.
    */
   @Decorators.logCaller()
-  setLogic(event: Abstract.AbstractEvent): null | void {
+  setLogic(event: Abstract.AbstractEvent<unknown[], void | null | Promise<void | null>>): null | void {
     const client = this.client;
 
     try {

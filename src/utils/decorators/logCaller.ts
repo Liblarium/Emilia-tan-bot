@@ -17,6 +17,9 @@ import { Checkers, emiliaError } from "@utils";
  * thrown and log the error message.
  * 
  * @param {LogCallerOptions} options - Options for the decorator.
+ * @param options.tags - Additional tags to categorize the log entry (e.g., ["featureX", "debug"]).
+ * @param options.metadata - Extra metadata for debugging or analytics (e.g., { userId: 123 }).
+ * @param options.context - Contextual data about the method call (e.g., { requestId: "abc123" }).
  * 
  * ## Example usage:
  * @example
@@ -47,8 +50,11 @@ export function logCaller(options?: LogCallerOptions) {
       // Add in logCategories new categories, if class have logCategories 
       if (categories.length > 0) target.logCategories = [...target.logCategories, ...categories];
 
+      const tags = ["log_caller"];
 
-      if (options?.viewArgs) new Log({ text: args, type: Enums.LogType.Info, categories: ["global", "log_caller", ...target.logCategories] });
+      if (options?.tags && options.tags.length > 0) tags.push(...options.tags);
+
+      if (options?.viewArgs) new Log({ text: args, type: Enums.LogType.Info, categories: ["global", "log_caller", ...target.logCategories], tags, code: Enums.ErrorCode.OK, metadata: options.metadata, context: options.context });
 
       // Call the original method
       try {
@@ -57,27 +63,29 @@ export function logCaller(options?: LogCallerOptions) {
         // If the result is a promise, handle it
         if (Checkers.isPromise(result)) {
           return result.then(res => {
-            if (options?.logSuccess) loggerSuccess(propertyKey);
+            if (options?.logSuccess) loggerSuccess(propertyKey, tags, options.metadata, options.context);
 
             return res;
           }).catch((error: Error) => {
-            logCallerErrorLogic({ target, propertyKey, error });
+            logCallerErrorLogic({ target, propertyKey, error, tags });
+
             throw error;
           });
         }
 
-        if (options?.logSuccess) loggerSuccess(propertyKey);
+        if (options?.logSuccess) loggerSuccess(propertyKey, tags, options.metadata, options.context);
 
         return result;
       } catch (error) {
-        logCallerErrorLogic({ target, propertyKey, error });
+        logCallerErrorLogic({ target, propertyKey, error, tags, metadata: options?.metadata, context: options?.context });
+
+        throw error;
       }
     };
 
     return descriptor;
   };
 }
-
 
 /**
  * This function handles the logging and error handling logic for the `@logCaller` decorator.
@@ -89,7 +97,7 @@ export function logCaller(options?: LogCallerOptions) {
  *
  * @returns {void} - This function does not return a value.
  */
-function logCallerErrorLogic({ target, propertyKey, error }: LogCallerErrorLogicArgs): void {
+function logCallerErrorLogic({ target, propertyKey, error, tags, metadata, context }: LogCallerErrorLogicArgs): void {
   const className = target.constructor.name;
   const logCategories = target.logCategories;
 
@@ -99,11 +107,11 @@ function logCallerErrorLogic({ target, propertyKey, error }: LogCallerErrorLogic
   // Check if error is an instance of Error and convert it if not
   if (!(error instanceof Error)) error = new Error(String(error));
   // Check if logCategories is an array. If not, throw an error.
-  if (!Array.isArray(logCategories)) throw emiliaError(`[${className}.@logCaller.${propertyKey}]: logCategories must be an array!`, Enums.ErrorCode.INVALID_TYPE, "TypeError");
+  if (!Array.isArray(logCategories)) throw emiliaError(`[${className}.@logCaller.${propertyKey}]: logCategories must be an array!`, Enums.ErrorCode.UNKNOWN_ERROR, "TypeError");
 
   // Log error message. P.S. ind - Index, val - Value.
   [`[${propertyKey}]: ${error.message}`, error].forEach((val, ind) => new Log({
-    text: val, categories: (ind === 0 ? ["global", ...logCategories] : ["log_caller"]), type: Enums.LogType.Error
+    text: val, categories: (ind === 0 ? ["global", ...logCategories] : ["log_caller"]), type: Enums.LogType.Error, code: Enums.ErrorCode.INVALID_TYPE, tags, metadata, context
   }));
 
   // Error message on console.
@@ -121,6 +129,6 @@ function logCallerErrorLogic({ target, propertyKey, error }: LogCallerErrorLogic
  * @param message - The success message to be logged.
  * @returns void This function doesn't return anything.
  */
-function loggerSuccess(message: string | symbol) {
-  new Log({ text: `Successful call to ${String(message)}`, type: Enums.LogType.Info, categories: ["global", "log_caller"] });
+function loggerSuccess(message: string | symbol, tags: string[], metadata?: object, context?: object) {
+  new Log({ text: `Successful call to ${String(message)}`, type: Enums.LogType.Info, categories: ["global", "log_caller"], tags, code: Enums.ErrorCode.OK, metadata, context });
 }

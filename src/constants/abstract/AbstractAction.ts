@@ -1,4 +1,4 @@
-export abstract class AbstractAction {
+export abstract class AbstractAction<T extends unknown[], R> {
   /**
    * The name of the action (command or event).
    */
@@ -16,16 +16,14 @@ export abstract class AbstractAction {
    * Executes the action with the given arguments.
    * @param args - The arguments to pass to the action.
    * @returns The result of the action.
-   * @throws {Error} - If the action is not implemented.
    * @example
-   * class MyAction extends AbstractAction {
+   * class MyCommand extends AbstractAction<[string, string], string> {
    *   execute(arg1: string, arg2: string): string {
    *     return `${arg1} ${arg2}`;
    *   }
    * }
-   * 
-   * const action = new MyAction("myActionName");
-   * console.log(action.execute("arg", "arg3")) // "arg arg3";
+   * const command = new MyCommand("myCommand");
+   * console.log(command.execute("hello", "world")); // "hello world"
    */
-  public abstract execute(...args: unknown[]): unknown;
+  public abstract execute(...args: T): R;
 }

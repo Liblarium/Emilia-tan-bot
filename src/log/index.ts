@@ -1,9 +1,12 @@
-import { Abstract, Enums } from "@constants";
-import type { ArrayMaybeEmpty } from "@type";
+import { Abstract } from "@constants";
 import type { LogOptions } from "@type/log";
-import { Checkers, Formatters } from "@utils";
+import { Checkers, Formatters, JSONs, Managers } from "@utils";
 
 const fileValidator = new Checkers.FileValidator();
+const fileManager = new Managers.FileManager(fileValidator);
+const jsonReader = new JSONs.JSONReader(fileValidator);
+const jsonWriter = new JSONs.JSONWriter(fileValidator, fileManager);
+const logFormatter = Formatters.LogFormatter;
 
 /**
  * A function to catch any errors that may occur in the code
@@ -30,26 +33,27 @@ const catchs = (e: unknown) => {
 *   categories: ["global", "database"], //In which categories to write all specified logs. Outputted once in console.log(). Not necessarily global or database, string[] there
 *   logs: true, //|?: whether to output text to console. By default, true
 *   inline: InlineType.Before, //|?: affects only the text in the console. 0 - No change, 1 - wrap from top to bottom, 2 - from bottom, 3 - both.
+*   code: ErrorCode.UNKNOWN_ERROR, //code to write to the log
+*   tags: ["tag1", "tag2"], //tags to add to the log
+*   metadata: { code: "value"}, //|?: metadata to add to the log
+*   context: { code: "value" }, //|?: context to add to the log
 * });
 *
 */
 export class Log extends Abstract.AbstractLog {
   /**
-   * Other categories to write logs to, excluding the main one
-   * @type {ArrayMaybeEmpty<string>}
-   * @private
-   */
-  private readonly otherCategories: ArrayMaybeEmpty<string>;
-
-  /**
    * Constructs a new Log object
-   * @param {LogOptions} logOptions
-   * @param {string} logOptions.text Log contents
-   * @param {TypeLog} logOptions.type information type. Numeric: 1 - info, 2 - error, 3- warning, 4 - debug, 5 - test
-   * @param {boolean} [logOptions.event=false] |? by default false. Whether to truncate output to console.log()
-   * @param {ArrayMaybeEmpty<string>} logOptions.categories global | database. |? Categories to write all specified logs to. Output is made once in console.log()
-   * @param {boolean} [logOptions.logs=true] ?: whether to output text to console. By default true
-   * @param {TypeInline} [logOptions.inline=0] |?: affects only the text in the console. 0 - No change, 1 - wrap at the top, 2 - at the bottom, 3 - both.
+   * @param logOptions
+   * @param logOptions.text Log contents
+   * @param logOptions.type information type. Numeric: 1 - info, 2 - error, 3- warning, 4 - debug, 5 - test
+   * @param logOptions.event |? by default false. Whether to truncate output to console.log()
+   * @param logOptions.categories global | database. |? Categories to write all specified logs to. Output is made once in console.log(). If not specified, global will be used
+   * @param logOptions.logs ?: whether to output text to console. By default true
+   * @param logOptions.inline |?: affects only the text in the console. 0 - No change, 1 - wrap at the top, 2 - at the bottom, 3 - both.
+   * @param logOptions.code code to write to the log
+   * @param logOptions.tags tags to add to the log
+   * @param logOptions.metadata |?: metadata to add to the log
+   * @param logOptions.context |?: context to add to the log
    */
   constructor({
     text,
@@ -58,47 +62,14 @@ export class Log extends Abstract.AbstractLog {
     categories,
     logs = true,
     inline = 0,
+    code,
+    tags = [],
+    metadata,
+    context = {},
   }: LogOptions) {
-    const uniqueCategories: ArrayMaybeEmpty<string> = Array.from(new Set(categories)).filter((category) => category !== "");
-
-    super({ text, type, event, logs, inline });
-
-    if (typeof type === "number") type = Formatters.LogFormatter.formatterType(type) ?? Enums.LogType.Error;
-    if (!categories.length) categories = ["other"];
-
-    this.setCategory(uniqueCategories[0]);
-    this.otherCategories = uniqueCategories.slice(1);
+    super({ text, type, event, logs, inline, code, jsonReader, jsonWriter, fileValidator, logFormatter, fileManager, categories, tags, metadata, context });
 
     this.log().catch(catchs);
-    this._addLogs().catch(catchs);
-  }
-
-  /**
-   * Private method to add logs to all categories except the main one
-   * @returns {Promise<void>}
-   * @private
-   */
-  private async _addLogs(): Promise<void> {
-    const categories = this.otherCategories;
-
-    if (categories.length === 0) return;
-
-    for (const categoryName of categories) {
-      const folderCheckResult = await fileValidator.checkFolder(
-        categoryName.toLowerCase(),
-      );
-
-      if (folderCheckResult.error) {
-        const errorText = `Не удалось создать папку ${categoryName}!`;
-        console.error(`[${Formatters.time()}][Log._addLogs | error]:`, errorText);
-        this.setCategory("global");
-        this.addLog(errorText, Enums.LogType.Error).catch(catchs);
-        continue;
-      }
-
-      this.setCategory(categoryName);
-      this.addLog(this.text, this.type).catch(catchs);
-    }
   }
 }
 

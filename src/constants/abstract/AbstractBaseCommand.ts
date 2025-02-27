@@ -4,7 +4,7 @@ import { SlashCommandBuilder } from "discord.js";
 
 const { AbstractAction } = Abstract;
 
-export abstract class AbstractBaseCommand extends AbstractAction {
+export abstract class AbstractBaseCommand<T extends unknown[], R> extends AbstractAction<T, R> {
   /**
    * @see {@link https://discord.com/developers/docs/interactions/application-commands#application-command-object official Discord API documentation}. If you need more information about Discord API
    *
@@ -48,11 +48,15 @@ export abstract class AbstractBaseCommand extends AbstractAction {
    * @param {string[]} [options.aliases=[]] - Alternative names for the command (aliases for message commands)
    */
   constructor({ name, description, option = {}, type, aliases }: CommandArguments) {
+    if (!name || !description) throw new Error("Command name and description are required!");
+
     super(name);
+
     this.data
       .setName(name)
       .setDescription(description);
 
+    // initialize command options
     this.option = {
       developer: option.developer ?? false,
       test: option.test ?? false,
@@ -66,7 +70,7 @@ export abstract class AbstractBaseCommand extends AbstractAction {
     };
 
     // If command have aliases. Only message command versions
-    if (aliases && aliases.length > 0) this.aliases = aliases;
+    if (aliases && aliases.length > 0 && type !== Enums.CommandType.Slash) this.aliases = aliases;
 
     // I have 3 versions of commands (both and only message or slash command)
     this.type = type ?? Enums.CommandType.Both;

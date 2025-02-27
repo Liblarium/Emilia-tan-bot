@@ -1,7 +1,19 @@
+import type { Abstract, Enums } from "@constants";
+import type { ArrayNotEmpty } from "@type";
+import type { Result } from "@type/utils";
+import type {
+  ClassWithFileManager,
+  ClassWithJSONReader,
+  ClassWithJSONWriter,
+  ClassWithValidator,
+} from "@type/utils";
+import { ClassWithLogCategories } from "@type/utils/logCaller";
+import type { ILogFormatters } from "@type/utils/logFormatter";
+
 export type LineType = { news: "" | "\n"; last: "" | "\n" };
 export type LogTypeNumber = 1 | 2 | 3 | 4 | 5;
-import type { Enums } from "@constants";
-export interface BaseLogOptions {
+
+export interface AbstractLogOptions {
   /**
    * Text which will be written to log
    */
@@ -21,7 +33,15 @@ export interface BaseLogOptions {
   /**
    * Inline mode. If 0 - no inline, if 1 - add new line at start, if 2 - add new line at end, if 3 - add new lines at start and end
    */
-  inline: TypeInline
+  inline: TypeInline;
+  /**
+   * Categories of log
+   */
+  categories: ArrayNotEmpty<string>;
+  /**
+   * Code of error which will be written to log
+   */
+  code: Enums.ErrorCode;
   /**
    * Metadata of log. It is an object which can contain any information.
    * It will be written to log as a JSON string.
@@ -53,6 +73,21 @@ export interface BaseLogOptions {
    * @default {[]}
    */
   tags?: string[];
+}
+
+export interface IAbstractLogWithDependencies
+  extends ClassWithJSONReader,
+  ClassWithJSONWriter,
+  ClassWithFileManager,
+  ClassWithValidator,
+  СlassWithLogFormatter { }
+
+export interface AbstractLogOptionsExtended
+  extends AbstractLogOptions,
+  IAbstractLogWithDependencies { }
+
+export interface СlassWithLogFormatter {
+  logFormatter: ILogFormatters;
 }
 
 /**
@@ -110,5 +145,9 @@ export interface AddLogOptions {
   tags?: string[];
   metadata?: object;
   context?: object;
-  errorCode: Enums.ErrorCode
+  errorCode: Enums.ErrorCode;
+}
+
+export interface IAbstractLog extends IAbstractLogWithDependencies {
+  findLogsByTags(tags: string[], matchAll: boolean = false, month?: boolean): Promise<Result<LogEntry>[]>;
 }

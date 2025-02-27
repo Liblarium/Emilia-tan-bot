@@ -77,6 +77,12 @@ export enum ErrorCode {
    */
   INVALID_TYPE = "INVALID_TYPE",
   /**
+   * Error formatting data. Invalid or empty input!
+   * 
+   * Please check the input data.
+   */
+  FORMATTING_ERROR = "FORMATTING_ERROR",
+  /**
    * Error parsing JSON string! Invalid input data
    * 
    * Please check the input data.
@@ -99,5 +105,35 @@ export enum ErrorCode {
    * 
    * Please check the client.
    */
-  CLIENT_NOT_FOUND = "CLIENT_NOT_FOUND"
+  CLIENT_NOT_FOUND = "CLIENT_NOT_FOUND",
+  /**
+   * Error to missed guild (is null).
+   * 
+   * Please check the guild id. Or fetch it.
+   */
+  GUILD_NOT_FOUND = "GUILD_NOT_FOUND",
+  /**
+   * Error to missed channel (is null).
+   * 
+   * Please check the channel id. Or fetch it.
+   */
+  CHANNEL_NOT_FOUND = "CHANNEL_NOT_FOUND",
+  /**
+   * Error to missed message (is null).
+   * 
+   * Please check the message id. Or fetch it.
+   */
+  MESSAGE_NOT_FOUND = "MESSAGE_NOT_FOUND",
+  /**
+   * Unknown error
+   */
+  UNKNOWN_ERROR = "UNKNOWN_ERROR",
+  /**
+   * It's fine, there not have error
+   */
+  OK = "OK",
+  /**
+   * Command not found
+   */
+  COMMAND_NOT_FOUND = "COMMAND_NOT_FOUND",
 }

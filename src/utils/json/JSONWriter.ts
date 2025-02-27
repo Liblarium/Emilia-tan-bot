@@ -1,5 +1,5 @@
 import { Enums } from "@constants";
-import type { Result } from "@type/utils/file";
+import type { Result } from "@type/utils";
 import type { IFileManager } from "@type/utils/fileManager";
 import type { IFileValidator } from "@type/utils/fileValidator";
 import type { IJSONWriter } from "@type/utils/jsonWriter";
@@ -100,10 +100,6 @@ export class JSONWriter implements IJSONWriter {
     data: T,
     pretty: boolean = false,
   ): Result<string> {
-    const jsonString = Formatters.objectToString(data, pretty);
-
-    return jsonString.trim() === ""
-      ? { success: false, error: { code: Enums.ErrorCode.INVALID_OBJECT, message: "Failed to stringify data. Invalid or empty input!" } }
-      : { success: true, data: jsonString };
+    return Formatters.objectToString(data, pretty);
   }
 }

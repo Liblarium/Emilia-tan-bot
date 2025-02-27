@@ -1,6 +1,6 @@
 import type { Abstract } from "@constants";
 
-export type ModuleType = Abstract.AbstractEvent | Abstract.AbstractBaseCommand;
+export type ModuleType<T extends Abstract.AbstractEvent | Abstract.AbstractBaseCommand> = T;
 
 /**
  * Type for guild prefix in database

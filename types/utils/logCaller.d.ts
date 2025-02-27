@@ -5,6 +5,9 @@ export interface LogCallerErrorLogicArgs {
   target: ClassWithLogCategories;
   propertyKey: string | symbol;
   error: Error;
+  tags: string[];
+  metadata?: object;
+  context?: object;
 }
 
 export type ClassWithLogCategories = { logCategories: ArrayNotEmpty<string> };
@@ -28,4 +31,19 @@ export interface LogCallerOptions {
    * @default []
    */
   categories?: Array<string>;
+  /**
+   * Additional tags to log
+   * @default ["log_caller"]
+   */
+  tags?: string[];
+  /**
+   * Additional metadata to log
+   * @default undefined
+   */
+  metadata?: object;
+  /**
+   * Additional context to log
+   * @default {}
+   */
+  context?: object;
 }

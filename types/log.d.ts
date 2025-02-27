@@ -35,6 +35,7 @@ export interface LogOptions {
    * @default LogType.Info = 1
    */
   type: TypeLog;
+  code: Enums.ErrorCode;
   /**
    * In which categories to write all specified logs. Outputted once in console.log(). Not necessarily global or database, string[] there
    */
@@ -54,4 +55,17 @@ export interface LogOptions {
    * @default Enums.InlineType.None = 0
    */
   inline?: Enums.InlineType;
+  /**
+   * Tags to add to the log
+   * @default []
+   */
+  tags: string[];
+  /**
+   * Metadata to add to the log
+   */
+  metadata?: object;
+  /**
+   * Context to add to the log
+   */
+  context?: object;
 }

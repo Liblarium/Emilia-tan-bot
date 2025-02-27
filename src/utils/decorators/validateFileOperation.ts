@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { Enums } from "@constants";
-import type { ClassWithValidator } from "@type/utils/file";
+import type { ClassWithValidator } from "@type/utils";
 import { emiliaError } from "@utils";
 
 /**

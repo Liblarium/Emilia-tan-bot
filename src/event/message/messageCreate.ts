@@ -3,7 +3,7 @@ import { Abstract } from "@constants";
 import { MessageCommand } from "@handlers/MessageCommand";
 import type { Message } from "discord.js";
 
-export default class MessageCreate extends Abstract.AbstractEvent {
+export default class MessageCreate extends Abstract.AbstractEvent<[Message, EmiliaClient], void> {
   constructor() {
     super({ name: "MessageCreate" });
   }

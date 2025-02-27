@@ -2,7 +2,7 @@ import { constants, access, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { Config, Enums } from "@constants";
 import type { ArrayNotEmpty } from "@type";
-import type { Result } from "@type/utils/file";
+import type { Result } from "@type/utils";
 import type {
   FolderCheckResult,
   IFileValidator,
@@ -166,6 +166,9 @@ export class FileValidator implements IFileValidator {
    * const filePath = "data.json";
    * const result = await fileHandler.isValidJSONFile(filePath);
    * console.log(result); // false. There is .json file. This check for non .json file
+   * const logFilePath = "file.log";
+   * const resultLog = await fileHandler.isValidJSONFile(logFilePath);
+   * console.log(resultLog); // true. There is non .json file. And have valid form
    */
   public async isValidJSONFile(filePath: string): Promise<boolean> {
     if (!this.isValidPath(filePath) || this.isJSONFile(filePath)) return false;

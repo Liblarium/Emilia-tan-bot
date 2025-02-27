@@ -1,14 +1,16 @@
 import { Enums } from "@constants";
 import type { ArrayNotEmpty } from "@type";
 import type { LineType, TypeLog } from "@type/constants/log";
+import type { ClassWithJSONReader, Result } from "@type/utils";
 import type {
   FormatterLogOption,
   FormattingConsoleOptions,
+  formatterTypeOption,
 } from "@type/utils/logFormatter";
-import { Checkers, Decorators, Formatters, emiliaError } from "@utils";
+import { Checkers, Decorators, Formatters } from "@utils";
 
 export class LogFormatter {
-  static readonly logCategories: ArrayNotEmpty<string> = [
+  public static readonly logCategories: ArrayNotEmpty<string> = [
     "utils",
     "formatters",
   ];
@@ -18,7 +20,7 @@ export class LogFormatter {
    * @param {FormatterLogOption} options - Options for formatting the log message.
    * @param {unknown} options.text - The text to log. Can be an object or a string.
    * @param {string} options.type - The type of the log. I.e. 'info', 'error', 'warning', 'debug' or 'test'.
-   * @param {string} options.category - The category of the log. I.e. 'global', 'database' or any other category.
+   * @param {string[]} options.categories - The categories of the log. I.e. 'global', 'database' or any other category.
    * @param {boolean} [options.date=false] - If true, adds the date to the log message with date and time with `dateAndTime()`. If false or undefined, only adds the time with `time()`.
    * @param {(...args: unknown[]) => string} [options.processingLine] - A function to process the log message before logging.
    * @returns {string} The formatted log message as a string.
@@ -32,8 +34,9 @@ export class LogFormatter {
     context = {},
     date = false,
     processingLine,
-  }: FormatterLogOption) {
-    return {
+    jsonReader
+  }: FormatterLogOption & ClassWithJSONReader): Result<string> {
+    return jsonReader.stringify({
       text: processingLine ? processingLine(text) : text,
       type,
       categories,
@@ -41,7 +44,7 @@ export class LogFormatter {
       metadata,
       context,
       date,
-    }
+    });
   }
 
   /**
@@ -55,13 +58,13 @@ export class LogFormatter {
    * setType(0); // EmiliaError: Невідомий тип логу: 0
    */
   @Decorators.logCaller()
-  static formatterType(type: (TypeLog & number) | string): TypeLog | undefined {
+  static formatterType(type: formatterTypeOption): Result<TypeLog> {
     // If the type is already a string and matches one of the allowed values:
     if (
       typeof type === "string" &&
       Object.values(Enums.LogType).includes(type as Enums.LogType)
     ) {
-      return type as TypeLog;
+      return { success: true, data: type as TypeLog };
     }
 
     // To avoid repeating Enums.LogType every time
@@ -76,9 +79,16 @@ export class LogFormatter {
       5: LogType.Test,
     };
 
-    if (typeof type === "number" && typeMap[type]) return typeMap[type];
+    if (typeof type === "number" && typeMap[type])
+      return { success: true, data: typeMap[type] };
 
-    throw emiliaError(`Unknown log type: ${type}`, Enums.ErrorCode.INVALID_TYPE, "TypeError");
+    return {
+      success: false,
+      error: {
+        message: `Unknown log type: ${type}`,
+        code: Enums.ErrorCode.INVALID_TYPE,
+      },
+    };
   }
 
   /**
@@ -99,8 +109,9 @@ export class LogFormatter {
     message,
     line,
     type,
-    category,
+    categories,
     event,
+    errorCode,
     logs,
     getTime = Formatters.time,
   }: FormattingConsoleOptions): void {
@@ -109,7 +120,14 @@ export class LogFormatter {
 
     if (logs)
       console.log(
-        `${line.news}[${getTime()}][${category} | ${typeof type === "number" ? this.formatterType(type) : type}]: ${editText}`,
+        line.news,
+        {
+          time: getTime(),
+          message: editText,
+          errorCode,
+          category: categories,
+          type: typeof type === "number" ? this.formatterType(type) : type,
+        },
         logText.out,
         line.last,
       );
@@ -169,8 +187,4 @@ export class LogFormatter {
       last: inline === 2 || inline === 3 ? "\n" : "",
     };
   }
-}
-
-function ObjectToString(context: object) {
-  throw new Error("Function not implemented.");
 }

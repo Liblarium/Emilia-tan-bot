@@ -1,6 +1,6 @@
 import { Enums } from "@constants";
-import type { Result } from "@type/utils/file";
-import { emiliaError } from "../error/EmiliaError";
+import type { Result } from "@type/utils";
+import { emiliaError } from "@utils";
 
 /**
  * Converts a JSON string to an object.

@@ -1,6 +1,6 @@
 import type { Enums } from "@constants";
 
-export abstract class EmiliaAbstractError extends Error {
+export abstract class AbstractEmiliaError extends Error {
   /**
    * Type of error
    * @type {string | undefined}
@@ -10,7 +10,7 @@ export abstract class EmiliaAbstractError extends Error {
   /**
    * Errorcode 'ErrorCode' Errorcode Error Code.
    */
-  protected code: Enums.ErrorCode;
+  public readonly code: Enums.ErrorCode;
   /**
    * Constructor for EmiliaAbstractError class
    * @param {string} message - Text of error

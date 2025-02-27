@@ -3,7 +3,7 @@ import type { ArrayNotEmpty } from "@type";
 import type { EventArguments } from "@type/constants/event";
 import { AbstractAction } from "./AbstractAction";
 
-export abstract class AbstractEvent extends AbstractAction {
+export abstract class AbstractEvent<T extends unknown[], R> extends AbstractAction<T, R> {
   public readonly once: boolean;
   public readonly category: Enums.EventCategoryType;
   public logCategories: ArrayNotEmpty<string> = ["event"];

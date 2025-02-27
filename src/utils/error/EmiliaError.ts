@@ -14,8 +14,8 @@ class EmiliaError {
     code: Enums.ErrorCode, // required argument
     errorType?: string,
     getTime?: () => string,
-  ): Abstract.EmiliaAbstractError {
-    return new (class extends Abstract.EmiliaAbstractError {
+  ): Abstract.AbstractEmiliaError {
+    return new (class extends Abstract.AbstractEmiliaError {
       constructor(message: string) {
         super(message, code, getTime ?? Formatters.time);
         this.errorType = errorType ?? "Error";

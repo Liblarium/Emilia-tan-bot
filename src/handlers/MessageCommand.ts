@@ -1,5 +1,5 @@
 import type { EmiliaClient } from "@client";
-import { Config } from "@constants";
+import { Config, Enums } from "@constants";
 import { Log } from "@log";
 import type { GuildPrefix } from "@type/handler";
 import { Transforms } from "@utils";
@@ -43,15 +43,15 @@ export class MessageCommand {
     const args = message.content.slice(pref.length).trim().split(/ +/);
     const argsShift = args.shift();
 
-    if (!argsShift) return new Log({ text: "По неизвестным причинам argsShift == undefined", type: 2, categories: ["global", "event", "command"] });
+    if (!argsShift) return new Log({ text: "По неизвестным причинам argsShift == undefined", type: 2, categories: ["global", "event", "command"], tags: ["handler", "command"], code: Enums.ErrorCode.UNKNOWN_ERROR });
 
     const commandName = argsShift.toLowerCase();
 
-    if (!commandName) return new Log({ text: "Произошла ошибка. CommandName = undefined", type: 2, categories: ["global", "events"] });
+    if (!commandName) return new Log({ text: "Произошла ошибка. CommandName = undefined", type: 2, categories: ["global", "events"], tags: ["handler", "command"], code: Enums.ErrorCode.INVALID_DATA });
 
     const command = client.command.get(commandName);
 
-    if (!command) return new Log({ text: `${message.member?.user?.username ?? "[Ошибка]"} попытался(ась) заюзать ${commandName || pref} в ${message.guild?.name ?? "[Ошибка]"}`, type: 2, event: true, categories: ["global", "events"] });
+    if (!command) return new Log({ text: `${message.member?.user?.username ?? "[Ошибка]"} попытался(ась) заюзать ${commandName || pref} в ${message.guild?.name ?? "[Ошибка]"}`, type: 2, event: true, categories: ["global", "events"], tags: ["handler", "command"], code: Enums.ErrorCode.COMMAND_NOT_FOUND });
 
     if (command.option.delete && message.channel.permissionsFor(cliUser.id)?.has(ManageMessages)) await message.delete();
 

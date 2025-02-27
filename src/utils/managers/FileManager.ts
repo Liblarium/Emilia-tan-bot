@@ -2,10 +2,11 @@ import { constants, access, appendFile, mkdir, unlink, writeFile } from "node:fs
 import { resolve } from "node:path";
 import { Enums } from "@constants";
 import type { ArrayNotEmpty } from "@type";
-import type { ClassWithValidator, Result } from "@type/utils/file";
+import type { ClassWithValidator, Result } from "@type/utils";
 import type { IFileManager } from "@type/utils/fileManager";
 import type { IFileValidator } from "@type/utils/fileValidator";
 import { Decorators, emiliaError } from "@utils";
+import { AbstractEmiliaError } from "src/constants/abstract";
 
 export class FileManager implements IFileManager {
   public readonly logCategories: ArrayNotEmpty<string> = ["fileManager"];
@@ -28,6 +29,9 @@ export class FileManager implements IFileManager {
    * @returns {Promise<CreateFolderResult>}
    * @example
    * const result = await FileHandler.createFolder("/path/to/folder", "newFolder");
+   * 
+   * if (!result) return console.error(result.error); // { success: false, error: { code: "CREATE_FOLDER_ERROR" or "INVALID_PATH", message: or "Invalid path or folder name!" } }
+   * 
    * console.log(result);
    * // {
    * //   success: true,
@@ -45,19 +49,32 @@ export class FileManager implements IFileManager {
     const pathFolder = resolve(path);
     const folder = resolve(pathFolder, folderName);
 
+    const [isPathValid, isFolderValid] = [pathFolder, folder].map(async (check) => await this.fileValidator.checkFolder(check));
+
+    if (!(await isPathValid) || !(await isFolderValid)) return {
+      success: false, error: {
+        code: Enums.ErrorCode.CREATE_FOLDER_ERROR,
+        message: `Invalid path or folder name: ${folder}. Maybe this path/folder on black list or exist/not writable!`,
+      }
+    }
     try {
-      await access(pathFolder, constants.W_OK);
+
       await mkdir(folder, { recursive: true });
       return {
         success: true,
         data: { path: folder },
       };
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : "Unknown error";
-      emiliaError(errorMessage, Enums.ErrorCode.CREATE_FOLDER_ERROR);
+      const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
+      const errorCode = e instanceof AbstractEmiliaError && e.code.length > 0 ? e.code : Enums.ErrorCode.CREATE_FOLDER_ERROR;
+      emiliaError(errorMessage, errorCode);
+
       return {
         success: false,
-        error: { code: Enums.ErrorCode.CREATE_FOLDER_ERROR, message: `Failed to create folder: ${errorMessage}` },
+        error: {
+          code: errorCode,
+          message: `Failed to create folder: ${errorMessage}`
+        }
       };
     }
   }
@@ -82,7 +99,8 @@ export class FileManager implements IFileManager {
       await writeFile(filePath, data);
       return { success: true, data: undefined };
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+      const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
+
       emiliaError(`FileHandler.writeFile: ${errorMessage}`, Enums.ErrorCode.FILE_NOT_WRITABLE);
       console.error(e);
       return {
@@ -114,7 +132,7 @@ export class FileManager implements IFileManager {
 
       return { success: true, data: undefined };
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+      const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
       emiliaError(`FileHandler.deleteFile: ${errorMessage}`, Enums.ErrorCode.FILE_NOT_WRITABLE);
       console.error(e);
       return {
@@ -152,7 +170,7 @@ export class FileManager implements IFileManager {
 
       return { success: true, data: undefined };
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : "Unknown error";
+      const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
       emiliaError(`FileHandler.appendFile: ${errorMessage}`, Enums.ErrorCode.APPEND_FILE_ERROR);
       console.error(e);
       return {

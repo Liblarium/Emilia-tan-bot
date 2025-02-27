@@ -1,4 +1,4 @@
-import type { ErrorDetails, Result } from "./file";
+import type { ErrorDetails, Result } from ".";
 import type { ClassWithLogCategories } from "./logCaller";
 
 export interface IFormatValidator {

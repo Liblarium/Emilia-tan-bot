@@ -43,7 +43,7 @@ export class CommandHandler extends Abstract.AbstractHandler {
    * @throws Catches any errors that occur during the process and passes them to the error handling function.
    */
   @Decorators.logCaller()
-  setLogic(command: Abstract.AbstractBaseCommand): void | Promise<void> {
+  setLogic(command: Abstract.AbstractBaseCommand<unknown[], void | Promise<void>>): void | Promise<void> {
     const client = this.client;
 
     try {
@@ -77,5 +77,9 @@ function error(e: unknown) {
     text: e,
     type: 2,
     categories: ["global", "handler", "command"],
+    tags: ["handler", "command"],
+    metadata: { error: e },
+    context: { error: e },
+    code: e instanceof Abstract.AbstractEmiliaError ? e.code : Enums.ErrorCode.UNKNOWN_ERROR
   });
 }

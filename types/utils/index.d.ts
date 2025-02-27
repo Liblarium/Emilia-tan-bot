@@ -41,4 +41,16 @@ export interface ClassWithFileManager {
    * The file manager
    */
   fileManager: IFileManager
-}; 
+};
+export interface ClassWithJSONReader {
+  /**
+   * The JSON reader
+   */
+  jsonReader: JSONs.JSONWriter
+}
+export interface ClassWithJSONWriter {
+  /**
+   * The JSON writer
+   */
+  jsonWriter: JSONs.JSONWriter
+}

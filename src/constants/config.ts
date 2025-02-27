@@ -31,6 +31,13 @@ export const FORBIDDEN_FILES: ArrayNotEmpty<string> = ["package.json", "package-
 export const ALLOWED_FILES: ArrayMaybeEmpty<string> = [];
 
 /**
+ * Delimiter for log file
+ * 
+ * Use from ".log" files
+ */
+export const DELIMITER_LOG_FILE = "\n";
+
+/**
  * Prefix
  * 
  * Defalt discord bot prefix
