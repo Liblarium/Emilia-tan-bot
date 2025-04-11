@@ -1,6 +1,6 @@
-import { Enums } from "@constants";
+import { ErrorCode } from "@constants/enum/errorCode";
 import type { Result } from "@type/utils";
-import { emiliaError } from "@utils";
+import { emiliaError } from "@utils/error/EmiliaError";
 
 /**
  * Converts an object to a formatted JSON string.
@@ -20,7 +20,7 @@ export function objectToString(
   } catch (error) {
     emiliaError(
       "Error converting object to JSON string!",
-      Enums.ErrorCode.INVALID_OBJECT,
+      ErrorCode.INVALID_OBJECT,
       "TypeError",
     );
 
@@ -29,7 +29,7 @@ export function objectToString(
     return {
       success: false,
       error: {
-        code: Enums.ErrorCode.INVALID_OBJECT,
+        code: ErrorCode.INVALID_OBJECT,
         message: `Error converting object: ${error.message}`,
       },
     };

@@ -1,16 +1,17 @@
-import { Abstract, Enums } from "@constants";
+import { CommandType } from "@constants/enum/command";
 import type { CommandArguments, CommandOptions } from "@type/constants/command";
 import { SlashCommandBuilder } from "discord.js";
+import { AbstractAction } from "./AbstractAction";
 
-const { AbstractAction } = Abstract;
-
-export abstract class AbstractBaseCommand<T extends unknown[], R> extends AbstractAction<T, R> {
+export abstract class AbstractBaseCommand extends AbstractAction<string> {
   /**
    * @see {@link https://discord.com/developers/docs/interactions/application-commands#application-command-object official Discord API documentation}. If you need more information about Discord API
    *
    * @see {@link https://discord.js.org/docs/packages/discord.js/main/SlashCommandBuilder:Class discord.js SlashCommandBuilder Documentation}. If you need more information about this class
    */
   public readonly data: SlashCommandBuilder = new SlashCommandBuilder();
+
+  public readonly name: string;
 
   /**
    * Command options
@@ -26,7 +27,7 @@ export abstract class AbstractBaseCommand<T extends unknown[], R> extends Abstra
   /**
    * The command type. Default is CommandType.Both
    */
-  public type: Enums.CommandType;
+  public type: CommandType;
 
   /**
    * Constructor for the AbstractBaseCommand class
@@ -52,6 +53,7 @@ export abstract class AbstractBaseCommand<T extends unknown[], R> extends Abstra
 
     super(name);
 
+    this.name = name;
     this.data
       .setName(name)
       .setDescription(description);
@@ -70,10 +72,10 @@ export abstract class AbstractBaseCommand<T extends unknown[], R> extends Abstra
     };
 
     // If command have aliases. Only message command versions
-    if (aliases && aliases.length > 0 && type !== Enums.CommandType.Slash) this.aliases = aliases;
+    if (aliases && aliases.length > 0 && type !== CommandType.Slash) this.aliases = aliases;
 
     // I have 3 versions of commands (both and only message or slash command)
-    this.type = type ?? Enums.CommandType.Both;
+    this.type = type ?? CommandType.Both;
   }
 }
 

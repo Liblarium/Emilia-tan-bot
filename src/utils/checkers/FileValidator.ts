@@ -1,13 +1,22 @@
 import { constants, access, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { Config, Enums } from "@constants";
+import {
+  ALLOWED_EXTENSIONS,
+  ALLOWED_FILES,
+  ALLOWED_FOLDERS,
+  FORBIDDEN_EXTENSIONS,
+  FORBIDDEN_FILES,
+  FORBIDDEN_FOLDERS
+} from "@constants/config";
+import { ErrorCode } from "@constants/enum/errorCode";
 import type { ArrayNotEmpty } from "@type";
 import type { Result } from "@type/utils";
 import type {
   FolderCheckResult,
   IFileValidator,
 } from "@type/utils/fileValidator";
-import { Decorators, emiliaError } from "@utils";
+import { logCaller } from "@utils/decorators/logCaller";
+import { emiliaError } from "@utils/error/EmiliaError";
 
 export class FileValidator implements IFileValidator {
   public logCategories: ArrayNotEmpty<string> = ["file_validator"];
@@ -33,7 +42,7 @@ export class FileValidator implements IFileValidator {
       return {
         success: false,
         error: {
-          code: Enums.ErrorCode.FILE_NOT_FOUND,
+          code: ErrorCode.FILE_NOT_FOUND,
           message: `File ${filePath} does not exist!`,
         },
       };
@@ -41,7 +50,7 @@ export class FileValidator implements IFileValidator {
       return {
         success: false,
         error: {
-          code: Enums.ErrorCode.FILE_NOT_WRITABLE,
+          code: ErrorCode.FILE_NOT_WRITABLE,
           message: `File ${filePath} is not writable!`,
         },
       };
@@ -64,7 +73,7 @@ export class FileValidator implements IFileValidator {
    * // Throws for empty path
    * isValidPath(""); 
    */
-  @Decorators.logCaller()
+  @logCaller()
   public isValidPath(filePath: string): boolean {
     this.validateConfig(filePath);
 
@@ -84,38 +93,38 @@ export class FileValidator implements IFileValidator {
    * @param {string} filePath - The file path to validate.
    * @throws {EmiliaError} If the file path is empty or if the configuration arrays are empty.
    */
-  @Decorators.logCaller()
+  @logCaller()
   private validateConfig(filePath: string): void {
     if (!filePath) {
       throw emiliaError(
         "File path is empty!",
-        Enums.ErrorCode.INVALID_PATH,
+        ErrorCode.INVALID_PATH,
         "InternalError",
       );
     }
 
     const isEmptyConfig = [
-      Config.FORBIDDEN_EXTENSIONS,
-      Config.ALLOWED_EXTENSIONS,
-      Config.FORBIDDEN_FOLDERS,
-      Config.ALLOWED_FOLDERS,
-      Config.FORBIDDEN_FILES,
+      FORBIDDEN_EXTENSIONS,
+      ALLOWED_EXTENSIONS,
+      FORBIDDEN_FOLDERS,
+      ALLOWED_FOLDERS,
+      FORBIDDEN_FILES,
     ].every((arr) => arr.length === 0);
 
     if (isEmptyConfig) {
       throw emiliaError(
-        "Forbidden or allowed extensions are empty! See constants/config.ts!",
-        Enums.ErrorCode.FILE_FORMAT_ERROR,
+        "Forbidden or allowed extensions are empty! See constants/ts!",
+        ErrorCode.FILE_FORMAT_ERROR,
         "InternalError",
       );
     }
   }
 
   private isExtensionValid(filePath: string): boolean {
-    const isForbidden = Config.FORBIDDEN_EXTENSIONS.some((ext) =>
+    const isForbidden = FORBIDDEN_EXTENSIONS.some((ext) =>
       filePath.endsWith(ext),
     );
-    const isAllowed = Config.ALLOWED_EXTENSIONS.some((ext) =>
+    const isAllowed = ALLOWED_EXTENSIONS.some((ext) =>
       filePath.endsWith(ext),
     );
 
@@ -123,10 +132,10 @@ export class FileValidator implements IFileValidator {
   }
 
   private isFolderValid(filePath: string): boolean {
-    const isForbiddenFolder = Config.FORBIDDEN_FOLDERS.some((folder) =>
+    const isForbiddenFolder = FORBIDDEN_FOLDERS.some((folder) =>
       filePath.includes(folder),
     );
-    const isAllowedFolder = Config.ALLOWED_FOLDERS.some((folder) =>
+    const isAllowedFolder = ALLOWED_FOLDERS.some((folder) =>
       filePath.includes(folder),
     );
 
@@ -134,11 +143,11 @@ export class FileValidator implements IFileValidator {
   }
 
   private isFileValid(filePath: string): boolean {
-    const isForbiddenFile = Config.FORBIDDEN_FILES.some((file) =>
+    const isForbiddenFile = FORBIDDEN_FILES.some((file) =>
       filePath.includes(file),
     );
-    const isAllowedFile = Config.ALLOWED_FILES.length === 0 ? true :
-      Config.ALLOWED_FILES.some((file) => filePath.includes(file));
+    const isAllowedFile = ALLOWED_FILES.length === 0 ? true :
+      ALLOWED_FILES.some((file) => filePath.includes(file));
 
     return !isForbiddenFile && isAllowedFile;
   }
@@ -188,10 +197,10 @@ export class FileValidator implements IFileValidator {
    * // { success: true }
    */
   public checkFormatFile(filePath: string): Result<void> {
-    const isForbidden = Config.FORBIDDEN_EXTENSIONS.some((ext) =>
+    const isForbidden = FORBIDDEN_EXTENSIONS.some((ext) =>
       filePath.endsWith(ext),
     );
-    const isAllowed = Config.ALLOWED_EXTENSIONS.some((ext) =>
+    const isAllowed = ALLOWED_EXTENSIONS.some((ext) =>
       filePath.endsWith(ext),
     );
 
@@ -199,7 +208,7 @@ export class FileValidator implements IFileValidator {
       ? {
         success: false,
         error: {
-          code: Enums.ErrorCode.FILE_FORMAT_ERROR,
+          code: ErrorCode.FILE_FORMAT_ERROR,
           message:
             "FileHandler: You cannot modify a file with this extension!",
         },
@@ -225,7 +234,7 @@ export class FileValidator implements IFileValidator {
         exists: false,
         writable: false,
         error: {
-          code: Enums.ErrorCode.INVALID_PATH,
+          code: ErrorCode.INVALID_PATH,
           message:
             "You checked folder with black list folders! Please - see at allow/deny folders on config file.",
         },
@@ -239,12 +248,12 @@ export class FileValidator implements IFileValidator {
         error: undefined,
       };
     } catch (e) {
-      emiliaError(e, Enums.ErrorCode.FOLDER_INVALID);
+      emiliaError(e, ErrorCode.FOLDER_INVALID);
       return {
         exists: false,
         writable: false,
         error: {
-          code: Enums.ErrorCode.FOLDER_INVALID,
+          code: ErrorCode.FOLDER_INVALID,
           message:
             "Folder does not exist or is not writable! Please check the folder path and permissions.",
         },

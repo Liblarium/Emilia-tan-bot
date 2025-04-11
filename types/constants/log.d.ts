@@ -1,13 +1,14 @@
-import type { Abstract, Enums } from "@constants";
+import type { ErrorCode } from "@constants/enum/errorCode";
+import type { LogType } from "@constants/enum/log";
+import type { InlineType } from "@constants/enum/log";
 import type { ArrayNotEmpty } from "@type";
-import type { Result } from "@type/utils";
 import type {
   ClassWithFileManager,
   ClassWithJSONReader,
   ClassWithJSONWriter,
   ClassWithValidator,
+  Result,
 } from "@type/utils";
-import { ClassWithLogCategories } from "@type/utils/logCaller";
 import type { ILogFormatters } from "@type/utils/logFormatter";
 
 export type LineType = { news: "" | "\n"; last: "" | "\n" };
@@ -33,7 +34,7 @@ export interface AbstractLogOptions {
   /**
    * Inline mode. If 0 - no inline, if 1 - add new line at start, if 2 - add new line at end, if 3 - add new lines at start and end
    */
-  inline: TypeInline;
+  inline: InlineType;
   /**
    * Categories of log
    */
@@ -41,7 +42,7 @@ export interface AbstractLogOptions {
   /**
    * Code of error which will be written to log
    */
-  code: Enums.ErrorCode;
+  code: ErrorCode;
   /**
    * Metadata of log. It is an object which can contain any information.
    * It will be written to log as a JSON string.
@@ -78,6 +79,7 @@ export interface AbstractLogOptions {
 export interface IAbstractLogWithDependencies
   extends ClassWithJSONReader,
   ClassWithJSONWriter,
+  ClassWithJSONReader,
   ClassWithFileManager,
   ClassWithValidator,
   СlassWithLogFormatter { }
@@ -93,7 +95,7 @@ export interface СlassWithLogFormatter {
 /**
  * Type of log. It is a union of LogType and LogTypeNumber
  */
-export type TypeLog = Enums.LogType | LogTypeNumber;
+export type TypeLog = LogType | LogTypeNumber;
 
 /**
  * Type of text
@@ -145,9 +147,13 @@ export interface AddLogOptions {
   tags?: string[];
   metadata?: object;
   context?: object;
-  errorCode: Enums.ErrorCode;
+  errorCode: ErrorCode;
 }
 
 export interface IAbstractLog extends IAbstractLogWithDependencies {
-  findLogsByTags(tags: string[], matchAll: boolean = false, month?: boolean): Promise<Result<LogEntry>[]>;
+  findLogsByTags(
+    tags: string[],
+    matchAll?: boolean,
+    month?: boolean,
+  ): Promise<Result<LogEntry>[]>;
 }

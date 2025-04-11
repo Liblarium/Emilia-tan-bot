@@ -1,4 +1,5 @@
-import type { Enums } from "@constants";
+import type { ErrorCode } from "@constants/enum/errorCode";
+import type { InlineType } from "@constants/enum/log";
 import type { ArrayNotEmpty } from "@type";
 import type { TypeLog, TypeText } from "./constants/log";
 
@@ -19,7 +20,7 @@ import type { TypeLog, TypeText } from "./constants/log";
  *   logs: true,
  *   inline: Enums.InlineType.Before,
  * };
- * 
+ *
  * new Log(options); // [time]: Hello from LogOptions
  */
 export interface LogOptions {
@@ -29,13 +30,13 @@ export interface LogOptions {
   text: TypeText;
   /**
    * information type. Numeric: 1 - info, 2 - error, 3- warning, 4 - debug, 5 - test
-   * 
+   *
    * Or you can use LogType (enum)
-   * 
+   *
    * @default LogType.Info = 1
    */
   type: TypeLog;
-  code: Enums.ErrorCode;
+  code: ErrorCode;
   /**
    * In which categories to write all specified logs. Outputted once in console.log(). Not necessarily global or database, string[] there
    */
@@ -54,7 +55,7 @@ export interface LogOptions {
    * Affects only the text in the console. 0 - No change, 1 - wrap from top to bottom, 2 - from bottom, 3 - both.
    * @default Enums.InlineType.None = 0
    */
-  inline?: Enums.InlineType;
+  inline?: InlineType;
   /**
    * Tags to add to the log
    * @default []

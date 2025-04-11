@@ -23,20 +23,20 @@
       "@client": [
         "src/client/index.ts"
       ],
-      "@constants": [
-        "src/constants/index.ts"
+      "@constants/*": [
+        "src/constants/*"
       ],
-      "@db": [
-        "src/database/index.ts"
+      "@db/*": [
+        "src/database/*"
       ],
-      "@utils": [
-        "src/utils/index.ts"
+      "@utils/*": [
+        "src/utils/*"
       ],
       "@log": [
         "src/log/index.ts"
       ],
-      "@interaction": [
-        "src/interaction/index.ts"
+      "@interaction/*": [
+        "src/interaction/*"
       ],
       "@handlers/*": [
         "src/handlers/*"
@@ -46,8 +46,7 @@
   "include": [
     "src",
     "node_modules/@types",
-    "types",
-    "__tests__"
+    "types"
   ],
   "exclude": [
     "./node_modules",

@@ -1,6 +1,8 @@
-export interface ActionArguments {
+export interface IAbstractAction {
   /**
    * Action (command/event) name
    */
-  name: string;
+  name: unknown;
+
+  execute: (...args: unknown[]) => unknown | Promise<void>;
 }

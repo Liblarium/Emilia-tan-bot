@@ -1,19 +1,21 @@
 /**
- * @enum
- * @name EventCagetoryType
- * @description This enum to define the category of the event
+ * The categories of events
  */
-export enum EventCategoryType {
+export enum CategoryEvents {
   /**
-   * Discord.js event. Default category.
+   * The category for discord.js events
    */
-  BOT = "bot",
+  Bot = "bot",
   /**
-   * MongoDB/Mongoose event
+   * The category for typegoose/mongoose events
    */
-  MONGO = "mongo",
+  Mongoose = "mongoose",
   /**
    * Custom event - you can create your own. Recomended: add there your category event
    */
-  CUSTOM = "custom"
+  Custom = "custom",
+  /**
+   * Unknowns events (`[key: stirng]: unknown[]`)
+   */
+  Unknown = "unknown"
 }

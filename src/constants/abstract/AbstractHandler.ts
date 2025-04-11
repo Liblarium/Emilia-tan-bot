@@ -1,165 +1,76 @@
-import { readdir } from "node:fs/promises";
-import { resolve } from "node:path";
 import type { EmiliaClient } from "@client";
-import { Abstract, Enums } from "@constants";
-import { Log } from "@log";
-import type { ArrayMaybeEmpty, ArrayNotEmpty, ArrayPathLimit } from "@type";
-import type { ModuleType } from "@type/handler";
-import { Checkers, Decorators } from "@utils";
+import { defaultHandlerFileFilter } from "@constants/config";
+import { FolderScanner } from "@handlers/FolderScanner";
+import { HandlerCore } from "@handlers/HandlerCore";
+import { ModuleImporter } from "@handlers/ModuleImporter";
+import type { ArrayNotEmpty } from "@type";
+import type {
+  HandlerPath,
+  IAbstractHandler,
+  IAbstractHandlerInjection,
+} from "@type/constants/handler";
+import type { ValidModule } from "@type/handler/BaseModule";
+import { logCaller } from "@utils/decorators/logCaller";
 
-export abstract class AbstractHandler {
-  /**
-   * The client which the handler is attached to.
-   */
-  public client: EmiliaClient;
-  /**
-   * The path to the folder where the handler will look for files.
-   * @default ["dist","command"]
-   */
-  protected folderPath: ArrayPathLimit;
-  /**
-   * The regular expression used to filter the files in the folder.
-   * @default /^[^.]+\.(js)$/
-   */
-  protected filterFile: RegExp;
 
+export abstract class AbstractHandler implements IAbstractHandler {
   public readonly logCategories: ArrayNotEmpty<string> = ["handler"];
 
   /**
-   * The constructor for the handler class.
-   * @param client - The client which the handler is attached to.
+   * Constructs an instance of AbstractHandler.
    *
-   * The handler will look for files in the "dist/command" directory and will filter them by the regular expression `^[^.]+\.(js)$`.
+   * @param client - The Discord client instance.
+   * @param injection - Configuration object for handler injection, including folder path and file filter.
+   * @param injection.folderPath - The folder path to scan for commands.
+   * @param injection.filterFile - The file filter to use when scanning the folder path.
+   * @param scanner - The FolderScanner instance used for scanning directories; defaults to scanning the `injection.folderPath` with `injection.filterFile`.
+   * @param core - The HandlerCore instance responsible for building the handler logic using the scanner and module importer.
    */
-  constructor(client: EmiliaClient) {
-    this.client = client;
-    this.folderPath = ["dist", "command"];
-    this.filterFile = /^[^.]+\.(js)$/;
+  constructor(
+    public client: EmiliaClient,
+    public injection: IAbstractHandlerInjection = {
+      folderPath: ["dist", "command"],
+      filterFile: defaultHandlerFileFilter,
+    },
+    private scanner: FolderScanner = new FolderScanner(
+      injection.folderPath,
+      injection.filterFile,
+    ),
+    private core = new HandlerCore(
+      this.scanner,
+      new ModuleImporter(injection.folderPath),
+    )
+  ) { }
+
+  abstract setLogic(module: ValidModule): void | Promise<void>;
+
+  setFilter(filter: RegExp): void {
+    if (filter instanceof RegExp) {
+      this.scanner = new FolderScanner(this.injection.folderPath, filter);
+    }
   }
 
-  /**
-   * Method to change the filter
-   * @param filter
-   * @default /^[^.]+\.(js)$/
-   */
-  public setFilter(filter: RegExp): void | Promise<void> {
-    if (filter instanceof RegExp) this.filterFile = filter;
-  }
-
-  /**
-   * Method to change the path for searching
-   * @param path
-   * @default ["dist","command"]
-   * @returns {void}
-   */
-  public setFolderPath(
-    path: ArrayPathLimit,
-  ): void | null | Promise<void | null> {
-    if (path) this.folderPath = path;
-  }
-
-  /**
-   * Method for working with commands/events
-   * @param folder
-   * @param file
-   * @returns {Promise<ModuleType>}
-   */
-  protected abstract setLogic(
-    modules: ModuleType<unknown>,
-  ): void | null | Promise<void | null>;
-
-  /**
-   * Build method for the handler class.
-   *
-   * This method will look for folders in the directory specified by the `folderPath` property.
-   *
-   * It will then look for files in each of those folders and filter them by the regular expression specified by the `filterFile` property.
-   *
-   * It will then import each of the filtered files and check if they are classes.
-   *
-   * If they are, it will create an instance of the class and pass it to the `setLogic` method.
-   *
-   * If the `setLogic` method returns `null`, it will skip the file.
-   *
-   * If any errors occur during the build process, it will log the error.
-   */
-  @Decorators.logCaller()
-  protected async build(): Promise<void> {
-    const foldersScan = await this.scanFolder();
-
-    try {
-      for (const folder of foldersScan) {
-        const fileScan = (await this.scanFolder(folder)).filter((file) =>
-          this.filterFile.test(file),
-        );
-
-        for (const file of fileScan) {
-          const FileModule = (await this.importModule(folder, file)).default
-            .default;
-
-          if (!Checkers.isClass(FileModule)) {
-            new Log({
-              text: `Файл ${file} не является классом!`,
-              type: 2,
-              categories: ["global", "handler"],
-              tags: ["handler"],
-              metadata: { file },
-              context: { file },
-              code: Enums.ErrorCode.INVALID_TYPE
-            });
-            continue;
-          }
-
-          const modules: ModuleType<Abstract.AbstractEvent<unknown[], void> | Abstract.AbstractBaseCommand<unknown[], void>> = new FileModule();
-          const logic = await this.setLogic(modules);
-          // TODO: delete this Log later. Now - for debug
-          new Log({
-            text: `Модуль ${file} успешно загружен!`,
-            type: 1,
-            categories: ["global", "handler"],
-            tags: ["handler"],
-            code: Enums.ErrorCode.OK,
-            metadata: { file },
-            context: { file },
-          });
-
-          if (logic === null) continue;
-        }
-      }
-    } catch (e: unknown) {
-      new Log({ text: e, type: 2, categories: ["global", "handler"], tags: ["handler"], code: e instanceof Abstract.AbstractEmiliaError ? e.code : Enums.ErrorCode.UNKNOWN_ERROR });
+  setFolderPath(path: HandlerPath): void {
+    if (Array.isArray(path) && path.length === 2) {
+      this.injection.folderPath = path;
+      this.scanner = new FolderScanner(path, this.injection.filterFile);
     }
   }
 
   /**
-   * Method for scanning the specified folder and sub-folders
-   * @param folder
-   * @returns
-   */
-  private async scanFolder(folder?: string): Promise<ArrayMaybeEmpty<string>> {
-    const folderPach = this.folderPath;
-
-    if (folder && folder.length >= 1) folderPach.push(folder);
-
-    const folders = resolve(...this.folderPath);
-
-    return await readdir(folders);
-  }
-
-  /**
-   * Imports a module from the specified folder and file.
+   * Builds the handler by scanning folders and files, importing modules, and setting up logic.
    *
-   * Constructs the full path to the module using the folderPath property,
-   * and then dynamically imports the module.
+   * @returns A promise that resolves when the build process is complete.
    *
-   * @param folder - The folder where the file is located.
-   * @param file - The file to import from the specified folder.
-   * @returns The default export of the imported module.
+   * @throws Will log an error if any issues occur during scanning, importing, or setting logic.
    */
-  private async importModule(folder: string, file: string) {
-    const modulePath = resolve(...this.folderPath, folder, file);
-    const importModule = await import(modulePath);
-
-    return importModule.default.default;
+  @logCaller({ tags: ["handler", "build"] })
+  protected async build(): Promise<void> {
+    try {
+      await this.core.build(this);
+    } catch (error) {
+      console.error("Build failed:", error);
+      throw error;
+    }
   }
 }

@@ -1,12 +1,16 @@
-import { Abstract } from "@constants";
+import { AbstractLog } from "@constants/abstract/AbstractLog";
 import type { LogOptions } from "@type/log";
-import { Checkers, Formatters, JSONs, Managers } from "@utils";
+import { FileValidator } from "@utils/checkers/FileValidator";
+import { LogFormatter } from "@utils/formatters/LogFormatter";
+import { JSONReader } from "@utils/json/JSONReader";
+import { JSONWriter } from "@utils/json/JSONWriter";
+import { FileManager } from "@utils/managers/FileManager";
 
-const fileValidator = new Checkers.FileValidator();
-const fileManager = new Managers.FileManager(fileValidator);
-const jsonReader = new JSONs.JSONReader(fileValidator);
-const jsonWriter = new JSONs.JSONWriter(fileValidator, fileManager);
-const logFormatter = Formatters.LogFormatter;
+
+const fileValidator = new FileValidator();
+const fileManager = new FileManager(fileValidator);
+const jsonReader = new JSONReader(fileValidator);
+const jsonWriter = new JSONWriter(fileValidator, fileManager);
 
 /**
  * A function to catch any errors that may occur in the code
@@ -40,7 +44,7 @@ const catchs = (e: unknown) => {
 * });
 *
 */
-export class Log extends Abstract.AbstractLog {
+export class Log extends AbstractLog {
   /**
    * Constructs a new Log object
    * @param logOptions
@@ -67,7 +71,7 @@ export class Log extends Abstract.AbstractLog {
     metadata,
     context = {},
   }: LogOptions) {
-    super({ text, type, event, logs, inline, code, jsonReader, jsonWriter, fileValidator, logFormatter, fileManager, categories, tags, metadata, context });
+    super({ text, type, event, logs, inline, code, jsonReader, jsonWriter, fileValidator, logFormatter: LogFormatter, fileManager, categories, tags, metadata, context });
 
     this.log().catch(catchs);
   }

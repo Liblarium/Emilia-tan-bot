@@ -1,17 +1,17 @@
-import type { Abstract } from '@constants';
+import type { AbstractBaseCommand } from "@constants/abstract/AbstractBaseCommand";
 import { PrismaClient } from "@prisma/client";
 import { Client, type ClientOptions, Collection } from 'discord.js';
 
 export const db = new PrismaClient();
 export class EmiliaClient extends Client {
   /**
-   * @type {Collection<string, Abstract.AbstractBaseCommand>} - The collection of commands
+   * @type {Collection<string, AbstractBaseCommand>} - The collection of commands
    */
-  public command: Collection<string, Abstract.AbstractBaseCommand> = new Collection();
+  public command: Collection<string, AbstractBaseCommand> = new Collection();
   /**
-   * @type {Collection<string, Abstract.AbstractBaseCommand>} - The collection of Slash commands
+   * @type {Collection<string, AbstractBaseCommand>} - The collection of Slash commands
    */
-  public slashCommand: Collection<string, Abstract.AbstractBaseCommand> = new Collection();
+  public slashCommand: Collection<string, AbstractBaseCommand> = new Collection();
   /**
    * @type {Collection<string, string>} - The collection of events
    */

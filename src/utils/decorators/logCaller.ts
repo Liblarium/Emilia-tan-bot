@@ -2,10 +2,13 @@
  * This file contains decorators for any functions in the codebase.
  */
 
-import { Enums } from "@constants";
+import { ErrorCode } from "@constants/enum/errorCode";
+import { LogType } from "@constants/enum/log";
 import { Log } from "@log";
 import type { ClassWithLogCategories, LogCallerErrorLogicArgs, LogCallerOptions } from "@type/utils/logCaller";
-import { Checkers, emiliaError } from "@utils";
+import { isPromise } from "@utils/checkers/isPromise";
+import { emiliaError } from "@utils/error/EmiliaError";
+
 
 /**
  * Decorator for logging method calls and handling errors.
@@ -54,14 +57,14 @@ export function logCaller(options?: LogCallerOptions) {
 
       if (options?.tags && options.tags.length > 0) tags.push(...options.tags);
 
-      if (options?.viewArgs) new Log({ text: args, type: Enums.LogType.Info, categories: ["global", "log_caller", ...target.logCategories], tags, code: Enums.ErrorCode.OK, metadata: options.metadata, context: options.context });
+      if (options?.viewArgs) new Log({ text: args, type: LogType.Info, categories: ["global", "log_caller", ...target.logCategories], tags, code: ErrorCode.OK, metadata: options.metadata, context: options.context });
 
       // Call the original method
       try {
         const result = await originalMethod.apply(this, args);
 
         // If the result is a promise, handle it
-        if (Checkers.isPromise(result)) {
+        if (isPromise(result)) {
           return result.then(res => {
             if (options?.logSuccess) loggerSuccess(propertyKey, tags, options.metadata, options.context);
 
@@ -107,11 +110,11 @@ function logCallerErrorLogic({ target, propertyKey, error, tags, metadata, conte
   // Check if error is an instance of Error and convert it if not
   if (!(error instanceof Error)) error = new Error(String(error));
   // Check if logCategories is an array. If not, throw an error.
-  if (!Array.isArray(logCategories)) throw emiliaError(`[${className}.@logCaller.${propertyKey}]: logCategories must be an array!`, Enums.ErrorCode.UNKNOWN_ERROR, "TypeError");
+  if (!Array.isArray(logCategories)) throw emiliaError(`[${className}.@logCaller.${propertyKey}]: logCategories must be an array!`, ErrorCode.UNKNOWN_ERROR, "TypeError");
 
   // Log error message. P.S. ind - Index, val - Value.
   [`[${propertyKey}]: ${error.message}`, error].forEach((val, ind) => new Log({
-    text: val, categories: (ind === 0 ? ["global", ...logCategories] : ["log_caller"]), type: Enums.LogType.Error, code: Enums.ErrorCode.INVALID_TYPE, tags, metadata, context
+    text: val, categories: (ind === 0 ? ["global", ...logCategories] : ["log_caller"]), type: LogType.Error, code: ErrorCode.INVALID_TYPE, tags, metadata, context
   }));
 
   // Error message on console.
@@ -130,5 +133,5 @@ function logCallerErrorLogic({ target, propertyKey, error, tags, metadata, conte
  * @returns void This function doesn't return anything.
  */
 function loggerSuccess(message: string | symbol, tags: string[], metadata?: object, context?: object) {
-  new Log({ text: `Successful call to ${String(message)}`, type: Enums.LogType.Info, categories: ["global", "log_caller"], tags, code: Enums.ErrorCode.OK, metadata, context });
+  new Log({ text: `Successful call to ${String(message)}`, type: LogType.Info, categories: ["global", "log_caller"], tags, code: ErrorCode.OK, metadata, context });
 }

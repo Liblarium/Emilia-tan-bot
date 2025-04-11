@@ -2,12 +2,16 @@ import { createReadStream } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
-import { Config, Enums } from "@constants";
+import { DELIMITER_LOG_FILE } from "@constants/config";
+import { ErrorCode } from "@constants/enum/errorCode";
 import type { ArrayNotEmpty } from "@type";
 import type { ClassWithValidator, Result } from "@type/utils";
 import type { IFileValidator } from "@type/utils/fileValidator";
 import type { IJSONReader } from "@type/utils/jsonReader";
-import { Decorators, Transforms, emiliaError } from "@utils";
+import { logCaller } from "@utils/decorators/logCaller";
+import { validateFileOperation } from "@utils/decorators/validateFileOperation";
+import { emiliaError } from "@utils/error/EmiliaError";
+import { objectFromString } from "@utils/transform/objectForString";
 
 export class JSONReader implements IJSONReader {
   /**
@@ -33,10 +37,10 @@ export class JSONReader implements IJSONReader {
    *  console.log(result); // { success: true, data: { name: "John", age: 30 } } if current file is a .json file
    * ```
    */
-  @Decorators.logCaller()
-  @Decorators.validateFileOperation<ClassWithValidator>()
+  @logCaller()
+  @validateFileOperation<ClassWithValidator>()
   async readFile<T extends object>(filePath: string): Promise<Result<T>> {
-    if (!this.fileValidator.isJSONFile(filePath)) return { success: false, error: { code: Enums.ErrorCode.FILE_FORMAT_ERROR, message: "You use this method about non .json file. You mistake. Use readLines method." } };
+    if (!this.fileValidator.isJSONFile(filePath)) return { success: false, error: { code: ErrorCode.FILE_FORMAT_ERROR, message: "You use this method about non .json file. You mistake. Use readLines method." } };
 
     const fileContent = await readFile(filePath, "utf-8");
 
@@ -61,8 +65,8 @@ export class JSONReader implements IJSONReader {
    *  console.log(result); // [{ key: 'value' }, { key: 'value' }] or [{ key: value }, { error: 'Error message' }, { key: 'value' }]
    * ```
    */
-  @Decorators.logCaller()
-  @Decorators.validateFileOperation<ClassWithValidator>()
+  @logCaller()
+  @validateFileOperation<ClassWithValidator>()
   async readLines<T extends object>(
     filePath: string,
     delimiter: string = "\n",
@@ -116,16 +120,16 @@ export class JSONReader implements IJSONReader {
    * console.log(result); // { success: true, data: { name: "John", age: 30 } }
    * ```
    */
-  @Decorators.logCaller()
+  @logCaller()
   public parse<T = unknown>(jsonParse: string): Result<T> {
     if (!jsonParse || jsonParse.length === 0)
       throw emiliaError(
         "[JSONReader.parse]: jsonParse is required!",
-        Enums.ErrorCode.ARGS_REQUIRED,
+        ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
-    return Transforms.objectFromString<T>(jsonParse);
+    return objectFromString<T>(jsonParse);
   }
 
   /**
@@ -142,26 +146,26 @@ export class JSONReader implements IJSONReader {
    *  console.log(result); // [{ success: true, data: { name: "John", age: 30 } }, { success: true, data: { name: "Jane", age: 25 } }]
    * ```
    */
-  @Decorators.logCaller()
+  @logCaller()
   public multiParse<T = unknown>(jsonParse: string): Result<T>[] {
     if (!jsonParse || jsonParse.length === 0) {
-      const error = { code: Enums.ErrorCode.ARGS_REQUIRED, message: "[JSONReader.parse]: jsonParse is required!" };
+      const error = { code: ErrorCode.ARGS_REQUIRED, message: "[JSONReader.parse]: jsonParse is required!" };
       console.error(error.message);
 
       throw emiliaError(error.message, error.code, "TypeError");
     }
 
-    const isDelimiter = jsonParse.indexOf(Config.DELIMITER_LOG_FILE) !== -1;
+    const isDelimiter = jsonParse.indexOf(DELIMITER_LOG_FILE) !== -1;
 
     // If the delimiter is not found, return a single result
     if (!isDelimiter) return [this.parse<T>(jsonParse)];
 
-    const parts = jsonParse.trim().split(Config.DELIMITER_LOG_FILE).filter(part => part.trim()); // We break the spaces
+    const parts = jsonParse.trim().split(DELIMITER_LOG_FILE).filter(part => part.trim()); // We break the spaces
     const results: Result<T>[] = parts.map(part => {
       try {
-        return Transforms.objectFromString<T>(part);
+        return objectFromString<T>(part);
       } catch (e) {
-        const error = { code: Enums.ErrorCode.JSON_PARSE_ERROR, message: `Parsing error: ${e.message}` };
+        const error = { code: ErrorCode.JSON_PARSE_ERROR, message: `Parsing error: ${e.message}` };
         console.error(`A error on line "${part}": ${error.message}`);
 
         return { success: false, error };

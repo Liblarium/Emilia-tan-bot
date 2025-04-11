@@ -1,24 +1,21 @@
 {
 	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"vcs": {
+		"enabled": false,
+		"clientKind": "git",
+		"useIgnoreFile": false
+	},
 	"files": {
 		"ignoreUnknown": true,
-		"include": [
-			"src/**/*.ts",
-			"src/**/*.js",
-			"src/**/*.d.ts",
-			"types/**/*.d.ts",
-			"types/*.d.ts",
-			"sanbox/**/*.ts",
-			"sanbox/**/*.js",
-			"sanbox/**/*.d.ts"
-		],
+		"include": ["src/*", "types/*", "sanbox/*"],
 		"ignore": [
 			"dist/*",
 			"sanbox/*.js",
-			"prisma",
+			"prisma/*",
 			"package.json",
-			"node_modules/**",
-			"oldCode"
+			"package-lock.json",
+			"node_modules/*",
+			"oldCode/*"
 		]
 	},
 	"javascript": {
@@ -27,63 +24,54 @@
 		}
 	},
 	"linter": {
-		"include": [
-			"src/**/*.ts",
-			"src/**/*.js",
-			"src/**/*.d.ts",
-			"types/**/*.d.ts",
-			"types/*.d.ts",
-			"sanbox/**/*.ts",
-			"sanbox/**/*.js",
-			"sanbox/**/*.d.ts"
-		],
+		"enabled": true,
+		"include": ["src/*", "types/*", "sanbox/*"],
 		"ignore": [
 			"dist/*",
 			"sanbox/*.js",
-			"prisma",
+			"prisma/*",
 			"package.json",
-			"node_modules/**",
-			"oldCode"
+			"package-lock.json",
+			"node_modules/*",
+			"oldCode/*"
 		],
 		"rules": {
+			"recommended": true,
 			"complexity": {
 				"noForEach": "off",
 				"noStaticOnlyClass": "off",
 				"noThisInStatic": "off",
-				"noUselessConstructor": "off"
+				"noUselessConstructor": "off",
+				"noBannedTypes": "off"
 			},
 			"style": {
 				"noCommaOperator": "off",
 				"noParameterAssign": "off",
 				"useDefaultParameterLast": "off",
 				"useLiteralEnumMembers": "off",
-				"noInferrableTypes": "off"
+				"noInferrableTypes": "off",
+				"useShorthandFunctionType": "off"
 			},
 			"suspicious": {
 				"noConfusingVoidType": "off",
 				"noAssignInExpressions": "off",
-				"noExplicitAny": "off"
+				"noExplicitAny": "off",
+				"useValidTypeof": "off"
 			}
 		}
 	},
 	"formatter": {
-		"include": [
-			"src/**/*.ts",
-			"src/**/*.js",
-			"src/**/*.d.ts",
-			"types/**/*.d.ts",
-			"types/*.d.ts",
-			"sanbox/**/*.ts",
-			"sanbox/**/*.js",
-			"sanbox/**/*.d.ts"
-		],
+		"enabled": true,
+		"indentStyle": "tab",
+		"include": ["src/*", "types/*", "sanbox/*"],
 		"ignore": [
 			"dist/*",
 			"sanbox/*.js",
-			"prisma",
+			"prisma/*",
 			"package.json",
-			"node_modules/**",
-			"oldCode"
+			"package-lock.json",
+			"node_modules/*",
+			"oldCode/*"
 		]
 	},
 	"organizeImports": {

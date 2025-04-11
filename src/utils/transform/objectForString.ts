@@ -1,6 +1,7 @@
-import { Enums } from "@constants";
+import { ErrorCode } from "@constants/enum/errorCode";
 import type { Result } from "@type/utils";
-import { emiliaError } from "@utils";
+import { emiliaError } from "@utils/error/EmiliaError";
+
 
 /**
  * Converts a JSON string to an object.
@@ -12,12 +13,15 @@ export function objectFromString<T = unknown>(jsonString: string): Result<T> {
   try {
     return { success: true, data: JSON.parse(jsonString) };
   } catch (error) {
-    emiliaError("Error parsing JSON string!", Enums.ErrorCode.JSON_PARSE_ERROR, "TypeError");
+    emiliaError("Error parsing JSON string!", ErrorCode.JSON_PARSE_ERROR, "TypeError");
     console.error(error);
 
     return {
       success: false,
-      error: { code: Enums.ErrorCode.JSON_PARSE_ERROR, message: "Error parsing JSON string! Invalid input data" },
-    }
+      error: {
+        code: ErrorCode.JSON_PARSE_ERROR,
+        message: "Error parsing JSON string! Invalid input data"
+      }
+    };
   }
 }

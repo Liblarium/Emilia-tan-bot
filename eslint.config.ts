@@ -1,8 +1,8 @@
 import globals from "globals";
 import pluginJs from "@eslint/js";
-import tsplugin from "@typescript-eslint/eslint-plugin";
 import tsparser from "@typescript-eslint/parser";
 import tseslint from "typescript-eslint";
+import biome from "eslint-config-biome";
 
 export default [
   {
@@ -12,36 +12,36 @@ export default [
       "biome.json",
       "tsconfig.json",
       "package.json",
+      "package-lock.json",
+      "esbuild.config.js",
       "jest.config.js",
       "*/**/*.deprecation",
       "tsconfig.*.json",
       "prisma/*",
-      "eslint.config.mjs",
+      "eslint.config.ts",
       "oldCode",
       "dist",
       "sanbox/*",
       "__tests__/*",
-      "types"
+      "types",
+      "*/**/*.test.ts"
     ]
   },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
+  biome,
   {
-    plugins: {
-      "@typescript-eslint": tsplugin,
-    },
     files: ["src/**/*.ts"],
     languageOptions: {
-      parser: tsparser,
-      parserOptions: {
-        project: ["./tsconfig.base.json", "./tsconfig.json"]
-      },
+      ecmaVersion: 2025,
       globals: {
         ...globals.browser,
+        ...globals.vitest,
         ...globals.node,
         ...globals.builtin,
         ...globals.es2025
-      }
+      },
+      parser: tsparser
     },
     rules: {
       "indent": "off",
@@ -57,6 +57,7 @@ export default [
       "import/no-unresolved": "off",
       "semi": "error",
       "no-unused-vars": "off",
+      "@typescript-eslint/no-unsafe-function-type": "off",
       "@typescript-eslint/no-redundant-type-constituents": "off",
       "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",

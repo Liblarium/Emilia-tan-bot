@@ -1,22 +1,18 @@
-export abstract class AbstractAction<T extends unknown[], R> {
-  /**
-   * The name of the action (command or event).
-   */
-  public readonly name: string;
+import type { IAbstractAction } from "@type/constants/action";
 
+export abstract class AbstractAction<T> implements IAbstractAction {
   /**
    * Creates a new action with the given name.
-   * @param name - The name of the action.
+   * @param name - The name of the action (command or event).
    */
-  constructor(name: string) {
-    this.name = name;
-  }
+  constructor(public readonly name: T) { }
 
   /**
    * Executes the action with the given arguments.
    * @param args - The arguments to pass to the action.
    * @returns The result of the action.
    * @example
+   * ```ts
    * class MyCommand extends AbstractAction<[string, string], string> {
    *   execute(arg1: string, arg2: string): string {
    *     return `${arg1} ${arg2}`;
@@ -24,6 +20,7 @@ export abstract class AbstractAction<T extends unknown[], R> {
    * }
    * const command = new MyCommand("myCommand");
    * console.log(command.execute("hello", "world")); // "hello world"
+   * ```
    */
-  public abstract execute(...args: T): R;
+  public abstract execute(...args: unknown[]): unknown | Promise<unknown>;
 }

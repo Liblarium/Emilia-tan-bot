@@ -1,5 +1,6 @@
-import { Enums } from "@constants";
-import { emiliaError } from "@utils";
+import { ErrorCode } from "@constants/enum/errorCode";
+import { emiliaError } from "@utils/error/EmiliaError";
+
 
 /**
  * Convert a string to a BigInt.
@@ -12,9 +13,9 @@ import { emiliaError } from "@utils";
 export const stringToBigInt = (str: string): bigint => {
   if (typeof str !== "string")
     throw emiliaError("[utils.stringToBigInt]: str must be a string!",
-      Enums.ErrorCode.INVALID_TYPE, "SyntaxError");
+      ErrorCode.INVALID_TYPE, "SyntaxError");
   if (!str || str.length === 0)
-    throw emiliaError("[utils.stringToBigInt]: str must not be empty!", Enums.ErrorCode.ARGS_REQUIRED, "TypeError");
+    throw emiliaError("[utils.stringToBigInt]: str must not be empty!", ErrorCode.ARGS_REQUIRED, "TypeError");
 
   return BigInt(str);
 };

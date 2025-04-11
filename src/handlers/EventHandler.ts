@@ -1,77 +1,86 @@
 import type { EmiliaClient } from "@client";
-import { Abstract, Enums } from "@constants";
-import { Log } from "@log";
-import { Decorators } from "@utils";
+import type { AbstractEvent } from "@constants/abstract/AbstractEvent";
+import { AbstractHandler } from "@constants/abstract/AbstractHandler";
+import type { CategoryEvents } from "@constants/enum/EventCategoryType";
+import type { EventArgsType, EventForCategory } from "@type/constants/event";
+import type { EventEmitterLike, IEventHandler } from "@type/handler/EventHandler";
+import { mongoose } from "@typegoose/typegoose";
+import { setType } from "@utils/other/setType";
 
-const catchs = (e: unknown) => {
-  new Log({ text: e, categories: ["global", "handler", "event"], type: 2, tags: ["handler", "event"], code: Enums.ErrorCode.UNKNOWN_ERROR });
-};
-
-export class EventHandler extends Abstract.AbstractHandler {
-  /**
-   * The constructor for the handler class.
-   * @param client - The client which the handler is attached to.
-   *
-   * The handler will look for files in the "dist/events" directory and will filter them by the regular expression `^[^.]+\.(j|t)s$`.
-   * The handler will then import each of the filtered files and check if they are classes.
-   * If they are, it will create an instance of the class and pass it to the `setLogic` method.
-   * If the `setLogic` method returns `null`, it will skip the file.
-   * If any errors occur during the build process, it will log the error.
-   */
-  constructor(client: EmiliaClient) {
+export class EventHandler
+  extends AbstractHandler
+  implements IEventHandler {
+  constructor(public client: EmiliaClient) {
     super(client);
-    this.client = client;
-    this.setFolderPath(["dist", "events"]);
-    this.build().catch(catchs);
   }
 
   /**
-   * Sets up the logic for handling an event.
-   * This function configures the event execution, logs errors, and manages event categories.
+   * Initializes the event handler by building the logic for all events.
    *
-   * @param event - The AbstractEvent object representing the event to be handled.
-   * @returns void if the event is successfully set up, null if there's an error or invalid configuration.
+   * @returns A promise that resolves when the build process is complete.
    *
-   * @throws Will log errors but not throw them, returning null instead.
+   * @throws Will log an error if any issues occur during the build process.
    */
-  @Decorators.logCaller()
-  setLogic(event: Abstract.AbstractEvent<unknown[], void | null | Promise<void | null>>): null | void {
-    const client = this.client;
+  public async handler() {
+    await this.build();
+  }
 
+  /**
+   * Sets the logic for the event handler by associating the event with the appropriate event emitter.
+   *
+   * @template T - The category of the event. Must be a key of `CategoryEvents`.
+   * @template K - The name of the event. Must be a key of `EventForCategory[T]`.
+   *
+   * @param module - The event module containing the event logic to be executed.
+   *
+   * @returns A promise that resolves when the event logic is successfully set, or void if there's no asynchronous process.
+   *
+   * @throws Will log and rethrow an error if the category of the module is unknown or if any issues occur during the event logic setup.
+   *
+   * @see {@link https://nodejs.org/api/events.html#events_class_eventemitter EventEmitter} for more information about event emitters.
+   * @see {@link EventEmitterLike EventEmitterLike} for the type that represents an event emitter.
+   */
+  public setLogic<T extends CategoryEvents, K extends EventForCategory<T>>(
+    module: AbstractEvent<T, K>
+  ): void | Promise<void> {
     try {
-      const eventExecute = async (...args: unknown[]) => {
-        try {
-          await event.execute(...args, client);
-        } catch (e) {
-          catchs(e);
-          return null;
-        }
+      const eventEmitterPlug = (<T extends CategoryEvents, K extends EventForCategory<T>>(once?: boolean) => (event: string, listener: (...args: EventArgsType<T, K>) => unknown) => {
+        console.log(`Unknown event${once ? " (once)" : ""}: ${event}`);
+
+        return (...args: EventArgsType<T, K>) => listener(...args);
+      });
+
+      /**
+       * @type {EventEmitterLike}
+       * @see {@link https://nodejs.org/api/events.html#events_class_eventemitter EventEmitter}
+       * @see {@link EventEmitterLike EventEmitterLike}
+       */
+      const eventEmitter: EventEmitterLike<T, K> = {
+        on: eventEmitterPlug<T, K>(),
+        once: eventEmitterPlug<T, K>(true)
       };
 
-      if (!event.category) {
-        catchs(
-          `It seems like ${event?.name ?? "error"} doesn't have a category.`,
-        );
-        return null;
-      }
-
-      client.events.set(event.name, event.category);
-
-      const eventMap: Record<string, () => EmiliaClient> = {
-        bot: () => client[event.once ? "once" : "on"](event.name, eventExecute),
+      /**
+       * @type {Record<CategoryEvents, EventEmitterLike>}
+       * @see {@link https://nodejs.org/api/events.html#events_class_eventemitter EventEmitter} If you need to more information for create event's
+       * @see {@link EventEmitterLike EventEmitterLike} The type that represents an event emitter
+       */
+      const eventMap: Record<CategoryEvents, EventEmitterLike<T, K>> = {
+        bot: this.client,
+        mongoose: mongoose.connection,
+        custom: eventEmitter,
+        unknown: eventEmitter,
       };
 
-      if (!(event.category in eventMap)) {
-        catchs(
-          `The specified category (${event.category}) is not among the available categories. Available: bot and mongo`,
-        );
-        return null;
-      }
+      if (!(module.category in eventMap)) throw new Error(`Unknown category: ${module.category}`);
 
-      eventMap[event.category]();
+      eventMap[module.category][module.once ? "once" : "on"](
+        setType<T>(module.name),
+        module.execute,
+      );
     } catch (e) {
-      catchs(e);
-      return null;
+      console.error(e);
+      throw e;
     }
   }
 }

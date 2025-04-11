@@ -14,6 +14,6 @@ export function isPromise<T>(obj: unknown): obj is Promise<T> {
   return (
     typeof obj === "object" &&
     "then" in obj &&
-    typeof (obj as any).then === "function"
+    typeof obj.then === "function"
   );
 }

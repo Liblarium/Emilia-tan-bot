@@ -1,7 +1,8 @@
 import type { EmiliaClient } from "@client";
-import { Enums } from "@constants";
+import { ErrorCode } from "@constants/enum/errorCode";
 import type { ArrayNotEmpty } from "@type";
-import { Decorators, emiliaError } from "@utils";
+import { logCaller } from "@utils/decorators/logCaller";
+import { emiliaError } from "@utils/error/EmiliaError";
 import type { ChatInputCommandInteraction } from "discord.js";
 
 export class SlashCommand {
@@ -27,12 +28,12 @@ export class SlashCommand {
    * slash command from the client's collection. If the command does not exist or is restricted to
    * developers, it will reply with an appropriate message. Otherwise, it executes the command.
    */
-  @Decorators.logCaller()
+  @logCaller()
   private async execute(
     interaction: ChatInputCommandInteraction,
     client: EmiliaClient,
   ): Promise<unknown> {
-    if (!client) throw emiliaError("Client must be initialized!", Enums.ErrorCode.CLIENT_NOT_FOUND);
+    if (!client) throw emiliaError("Client must be initialized!", ErrorCode.CLIENT_NOT_FOUND);
     if (!interaction.isChatInputCommand()) return;
 
     const slash_command = client.slashCommand.get(interaction.commandName);

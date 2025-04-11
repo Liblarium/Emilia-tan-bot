@@ -1,5 +1,5 @@
 import { db } from "@client";
-import { Enums } from "@constants";
+import { ErrorCode } from "@constants/enum/errorCode";
 import type { ArrayNotEmpty } from "@type";
 import type {
   CreateLevelOptions,
@@ -10,7 +10,9 @@ import type {
   UpdateLevelType,
   UpdateLocalLevelOptions,
 } from "@type/database/levelManage";
-import { Decorators, Transforms, emiliaError } from "@utils";
+import { logCaller } from "@utils/decorators/logCaller";
+import { emiliaError } from "@utils/error/EmiliaError";
+import { stringToBigInt } from "@utils/transform/stringToBigInt";
 
 /**
  * Handles the logic for managing levels in the database.
@@ -24,7 +26,7 @@ export class LevelManager {
    * @returns The next time in milliseconds as a BigInt.
    */
   private get getNextXpTime(): bigint {
-    return Transforms.stringToBigInt((Date.now() + 30 * 1000).toString());
+    return stringToBigInt((Date.now() + 30 * 1000).toString());
   }
 
   /**
@@ -35,7 +37,7 @@ export class LevelManager {
    * @param options.guildId - The unique identifier of the guild.
    * @returns A promise that resolves when the create operation is complete.
    */
-  @Decorators.logCaller()
+  @logCaller()
   public async createLevel({ id, guildId }: CreateLevelOptions) {
     const guildCheck = await this.guildCheck(guildId);
 
@@ -48,11 +50,11 @@ export class LevelManager {
 
     // Create on Global/LocalLevel table new user if not found
     if (!globalLevel && guildCheck.globalLevel)
-      await this.createGlobalLevel(Transforms.stringToBigInt(id));
+      await this.createGlobalLevel(stringToBigInt(id));
     if (!localLevel && guildCheck.levelModule)
       await this.createLocalLevel(
-        Transforms.stringToBigInt(id),
-        Transforms.stringToBigInt(guildId),
+        stringToBigInt(id),
+        stringToBigInt(guildId),
       );
 
     // Or Ignored both tables
@@ -69,7 +71,7 @@ export class LevelManager {
    * @throws {Error} If the id is empty or data object is empty.
    * @returns A promise that resolves when the update operation is complete.
    */
-  @Decorators.logCaller()
+  @logCaller()
   public async updateGlobalLevel({
     id,
     data,
@@ -79,11 +81,11 @@ export class LevelManager {
     if (globalLevel) {
       await this.updateLevelLogic(id, "global", data);
     } else {
-      await this.createGlobalLevel(Transforms.stringToBigInt(id));
+      await this.createGlobalLevel(stringToBigInt(id));
     }
   }
 
-  @Decorators.logCaller()
+  @logCaller()
   public async updateLocalLevel({
     id,
     guildId,
@@ -95,8 +97,8 @@ export class LevelManager {
       await this.updateLevelLogic(localLevel.id.toString(), "local", data);
     } else {
       await this.createLocalLevel(
-        Transforms.stringToBigInt(id),
-        Transforms.stringToBigInt(guildId),
+        stringToBigInt(id),
+        stringToBigInt(guildId),
       );
     }
   }
@@ -110,7 +112,7 @@ export class LevelManager {
    * @throws {Error} If the id is empty or data object is empty.
    * @returns A promise that resolves when the update operation is complete.
    */
-  @Decorators.logCaller()
+  @logCaller()
   private async updateLevelLogic(
     id: string,
     type: UpdateLevelType,
@@ -119,13 +121,13 @@ export class LevelManager {
     if (!id || id.length === 0)
       throw emiliaError(
         "[LevelManager.updateLevel(logic)]: Id is required!",
-        Enums.ErrorCode.ARGS_REQUIRED,
+        ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
     if (!data || Object.keys(data).length === 0)
       throw emiliaError(
         "[LevelManager.updateLevel(logic)]: Data is required!",
-        Enums.ErrorCode.ARGS_REQUIRED,
+        ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
@@ -135,7 +137,7 @@ export class LevelManager {
 
     // Update the level in the chosen table, select only the id column to return it.
     await updater.update({
-      where: { id: Transforms.stringToBigInt(id) },
+      where: { id: stringToBigInt(id) },
       data,
       select: { id: true },
     });
@@ -148,17 +150,17 @@ export class LevelManager {
    * @throws {TypeError} If the id is empty or not provided.
    * @returns A promise that resolves when the delete operation is complete.
    */
-  @Decorators.logCaller()
+  @logCaller()
   public async deleteGlobalLevel(id: string) {
     if (!id || id.length === 0)
       throw emiliaError(
         "[LevelManager.deleteGlobalLevel]: Id is required!",
-        Enums.ErrorCode.ARGS_REQUIRED,
+        ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
     await db.globalLevel.delete({
-      where: { id: Transforms.stringToBigInt(id) },
+      where: { id: stringToBigInt(id) },
     });
   }
 
@@ -170,18 +172,18 @@ export class LevelManager {
    * @throws {TypeError} If the id or guildId is empty or not provided.
    * @returns A promise that resolves when the delete operation is complete.
    */
-  @Decorators.logCaller()
+  @logCaller()
   public async deleteLocalLevel(id: string, guildId: string) {
     if (!id || id.length === 0)
       throw emiliaError(
         "[LevelManager.deleteLocalLevel]: Id is required!",
-        Enums.ErrorCode.ARGS_REQUIRED,
+        ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
     if (!guildId || guildId.length === 0)
       throw emiliaError(
         "[LevelManager.deleteLocalLevel]: GuildId is required!",
-        Enums.ErrorCode.ARGS_REQUIRED,
+        ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
@@ -199,16 +201,16 @@ export class LevelManager {
    * @throws {TypeError} If the id is empty or not provided.
    * @returns A promise that resolves with the global level ID as a BigInt.
    */
-  @Decorators.logCaller()
+  @logCaller()
   private async getGlobalLevelId(id: string) {
     if (!id || id.length === 0)
       throw emiliaError(
         "[LevelManager.getGlobalLevelId]: Id is required!",
-        Enums.ErrorCode.ARGS_REQUIRED,
+        ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
-    const bigId = Transforms.stringToBigInt(id);
+    const bigId = stringToBigInt(id);
 
     return db.globalLevel.findFirst({
       where: { id: bigId },
@@ -224,17 +226,17 @@ export class LevelManager {
    * @throws {TypeError} If the id or guildId is empty or not provided.
    * @returns A promise that resolves with the local level ID as a BigInt.
    */
-  @Decorators.logCaller()
+  @logCaller()
   private async getLocalLevelId(id: string, guildId: string) {
     if (!id || !guildId || id.length === 0 || guildId.length === 0)
       throw emiliaError(
         "[LevelManager.getLocalLevelId]: id and guildId is required!",
-        Enums.ErrorCode.ARGS_REQUIRED,
+        ErrorCode.ARGS_REQUIRED,
         "TypeError",
       );
 
-    const bigId = Transforms.stringToBigInt(id);
-    const bigGuildId = Transforms.stringToBigInt(guildId);
+    const bigId = stringToBigInt(id);
+    const bigGuildId = stringToBigInt(guildId);
 
     const AND: ({ userId: bigint } | { guildId: bigint })[] = [
       { userId: bigId },
@@ -254,10 +256,10 @@ export class LevelManager {
    *          - addInBD: Whether the guild is added to the database.
    *          Returns null if the guild is not found.
    */
-  @Decorators.logCaller()
+  @logCaller()
   private async guildCheck(id: string) {
     const guild = await db.guild.findUnique({
-      where: { id: Transforms.stringToBigInt(id) },
+      where: { id: stringToBigInt(id) },
       select: { globalLevel: true, levelModule: true, addInBD: true },
     });
 
@@ -274,7 +276,7 @@ export class LevelManager {
    * @throws {Error} Throws an error if the id is not provided.
    * @returns A promise that resolves to the created global level entry with its id.
    */
-  @Decorators.logCaller()
+  @logCaller()
   private async createGlobalLevel(id: bigint) {
     await db.globalLevel.create({
       data: {
@@ -296,12 +298,12 @@ export class LevelManager {
    *
    * @returns A promise that resolves to the created local level entry with its `id`.
    */
-  @Decorators.logCaller()
+  @logCaller()
   private async createLocalLevel(id: bigint, guildId: bigint) {
     if (!id)
-      throw emiliaError("[LevelManager.createLevel(local)]: Id is required!", Enums.ErrorCode.ARGS_REQUIRED);
+      throw emiliaError("[LevelManager.createLevel(local)]: Id is required!", ErrorCode.ARGS_REQUIRED);
     if (!guildId)
-      throw emiliaError("[LevelManager.createLevel(local)]: GuildId is required!", Enums.ErrorCode.ARGS_REQUIRED);
+      throw emiliaError("[LevelManager.createLevel(local)]: GuildId is required!", ErrorCode.ARGS_REQUIRED);
 
     await db.localLevel.create({
       data: {

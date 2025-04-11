@@ -1,13 +1,16 @@
-import { Enums } from "@constants";
+import { ErrorCode } from "@constants/enum/errorCode";
+import { LogType } from "@constants/enum/log";
 import type { ArrayNotEmpty } from "@type";
 import type { LineType, TypeLog } from "@type/constants/log";
-import type { ClassWithJSONReader, Result } from "@type/utils";
+import type { ClassWithJSONWriter, Result } from "@type/utils";
 import type {
   FormatterLogOption,
   FormattingConsoleOptions,
   formatterTypeOption,
 } from "@type/utils/logFormatter";
-import { Checkers, Decorators, Formatters } from "@utils";
+import { isObject } from "@utils/checkers/isObject";
+import { logCaller } from "@utils/decorators/logCaller";
+import { time } from "./timeAndDate";
 
 export class LogFormatter {
   public static readonly logCategories: ArrayNotEmpty<string> = [
@@ -34,9 +37,9 @@ export class LogFormatter {
     context = {},
     date = false,
     processingLine,
-    jsonReader
-  }: FormatterLogOption & ClassWithJSONReader): Result<string> {
-    return jsonReader.stringify({
+    jsonWriter
+  }: FormatterLogOption & ClassWithJSONWriter): Result<string> {
+    return jsonWriter.stringify({
       text: processingLine ? processingLine(text) : text,
       type,
       categories,
@@ -57,18 +60,17 @@ export class LogFormatter {
    * setType(5); // "test"
    * setType(0); // EmiliaError: Невідомий тип логу: 0
    */
-  @Decorators.logCaller()
+  @logCaller()
   static formatterType(type: formatterTypeOption): Result<TypeLog> {
     // If the type is already a string and matches one of the allowed values:
     if (
       typeof type === "string" &&
-      Object.values(Enums.LogType).includes(type as Enums.LogType)
+      Object.values(LogType).includes(type as LogType)
     ) {
       return { success: true, data: type as TypeLog };
     }
 
-    // To avoid repeating Enums.LogType every time
-    const { LogType } = Enums;
+    // To avoid repeating LogType every time
 
     // If a number is provided, you can convert it using a map:
     const typeMap: Record<number, TypeLog> = {
@@ -86,7 +88,7 @@ export class LogFormatter {
       success: false,
       error: {
         message: `Unknown log type: ${type}`,
-        code: Enums.ErrorCode.INVALID_TYPE,
+        code: ErrorCode.INVALID_TYPE,
       },
     };
   }
@@ -101,7 +103,7 @@ export class LogFormatter {
    * @param {string} params.category - The category of the log.
    * @param {boolean} [params.event] - Whether to format the log as an event. Default is `false`.
    * @param {boolean} [params.logs] - Whether to log the formatted message. Default is `true`.
-   * @param {() => string} [params.getTime=Formatters.time] - A function to get the current time. Default is the `time` function from the `@utils` module.
+   * @param {() => string} [params.getTime=time] - A function to get the current time. Default is the `time` function from the `@utils` module.
    *
    * @returns {void}
    */
@@ -113,7 +115,7 @@ export class LogFormatter {
     event,
     errorCode,
     logs,
-    getTime = Formatters.time,
+    getTime = time,
   }: FormattingConsoleOptions): void {
     const logText = this.formatLogText(message);
     const editText = this.formatEventText(logText.in, event, type);
@@ -140,12 +142,12 @@ export class LogFormatter {
    */
   private static formatLogText(message: unknown): { in: string; out: unknown } {
     return {
-      in: Checkers.isObject(message)
+      in: isObject(message)
         ? ""
         : typeof message === "string"
           ? message
           : String(message),
-      out: Checkers.isObject(message) ? message : "",
+      out: isObject(message) ? message : "",
     };
   }
 

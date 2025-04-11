@@ -1,7 +1,7 @@
-import type { Enums } from "@constants";
+import type { ErrorCode } from "@constants/enum/errorCode";
 import type { LineType, TypeLog } from "@type/constants/log";
 import type { Result } from "@type/utils";
-import type { Formatters } from "@utils";
+import type { LogFormatter } from "@utils/formatters/LogFormatter";
 
 /**
  * Formats a log message with the given text, type and category.
@@ -31,7 +31,7 @@ export interface FormatterLogOption {
   /**
    * The error code to add to the log message.
    */
-  errorCode: Enums.ErrorCode;
+  errorCode: ErrorCode;
   /**
    * The metadata to add to the log message.
    */
@@ -79,7 +79,7 @@ export interface FormattingConsoleOptions {
   /**
    * The error code to add to the log message.
    */
-  errorCode: Enums.ErrorCode;
+  errorCode: ErrorCode;
   /**
    * Whether to format the log as an event.
    * @default false
@@ -102,7 +102,7 @@ export type formatterTypeOption = (TypeLog | number) | string;
  */
 export interface ILogFormatters
   extends ILogFormatterStaticMethods,
-  Formatters.LogFormatter { }
+  LogFormatter { }
 
 interface ILogFormatterStaticMethods {
   /**

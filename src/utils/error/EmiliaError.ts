@@ -1,5 +1,6 @@
-import { Abstract, type Enums } from "@constants";
-import { Formatters } from "@utils";
+import { AbstractEmiliaError } from "@constants/abstract/EmiliaAbstractError";
+import type { ErrorCode } from "@constants/enum/errorCode";
+import { time } from "@utils/formatters/timeAndDate";
 
 class EmiliaError {
   /**
@@ -11,13 +12,13 @@ class EmiliaError {
    */
   public createError(
     message: string,
-    code: Enums.ErrorCode, // required argument
+    code: ErrorCode, // required argument
     errorType?: string,
     getTime?: () => string,
-  ): Abstract.AbstractEmiliaError {
-    return new (class extends Abstract.AbstractEmiliaError {
+  ): AbstractEmiliaError {
+    return new (class extends AbstractEmiliaError {
       constructor(message: string) {
-        super(message, code, getTime ?? Formatters.time);
+        super(message, code, getTime ?? time);
         this.errorType = errorType ?? "Error";
       }
     })(message);

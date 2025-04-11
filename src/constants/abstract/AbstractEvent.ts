@@ -1,29 +1,52 @@
-import { Enums } from "@constants";
 import type { ArrayNotEmpty } from "@type";
-import type { EventArguments } from "@type/constants/event";
+import type {
+  AbstractEventOptions,
+  EventArgsType,
+  EventForCategory,
+  IAbstractEvent,
+} from "@type/constants/event";
+import type { CategoryEvents } from "../enum/EventCategoryType";
 import { AbstractAction } from "./AbstractAction";
 
-export abstract class AbstractEvent<T extends unknown[], R> extends AbstractAction<T, R> {
-  public readonly once: boolean;
-  public readonly category: Enums.EventCategoryType;
+/**
+ * Represents an abstract event.
+ *
+ * @template T - The name of the event. Must be a key of `ClientEvents`
+ * @template K - The name of the event. Must be a key of `EventForCategory[T]`
+ *
+ * If you need to more other events - edit EventsType
+ * @see {@link EventsType EventsType}.
+ *
+ * If you need other event arguments - use `"unknown"` on T
+ */
+export abstract class AbstractEvent<
+  T extends CategoryEvents,
+  K extends EventForCategory<T>,
+>
+  extends AbstractAction<K>
+  implements IAbstractEvent<T, K> {
+  public readonly category: T;
   public logCategories: ArrayNotEmpty<string> = ["event"];
+  public readonly once: boolean = false;
 
-  /**
-   * Constructor for the AbstractEvent class
-   *
-   * @param {EventArguments} options - Event arguments
-   * @param {string} options.name - Event name
-   * @param {boolean} [options.once=false] - Whether the event should only be triggered once
-   * @param {Enums.EventCategoryType} [options.category=Enums.EventCategoryType.BOT] - The category of the event
-   */
   constructor({
     name,
-    once = false,
-    category = Enums.EventCategoryType.BOT,
-  }: EventArguments) {
+    category,
+    once,
+    logCategories,
+  }: AbstractEventOptions<T, K>) {
     super(name);
-
-    this.once = once;
     this.category = category;
+    this.once = once ?? false;
+    this.logCategories = logCategories ?? ["event"];
   }
+
+  /**
+   * Executes the event logic
+   * @template R - The type of the return value
+   * @param args The arguments to pass to the event
+   */
+  public abstract execute(
+    ...args: EventArgsType<T, K>
+  ): unknown | Promise<unknown>;
 }

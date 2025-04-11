@@ -1,4 +1,6 @@
-import type { Enums } from "@constants"
+import type { ErrorCode } from "@constants/enum/errorCode";
+import type { JSONReader } from "@utils/json/JSONReader";
+import type { JSONWriter } from "@utils/json/JSONWriter";
 import type { IFileManager } from "./fileManager";
 import type { IFileValidator } from "./fileValidator";
 
@@ -11,12 +13,12 @@ export interface ErrorDetails {
    * 
    * @type {string}
    *
-   * {@link Enums.ErrorCode} - Enum for error codes and more info about error codes
+   * {@link ErrorCode} - Enum for error codes and more info about error codes
    * 
    * @example
-   * const error = { code: Enums.ErrorCode.FILE_NOT_FOUND, message: "The file was not found." };
+   * const error = { code: ErrorCode.FILE_NOT_FOUND, message: "The file was not found." };
    */
-  code: Enums.ErrorCode;
+  code: ErrorCode;
   /**
    * The error message
    * @type {string}
@@ -34,23 +36,23 @@ export interface ClassWithValidator {
   /**
    * The file validator
    */
-  fileValidator: IFileValidator
+  fileValidator: IFileValidator;
 };
 export interface ClassWithFileManager {
   /**
    * The file manager
    */
-  fileManager: IFileManager
+  fileManager: IFileManager;
 };
 export interface ClassWithJSONReader {
   /**
    * The JSON reader
    */
-  jsonReader: JSONs.JSONWriter
+  jsonReader: JSONReader;
 }
 export interface ClassWithJSONWriter {
   /**
    * The JSON writer
    */
-  jsonWriter: JSONs.JSONWriter
+  jsonWriter: JSONWriter;
 }

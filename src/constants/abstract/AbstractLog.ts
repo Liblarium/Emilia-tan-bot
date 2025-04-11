@@ -1,6 +1,8 @@
 import { readdir } from "node:fs/promises";
 import { resolve } from "node:path";
-import { Abstract, Config, Enums } from "@constants";
+import { DELIMITER_LOG_FILE } from "@constants/config";
+import { ErrorCode } from "@constants/enum/errorCode";
+import { type InlineType, LogType } from "@constants/enum/log";
 import type { ArrayNotEmpty } from "@type";
 import type {
   AbstractLogOptionsExtended,
@@ -14,14 +16,18 @@ import type {
 import type { ClassWithValidator, Result } from "@type/utils";
 import type { IFileManager } from "@type/utils/fileManager";
 import type { IFileValidator } from "@type/utils/fileValidator";
-import type { IJSONReader } from "@type/utils/jsonReader";
-import type { IJSONWriter } from "@type/utils/jsonWriter";
 import type { ILogFormatters } from "@type/utils/logFormatter";
-import { Decorators, Formatters, emiliaError } from "@utils";
+import { validateFileOperation } from "@utils/decorators/validateFileOperation";
+import { emiliaError } from "@utils/error/EmiliaError";
+import { time } from "@utils/formatters/timeAndDate";
+import type { JSONReader } from "@utils/json/JSONReader";
+import type { JSONWriter } from "@utils/json/JSONWriter";
+import { setType } from "@utils/other/setType";
+import { AbstractEmiliaError } from "./EmiliaAbstractError";
 
 const baseLogPath = process.env.BASE_LOG_PATH ?? "logs";
 const error: (...e: unknown[]) => void = (...e: unknown[]) =>
-  console.error([Formatters.time()], e);
+  console.error([time()], e);
 /**
  * Class for working with logs
  */
@@ -49,7 +55,7 @@ export abstract class AbstractLog implements IAbstractLog {
    * If not 0, log will be written with new line
    * @default InlineType.None = 0
    */
-  protected inline: Enums.InlineType;
+  protected inline: InlineType;
   /**
    * Category of log
    * @default "other"
@@ -75,9 +81,9 @@ export abstract class AbstractLog implements IAbstractLog {
   protected tags: string[];
   /**
    * Code of log.
-   * @default Enums.ErrorCode.UNKNOWN_ERROR
+   * @default ErrorCode.UNKNOWN_ERROR
    */
-  protected code: Enums.ErrorCode = Enums.ErrorCode.UNKNOWN_ERROR;
+  protected code: ErrorCode = ErrorCode.UNKNOWN_ERROR;
 
   /**
    * Instance of file manager
@@ -98,19 +104,19 @@ export abstract class AbstractLog implements IAbstractLog {
   /**
    * Instance of json reader. Static version. Becomes readonly after appointment
    */
-  public static jsonReader: IJSONReader;
+  public static jsonReader: JSONReader;
   /**
    * Instance of json writer. Static version. Becomes readonly after appointment
    */
-  public static jsonWriter: IJSONWriter;
+  public static jsonWriter: JSONWriter;
   /**
    * Instance of json reader
    */
-  public readonly jsonReader: IJSONReader;
+  public readonly jsonReader: JSONReader;
   /**
    * Instance of json writer
    */
-  public readonly jsonWriter: IJSONWriter;
+  public readonly jsonWriter: JSONWriter;
   /**
    * Instance of log formatter
    */
@@ -143,11 +149,11 @@ export abstract class AbstractLog implements IAbstractLog {
    */
   constructor({
     text = "{Nothing specified}",
-    type = Enums.LogType.Info,
+    type = LogType.Info,
     event = false,
     logs = true,
     inline = 0,
-    code = Enums.ErrorCode.UNKNOWN_ERROR,
+    code = ErrorCode.UNKNOWN_ERROR,
     metadata,
     context = {},
     tags = [],
@@ -156,7 +162,7 @@ export abstract class AbstractLog implements IAbstractLog {
     fileValidator,
     jsonReader,
     jsonWriter,
-    logFormatter
+    logFormatter,
   }: AbstractLogOptionsExtended) {
     this.text = text;
     this.logs = logs;
@@ -181,7 +187,7 @@ export abstract class AbstractLog implements IAbstractLog {
    * Initialize the log by checking and creating the base log folder if necessary.
    * @returns {Promise<void>}
    */
-  @Decorators.validateFileOperation<IAbstractLogWithDependencies>()
+  @validateFileOperation<IAbstractLogWithDependencies>()
   public static async initialize(): Promise<void> {
     try {
       // Check if base log folder exists
@@ -206,7 +212,7 @@ export abstract class AbstractLog implements IAbstractLog {
       }
     } catch (e) {
       error(
-        `AbstractLog.initialize: ${e instanceof Abstract.AbstractEmiliaError ? e.message : "Unknown error"}`,
+        `AbstractLog.initialize: ${e instanceof AbstractEmiliaError ? e.message : "Unknown error"}`,
       );
     }
   }
@@ -218,23 +224,23 @@ export abstract class AbstractLog implements IAbstractLog {
    *
    * @param {IFileManager} manager - The file manager.
    * @param {IFileValidator} validator - The file validator.
-   * @param {IJSONReader} reader - The json reader.
-   * @param {IJSONWriter} writer - The json writer.
+   * @param {JSONReader} reader - The json reader.
+   * @param {JSONWriter} writer - The json writer.
    * @param {ILogFormatters} formatter - The formatter on log class.
    */
   public static setFileDependencies(
     manager: IFileManager,
     validator: IFileValidator,
-    reader: IJSONReader,
-    writer: IJSONWriter,
-    formatter: ILogFormatters
+    reader: JSONReader,
+    writer: JSONWriter,
+    formatter: ILogFormatters,
   ): void {
     const dependencies = {
       fileManager: manager,
       fileValidator: validator,
       jsonReader: reader,
       jsonWriter: writer,
-      logFormatter: formatter
+      logFormatter: formatter,
     };
 
     Object.entries(dependencies).forEach(([key, value]) => {
@@ -252,9 +258,9 @@ export abstract class AbstractLog implements IAbstractLog {
    */
   protected setCategories(categories: ArrayNotEmpty<string>): void {
     if (categories.length > 0) {
-      this.categories = categories
-        .map((cat) => cat.toLocaleLowerCase())
-        .filter((cat) => /^[a-z0-9_-]+$/.test(cat)) as ArrayNotEmpty<string>;
+      this.categories = setType<ArrayNotEmpty<string>>(categories
+        .map((categ) => categ.toLocaleLowerCase())
+        .filter((categ) => /^[a-z0-9_-]+$/.test(categ)));
 
       if (this.categories.length === 0) this.categories = ["global"];
     }
@@ -271,14 +277,14 @@ export abstract class AbstractLog implements IAbstractLog {
    * @example 
    * ```ts
    * import { Enums, Abstract } from '@constants';
-import { FileManager } from '../../utils/managers/FileManager';
+   * import { FileManager } from '../../utils/managers/FileManager';
    * 
-   * class Log extends Abstract.AbstractLog {
+   * class Log extends AbstractLog {
    *   // your code here
    * }
    * 
    * const log = new Log({ text: "Hello from AbstractLog", type: LogType.Info });
-   * const result = await log.addLog({ text: "Log message", logType: LogType.Warning, metadata: { key: "value" }, context: { key: "value" }, tags: ["tag1", "tag2"], errorCode: Enums.ErrorCode.UNKNOWN_ERROR });
+   * const result = await log.addLog({ text: "Log message", logType: LogType.Warning, metadata: { key: "value" }, context: { key: "value" }, tags: ["tag1", "tag2"], errorCode: ErrorCode.UNKNOWN_ERROR });
    * console.log(result); // { success: true, data: undefined } or { success: false, error: { code: "APPEND_FILE_ERROR", message: "Failed to write log to file" } }
    * ```
    */
@@ -311,19 +317,26 @@ import { FileManager } from '../../utils/managers/FileManager';
     // If the log file doesn't exist, create it
     if (!fullText.success) return fullText;
     if (logFilePath.trim() === "")
-      return { success: false, error: { message: "Log file path is empty!", code: Enums.ErrorCode.INVALID_PATH } };
+      return {
+        success: false,
+        error: {
+          message: "Log file path is empty!",
+          code: ErrorCode.INVALID_PATH,
+        },
+      };
 
     try {
-      return await this.fileManager.appendFile(
-        logFilePath,
-        fullText.data,
-      );
+      return await this.fileManager.appendFile(logFilePath, fullText.data);
     } catch (e) {
-      const err = e instanceof Abstract.AbstractEmiliaError ? e : { message: "Failed to write log to file", code: Enums.ErrorCode.APPEND_FILE_ERROR };
+      const err =
+        e instanceof AbstractEmiliaError
+          ? e
+          : {
+            message: "Failed to write log to file",
+            code: ErrorCode.APPEND_FILE_ERROR,
+          };
 
-      error(
-        `AbstractLog.addLog: ${err.message}`,
-      );
+      error(`AbstractLog.addLog: ${err.message}`);
 
       return {
         success: false,
@@ -345,14 +358,19 @@ import { FileManager } from '../../utils/managers/FileManager';
    * @param filter - Whether to filter or not. Default is false.
    * @returns {Promise<Result<LogEntry>[]>} - A promise that resolves with an array of log entries matching the tags.
    */
-  private async filterLogsByTags(logFiles: string[], tags: string[], filter = false): Promise<Result<LogEntry>[]> {
+  private async filterLogsByTags(
+    logFiles: string[],
+    tags: string[],
+    filter = false,
+  ): Promise<Result<LogEntry>[]> {
     const logEntries = [];
 
     for (const file of logFiles) {
       const logs = await this.readLogFile(file);
 
       for (const log of logs) {
-        const callback = (val: string) => log.success && log.data.tags.includes(val);
+        const callback = (val: string) =>
+          log.success && log.data.tags.includes(val);
 
         if (filter ? tags.some(callback) : tags.every(callback)) {
           logEntries.push(log);
@@ -375,7 +393,11 @@ import { FileManager } from '../../utils/managers/FileManager';
    * console.log(logs); // [{ success: true, data: { text: "DB error", tags: ["error", "db"], ... } }]
    * ```
    */
-  public async findLogsByTags(tags: string[], matchAll: boolean = false, month?: boolean): Promise<Result<LogEntry>[]> {
+  public async findLogsByTags(
+    tags: string[],
+    matchAll: boolean = false,
+    month?: boolean,
+  ): Promise<Result<LogEntry>[]> {
     const logFiles = await this.getLogFiles(month);
 
     return await this.filterLogsByTags(logFiles, tags, !matchAll);
@@ -386,9 +408,12 @@ import { FileManager } from '../../utils/managers/FileManager';
    * @param {string} [month] - The month to filter by (optional).
    * @returns {Promise<string[]>} - A promise that resolves with an array of log file paths.
    */
-  @Decorators.validateFileOperation<ClassWithValidator>()
+  @validateFileOperation<ClassWithValidator>()
   private async getLogFiles(month?: boolean): Promise<string[]> {
-    const logDir = resolve(baseLogPath, month ? this.getCurrentLogFolder() : "");
+    const logDir = resolve(
+      baseLogPath,
+      month ? this.getCurrentLogFolder() : "",
+    );
     const files = await readdir(logDir);
 
     return files
@@ -402,10 +427,16 @@ import { FileManager } from '../../utils/managers/FileManager';
    * @returns {Promise<Result<LogEntry>[]>} - A promise that resolves with an array of log entries.
    */
   private async readLogFile(filePath: string): Promise<Result<LogEntry>[]> {
-    const results = await this.jsonReader.readLines<LogEntry>(filePath, Config.DELIMITER_LOG_FILE);
+    const results = await this.jsonReader.readLines<LogEntry>(
+      filePath,
+      DELIMITER_LOG_FILE,
+    );
 
     results.forEach((res, index) => {
-      if (!res.success) console.error(`Error in log entry ${index + 1}: ${res.error.message}, error code: ${res.error.code}`);
+      if (!res.success)
+        console.error(
+          `Error in log entry ${index + 1}: ${res.error.message}, error code: ${res.error.code}`,
+        );
     });
 
     return results;
@@ -428,10 +459,16 @@ import { FileManager } from '../../utils/managers/FileManager';
     const line = this.logFormatter.formattingLineType(this.inline);
     const currentPath = this.getCurrentLogFolder();
 
+    // check folder
     const checkFolder = await this.fileValidator.checkFolder(currentPath);
 
     try {
-      if (checkFolder.error) throw emiliaError(checkFolder.error.message, checkFolder.error.code, "InternalError");
+      if (checkFolder.error)
+        throw emiliaError(
+          checkFolder.error.message,
+          checkFolder.error.code,
+          "InternalError",
+        );
 
       const errorCode = this.code;
 
@@ -452,7 +489,7 @@ import { FileManager } from '../../utils/managers/FileManager';
       error("BaseLog.log:", e);
       await this.addLog({
         text: e,
-        logType: Enums.LogType.Error,
+        logType: LogType.Error,
         errorCode: e.code,
       });
     }
@@ -464,7 +501,7 @@ import { FileManager } from '../../utils/managers/FileManager';
    * @returns An array of LogEntry objects that succeeded.
    */
   protected getSuccessfulLogs(results: Result<LogEntry>[]): LogEntry[] {
-    return results.filter(r => r.success).map(r => r.data);
+    return results.filter((r) => r.success).map((r) => r.data);
   }
 
   /**
@@ -472,7 +509,6 @@ import { FileManager } from '../../utils/managers/FileManager';
    * The path is in the format of `${baseLogPath}/${month}.${year}`.
    * @returns {string} The current log folder path.
    */
-
   protected getCurrentLogFolder(): string {
     const now = new Date();
     const monthYear = `${(now.getMonth() + 1).toString().padStart(2, "0")}.${now.getFullYear()}`;

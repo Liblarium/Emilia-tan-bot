@@ -1,19 +1,25 @@
 
 import type { EmiliaClient } from "@client";
-import { Abstract, Config, Enums } from "@constants";
+import { AbstractEvent } from "@constants/abstract/AbstractEvent";
+import { prefix } from "@constants/config";
+import { CategoryEvents } from "@constants/enum/EventCategoryType";
+import { ErrorCode } from "@constants/enum/errorCode";
+import { LogType } from "@constants/enum/log";
 import { Log } from "@log";
-import { Decorators, Other, emiliaError } from "@utils";
+import { logCaller } from "@utils/decorators/logCaller";
+import { emiliaError } from "@utils/error/EmiliaError";
+import { random } from "@utils/other/random";
 import { REST, Routes } from "discord.js";
 
 let currentStatusIndex = 0;
 
-export default class Ready extends Abstract.AbstractEvent<[EmiliaClient], void> {
+export default class Ready extends AbstractEvent<CategoryEvents.Bot, "ready"> {
   constructor() {
-    super({ name: "ready" });
+    super({ name: "ready", category: CategoryEvents.Bot });
   }
 
   public execute(client: EmiliaClient): void {
-    if (!client || !client.user || !process.env.TOKEN) throw emiliaError("`client` not found or `TOKEN` empty in .env file!", process.env.TOKEN ? Enums.ErrorCode.CLIENT_NOT_FOUND : Enums.ErrorCode.ENV_REQUIRED);
+    if (!client || !client.user || !process.env.TOKEN) throw emiliaError("`client` not found or `TOKEN` empty in .env file!", process.env.TOKEN ? ErrorCode.CLIENT_NOT_FOUND : ErrorCode.ENV_REQUIRED);
 
     const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
 
@@ -25,16 +31,16 @@ export default class Ready extends Abstract.AbstractEvent<[EmiliaClient], void> 
 
     // Register slash commands
     rest.put(Routes.applicationCommands(client.user.id), { body: commands }).then(() => {
-      const text = [`Loaded ${client.command.size} commands`, `Registered ${commands.length} slash commands`, `Loaded ${client.events.size} events`, `Default prefix: ${Config.prefix}`];
+      const text = [`Loaded ${client.command.size} commands`, `Registered ${commands.length} slash commands`, `Loaded ${client.events.size} events`, `Default prefix: ${prefix}`];
 
       // Log the loaded commands and events
       for (const arr of text) {
-        new Log({ text: arr, type: Enums.LogType.Info, categories: ["global", "event"], tags: ["event", "ready"], code: Enums.ErrorCode.OK });
+        new Log({ text: arr, type: LogType.Info, categories: ["global", "event"], tags: ["event", "ready"], code: ErrorCode.OK });
       }
 
       // Set bot status
       return this.myStatus(client);
-    }).catch(e => new Log({ text: e, type: 2, categories: ["global", "event"], tags: ["event", "ready"], code: Enums.ErrorCode.UNKNOWN_ERROR }));
+    }).catch(e => new Log({ text: e, type: 2, categories: ["global", "event"], tags: ["event", "ready"], code: ErrorCode.UNKNOWN_ERROR }));
 
     // Update bot status every hour (or other time)
     setInterval(() => this.myStatus(client), time_upd);
@@ -48,7 +54,7 @@ export default class Ready extends Abstract.AbstractEvent<[EmiliaClient], void> 
    * @param client - The EmiliaClient instance for which to update the status.
    * @returns void This function doesn't return anything.
    */
-  @Decorators.logCaller()
+  @logCaller()
   private myStatus(client: EmiliaClient): void {
     const status = [
       "Dark Souls 2",
@@ -66,7 +72,7 @@ export default class Ready extends Abstract.AbstractEvent<[EmiliaClient], void> 
     ];
 
     // Get random status from predefined list and set it as the client's current activity
-    const random_status = status[Other.random(0, status.length - 1)];
+    const random_status = status[random(0, status.length - 1)];
 
     // Set the status
     client.user?.setActivity(random_status);
@@ -74,10 +80,10 @@ export default class Ready extends Abstract.AbstractEvent<[EmiliaClient], void> 
     // Log the status update
     new Log({
       text: `Я обновила статус (${currentStatusIndex++}) [${status.indexOf(random_status)}]`,
-      type: Enums.LogType.Info,
+      type: LogType.Info,
       categories: ["global", "event"],
       tags: ["event", "ready"],
-      code: Enums.ErrorCode.OK
+      code: ErrorCode.OK
     });
   }
 }

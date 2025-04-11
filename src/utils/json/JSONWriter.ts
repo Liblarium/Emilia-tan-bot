@@ -1,9 +1,10 @@
-import { Enums } from "@constants";
+import { ErrorCode } from "@constants/enum/errorCode";
 import type { Result } from "@type/utils";
 import type { IFileManager } from "@type/utils/fileManager";
 import type { IFileValidator } from "@type/utils/fileValidator";
 import type { IJSONWriter } from "@type/utils/jsonWriter";
-import { Formatters } from "@utils";
+import { objectToString } from "@utils/formatters/objectToString";
+
 
 export class JSONWriter implements IJSONWriter {
   constructor(
@@ -66,7 +67,7 @@ export class JSONWriter implements IJSONWriter {
       if (delimiter) return {
         success: false,
         error: {
-          code: Enums.ErrorCode.WRONG_DELIMITER,
+          code: ErrorCode.WRONG_DELIMITER,
           message: "Why you use delimiter on .json file? Use writeFile method for .json files",
         }
       };
@@ -100,6 +101,6 @@ export class JSONWriter implements IJSONWriter {
     data: T,
     pretty: boolean = false,
   ): Result<string> {
-    return Formatters.objectToString(data, pretty);
+    return objectToString(data, pretty);
   }
 }
