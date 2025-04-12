@@ -57,7 +57,7 @@ export abstract class AbstractLog implements IAbstractLog {
    */
   protected inline: InlineType;
   /**
-   * Category of log
+   * Categories of log
    * @default "other"
    */
   protected categories: ArrayNotEmpty<string>;
@@ -254,7 +254,7 @@ export abstract class AbstractLog implements IAbstractLog {
 
   /**
    * Method for change categories of log
-   * @param categoies - Categories of log
+   * @param categories - Categories of log
    */
   protected setCategories(categories: ArrayNotEmpty<string>): void {
     if (categories.length > 0) {
@@ -300,7 +300,7 @@ export abstract class AbstractLog implements IAbstractLog {
 
     if (!editType.success) return editType;
 
-    const type = editType.data.toLocaleString().toLocaleLowerCase();
+    const type = editType.data;
     const categories = this.categories.map((cat) => cat.toLocaleLowerCase());
 
     const logFilePath = this.getCurrentLogPath();

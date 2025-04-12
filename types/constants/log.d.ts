@@ -120,9 +120,9 @@ export interface LogEntry {
    */
   type: TypeLog;
   /**
-   * Category of the log entry
+   * Categories of the log entry
    */
-  category: string;
+  categories: ArrayNotEmpty<string>;
   /**
    * Metadata of the log entry
    */
@@ -135,6 +135,10 @@ export interface LogEntry {
    * Timestamp of the log entry
    */
   timestamp: string;
+  /**
+   * Error code of the log entry
+   */
+  errorCode: ErrorCode;
   /**
    * Tags associated with the log entry
    */

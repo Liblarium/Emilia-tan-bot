@@ -56,7 +56,8 @@
 				"noConfusingVoidType": "off",
 				"noAssignInExpressions": "off",
 				"noExplicitAny": "off",
-				"useValidTypeof": "off"
+				"useValidTypeof": "off",
+				"noShadowRestrictedNames": "off"
 			}
 		}
 	},

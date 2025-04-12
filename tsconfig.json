@@ -35,6 +35,9 @@
       "@log": [
         "src/log/index.ts"
       ],
+      "@log/*": [
+        "src/log/*",
+      ],
       "@interaction/*": [
         "src/interaction/*"
       ],

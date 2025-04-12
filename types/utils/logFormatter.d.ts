@@ -1,4 +1,5 @@
 import type { ErrorCode } from "@constants/enum/errorCode";
+import type { LogType } from "@constants/enum/log";
 import type { LineType, TypeLog } from "@type/constants/log";
 import type { Result } from "@type/utils";
 import type { LogFormatter } from "@utils/formatters/LogFormatter";
@@ -14,9 +15,9 @@ export interface FormatterLogOption {
   /**
    * The type of the log. I.e. 'info', 'error', 'warning', 'debug' or 'test'.
    */
-  type: string;
+  type: TypeLog;
   /**
-   * The category of the log. I.e. 'global', 'database' or any other category.
+   * The categories of the log. I.e. 'global', 'database' or any other category.
    */
   categories: string[];
   /**
@@ -56,7 +57,7 @@ export interface FormatterLogOption {
  */
 export interface FormattingConsoleOptions {
   /**
-   * The parameters for formatting and logging.
+   * The message to log. Can be an object or a string.
    */
   message: unknown;
   /**
@@ -68,7 +69,7 @@ export interface FormattingConsoleOptions {
    */
   type: TypeLog;
   /**
-   * The category of the log.
+   * The categories of the log.
    */
   categories: string[];
   /**
@@ -126,7 +127,7 @@ interface ILogFormatterStaticMethods {
    * setType(5); // "test"
    * setType(0); // EmiliaError: Невідомий тип логу: 0
    */
-  formatterType(options: formatterTypeOption): Result<TypeLog>;
+  formatterType(options: formatterTypeOption): Result<LogType>;
   /**
    * Formats a log message with the given text, type and category.
    * @param {FormatterLogOption} options - Options for formatting the log message.
@@ -145,7 +146,7 @@ interface ILogFormatterStaticMethods {
    * @param {unknown} params.message - The log message. Can be an object or a string.
    * @param {LineType} params.line - The line type for formatting the log message.
    * @param {TypeLog} params.type - The type of the log.
-   * @param {string} params.category - The category of the log.
+   * @param {string} params.categories - The categories of the log.
    * @param {boolean} [params.event] - Whether to format the log as an event. Default is `false`.
    * @param {boolean} [params.logs] - Whether to log the formatted message. Default is `true`.
    * @param {() => string} [params.getTime=Formatters.time] - A function to get the current time. Default is the `time` function from the `@utils` module.
@@ -153,4 +154,9 @@ interface ILogFormatterStaticMethods {
    * @returns {void}
    */
   formattingConsole(options: FormattingConsoleOptions): void;
+}
+
+export interface FormattedLogText {
+  in: string;
+  out: unknown;
 }

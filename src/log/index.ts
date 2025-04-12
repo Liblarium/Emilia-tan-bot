@@ -1,50 +1,32 @@
-import { AbstractLog } from "@constants/abstract/AbstractLog";
+import { LogType } from "@constants/enum/log";
+import type { LoggerData } from "@type/constants/logger";
 import type { LogOptions } from "@type/log";
-import { FileValidator } from "@utils/checkers/FileValidator";
-import { LogFormatter } from "@utils/formatters/LogFormatter";
-import { JSONReader } from "@utils/json/JSONReader";
-import { JSONWriter } from "@utils/json/JSONWriter";
-import { FileManager } from "@utils/managers/FileManager";
-
-
-const fileValidator = new FileValidator();
-const fileManager = new FileManager(fileValidator);
-const jsonReader = new JSONReader(fileValidator);
-const jsonWriter = new JSONWriter(fileValidator, fileManager);
+import type { Result } from "@type/utils";
 
 /**
- * A function to catch any errors that may occur in the code
- * and log them to the console with a red color
- * @param e The error that occurred
+ * Class for logging data to a file and console
+ *
+ * "Label" notations in comments:
+ * - `!:` - unimplemented mandatory argument
+ * - `!|?:` - unimplemented optional argument
+ * - `|?:` - optional argument
+ * - if without `!` or `?` - then mandatory argument
+ * @example
+ * new Log().logProcessing({
+ *   text: "Log contents".
+ *   type: LogType.Info, //information type. Numeric: 1 - info, 2 - error, 3- warning, 4 - debug, 5 - test
+ *   event: false, //|?: by default false. Whether to truncate output in console.log().
+ *   categories: ["global", "database"], //In which categories to write all specified logs. Outputted once in console.log(). Not necessarily global or database, string[] there
+ *   logs: true, //|?: whether to output text to console. By default, true
+ *   inline: InlineType.Before, //|?: affects only the text in the console. 0 - No change, 1 - wrap from top to bottom, 2 - from bottom, 3 - both.
+ *   code: ErrorCode.UNKNOWN_ERROR, //code to write to the log
+ *   tags: ["tag1", "tag2"], //tags to add to the log
+ *   metadata: { code: "value"}, //|?: metadata to add to the log
+ *   context: { code: "value" }, //|?: context to add to the log
+ * });
+ *
  */
-const catchs = (e: unknown) => {
-  console.error("\x1b[31m", e, "\x1b[0m");
-};
-
-/**
-* Class for logging data to a file and console
-*
-* "Label" notations in comments:
-* - `!:` - unimplemented mandatory argument
-* - `!|?:` - unimplemented optional argument
-* - `|?:` - optional argument
-* - if without `!` or `?` - then mandatory argument
-* @example
-* new Log({
-*   text: "Log contents".
-*   type: LogType.Info, //information type. Numeric: 1 - info, 2 - error, 3- warning, 4 - debug, 5 - test
-*   event: false, //|?: by default false. Whether to truncate output in console.log().
-*   categories: ["global", "database"], //In which categories to write all specified logs. Outputted once in console.log(). Not necessarily global or database, string[] there
-*   logs: true, //|?: whether to output text to console. By default, true
-*   inline: InlineType.Before, //|?: affects only the text in the console. 0 - No change, 1 - wrap from top to bottom, 2 - from bottom, 3 - both.
-*   code: ErrorCode.UNKNOWN_ERROR, //code to write to the log
-*   tags: ["tag1", "tag2"], //tags to add to the log
-*   metadata: { code: "value"}, //|?: metadata to add to the log
-*   context: { code: "value" }, //|?: context to add to the log
-* });
-*
-*/
-export class Log extends AbstractLog {
+export class Log {
   /**
    * Constructs a new Log object
    * @param logOptions
@@ -59,21 +41,42 @@ export class Log extends AbstractLog {
    * @param logOptions.metadata |?: metadata to add to the log
    * @param logOptions.context |?: context to add to the log
    */
-  constructor({
-    text,
-    type,
-    event = false,
-    categories,
-    logs = true,
-    inline = 0,
-    code,
-    tags = [],
-    metadata,
-    context = {},
-  }: LogOptions) {
-    super({ text, type, event, logs, inline, code, jsonReader, jsonWriter, fileValidator, logFormatter: LogFormatter, fileManager, categories, tags, metadata, context });
+  public async logProcessing(
+    logOptions: LogOptions,
+  ): Promise<void | Result<LogType>> {
+    const {
+      type,
+      logFormatter,
+      consoleLogger,
+      event = false,
+      fileLogger,
+      inline,
+      logs = true,
+    } = logOptions;
+    let logType: LogType = typeof type === "number" ? LogType.Info : type;
 
-    this.log().catch(catchs);
+    if (typeof type === "number") {
+      const result = logFormatter.formatterType(type);
+
+      if (result.success) logType = result.data;
+      return result;
+    }
+
+    const logData: LoggerData = {
+      text: logOptions.text,
+      categories: logOptions.categories,
+      tags: logOptions.tags,
+      metadata: logOptions.metadata ?? {},
+      context: logOptions.context ?? {},
+      errorCode: logOptions.code,
+      timestamp: new Date().toISOString(),
+    };
+    const consoleData = { ...logData, inline };
+
+    // If the console logger is enabled and logs is true
+    if (logs && consoleLogger) await consoleLogger[logType](consoleData, event);
+
+    // If the file logger is enabled
+    if (fileLogger) await fileLogger[logType](logData);
   }
 }
-

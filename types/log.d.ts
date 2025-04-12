@@ -1,7 +1,10 @@
 import type { ErrorCode } from "@constants/enum/errorCode";
 import type { InlineType } from "@constants/enum/log";
 import type { ArrayNotEmpty } from "@type";
+import type { ConsoleLogger } from "src/log/ConsoleLogger";
+import type { FileLogger } from "src/log/FileLogger";
 import type { TypeLog, TypeText } from "./constants/log";
+import type { ClassWithLogFormatter } from "./utils/index";
 
 /**
  * Options for Log class
@@ -23,7 +26,7 @@ import type { TypeLog, TypeText } from "./constants/log";
  *
  * new Log(options); // [time]: Hello from LogOptions
  */
-export interface LogOptions {
+export interface LogOptions extends ClassWithLogFormatter, LogDeps {
   /**
    * Log contents
    */
@@ -36,6 +39,9 @@ export interface LogOptions {
    * @default LogType.Info = 1
    */
   type: TypeLog;
+  /**
+   * The error code
+   */
   code: ErrorCode;
   /**
    * In which categories to write all specified logs. Outputted once in console.log(). Not necessarily global or database, string[] there
@@ -69,4 +75,15 @@ export interface LogOptions {
    * Context to add to the log
    */
   context?: object;
+}
+
+export interface LogDeps {
+  /**
+   * The console logger
+   */
+  consoleLogger: ConsoleLogger;
+  /**
+   * The file logger
+   */
+  fileLogger: FileLogger;
 }

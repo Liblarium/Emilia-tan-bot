@@ -47,6 +47,10 @@ export enum ErrorCode {
    */
   INVALID_PATH = "INVALID_PATH",
   /**
+   * Invalid parameter! Please check the parameter.
+   */
+  INVALID_PARAMETER = "INVALID_PARAMETER",
+  /**
    * You cannot use extension who not allowed. See `Config.ALLOWED_EXTENSIONS` and `Config.FORBIDDEN_EXTENSIONS`.
    */
   FILE_FORMAT_ERROR = "FILE_FORMAT_ERROR",
@@ -124,6 +128,12 @@ export enum ErrorCode {
    * Please check the message id. Or fetch it.
    */
   MESSAGE_NOT_FOUND = "MESSAGE_NOT_FOUND",
+  /**
+   * Missing dependencies. 
+   * 
+   * Please check the dependencies.
+   */
+  MISSING_DEPENDENCIES = "MISSING_DEPENDENCIES",
   /**
    * Unknown error
    */

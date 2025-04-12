@@ -6,7 +6,7 @@ import type { ArrayNotEmpty } from "@type";
 import type { ClassWithValidator, Result } from "@type/utils";
 import type { IFileManager } from "@type/utils/fileManager";
 import type { IFileValidator } from "@type/utils/fileValidator";
-import { logCaller } from "@utils/decorators/logCaller";
+//import { logCaller } from "@utils/decorators/logCaller";
 import { validateFileOperation } from "@utils/decorators/validateFileOperation";
 import { emiliaError } from "@utils/error/EmiliaError";
 
@@ -41,7 +41,7 @@ export class FileManager implements IFileManager {
    * //   path: "/path/to/folder/newFolder"
    * // }
    */
-  @logCaller()
+  //@logCaller()
   async createFolder(
     path: string,
     folderName: string,
@@ -96,7 +96,7 @@ export class FileManager implements IFileManager {
    * //   data: undefined
    * // }
    */
-  @logCaller()
+  //@logCaller()
   @validateFileOperation()
   async writeFile(filePath: string, data: string): Promise<Result<void>> {
     try {
@@ -117,7 +117,7 @@ export class FileManager implements IFileManager {
   /**
    * Deletes a file by the given name.
    * @param {string} fileName - Name of the file to delete
-   * @returns {Promise<DeleteFileResult>}
+   * @returns {Promise<Result<void>>}
    * @example
    * const result = await FileHandler.deleteFile("path/to/file.txt");
    * console.log(result);
@@ -126,9 +126,9 @@ export class FileManager implements IFileManager {
    * //   error: undefined
    * // }
    */
-  @logCaller()
+  //@logCaller()
   @validateFileOperation<ClassWithValidator>()
-  async deleteFile(fileName: string): Promise<Result> {
+  async deleteFile(fileName: string): Promise<Result<void>> {
     try {
       const filePath = resolve(fileName);
 
@@ -158,7 +158,7 @@ export class FileManager implements IFileManager {
    * //   success: true
    * // }
    */
-  @logCaller()
+  //@logCaller()
   @validateFileOperation<ClassWithValidator>()
   async appendFile(fileName: string, data: string): Promise<Result<void>> {
     try {

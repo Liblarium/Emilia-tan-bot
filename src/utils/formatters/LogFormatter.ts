@@ -4,13 +4,14 @@ import type { ArrayNotEmpty } from "@type";
 import type { LineType, TypeLog } from "@type/constants/log";
 import type { ClassWithJSONWriter, Result } from "@type/utils";
 import type {
+  FormattedLogText,
   FormatterLogOption,
   FormattingConsoleOptions,
   formatterTypeOption,
 } from "@type/utils/logFormatter";
 import { isObject } from "@utils/checkers/isObject";
-import { logCaller } from "@utils/decorators/logCaller";
-import { time } from "./timeAndDate";
+//import { logCaller } from "@utils/decorators/logCaller";
+import { setType } from "@utils/other/setType";
 
 export class LogFormatter {
   public static readonly logCategories: ArrayNotEmpty<string> = [
@@ -19,7 +20,7 @@ export class LogFormatter {
   ];
 
   /**
-   * Formats a log message with the given text, type and category.
+   * Formats a log message with the given text, type and categories.
    * @param {FormatterLogOption} options - Options for formatting the log message.
    * @param {unknown} options.text - The text to log. Can be an object or a string.
    * @param {string} options.type - The type of the log. I.e. 'info', 'error', 'warning', 'debug' or 'test'.
@@ -27,6 +28,7 @@ export class LogFormatter {
    * @param {boolean} [options.date=false] - If true, adds the date to the log message with date and time with `dateAndTime()`. If false or undefined, only adds the time with `time()`.
    * @param {(...args: unknown[]) => string} [options.processingLine] - A function to process the log message before logging.
    * @returns {string} The formatted log message as a string.
+   * @returns {Result<string>} The formatted log message as a Result object.
    */
   static formatterLog({
     text,
@@ -37,42 +39,80 @@ export class LogFormatter {
     context = {},
     date = false,
     processingLine,
+    errorCode,
     jsonWriter
   }: FormatterLogOption & ClassWithJSONWriter): Result<string> {
+    if (!jsonWriter || !text || !type || !categories || !errorCode) return {
+      success: false,
+      error: {
+        code: ErrorCode.INVALID_PARAMETER,
+        message: "Required parameters are missing: jsonWriter, text, type, categories, or errorCode"
+      }
+    };
+
+    // Editing type if it is not a string
+    const typeResult = this.processLogType(type);
+
+    // Send Error, if have error
+    if (!typeResult.success) return typeResult;
+
+    // log formatting
     return jsonWriter.stringify({
-      text: processingLine ? processingLine(text) : text,
-      type,
+      text: this.processLogText(text, processingLine),
+      type: typeResult.data,
       categories,
       tags,
       metadata,
       context,
-      date,
+      errorCode,
+      timestamp: date ? dateAndTime() : time(),
     });
   }
 
   /**
-   * Method for change number value of type to string
-   * @param {TypeLog | undefined | null} type - Type of log
-   * @returns {void}
-   * @throws {EmiliaTypeError} - If the type is not a number or is not within the range of TypeLog values
-   * @example
-   * setType(1); // "info"
-   * setType(5); // "test"
-   * setType(0); // EmiliaError: Невідомий тип логу: 0
+   * Processes the type of log and leads it to the string format
+   * @private
    */
-  @logCaller()
+  private static processLogType(type: formatterTypeOption): Result<string> {
+    if (typeof type === "string") return { success: true, data: type };
+
+    const typeResult = this.formatterType(type);
+    return typeResult.success
+      ? { success: true, data: typeResult.data.toString() }
+      : typeResult;
+  }
+
+  /**
+   * Processes the text of the log, taking into account the processing function
+   * @private
+   */
+  private static processLogText(text: unknown, processingLine?: (text: unknown) => string): string {
+    return processingLine ? processingLine(text) : String(text);
+  }
+
+  /**
+ * Converts a log type value to a standardized TypeLog format
+ * @param {formatterTypeOption} type - Type of log (string, number, or TypeLog)
+ * @returns {Result<TypeLog>} Result object with the converted TypeLog or an error
+ * @example
+ * ```ts
+ * formatterType(1); // { success: true, data: "info" }
+ * formatterType(5); // { success: true, data: "test" }
+ * formatterType(0); // { success: false, error: { message: "Unknown log type: 0", code: ErrorCode.INVALID_TYPE } }
+ * formatterType("info"); // { success: true, data: "info" }
+ * ```
+ */
+  // @logCaller()
   static formatterType(type: formatterTypeOption): Result<TypeLog> {
-    // If the type is already a string and matches one of the allowed values:
-    if (
-      typeof type === "string" &&
-      Object.values(LogType).includes(type as LogType)
-    ) {
-      return { success: true, data: type as TypeLog };
+    // If the type is already a string, validate it's a valid LogType value
+    if (typeof type === "string") {
+      const validLogTypes = Object.values(LogType);
+
+      if (validLogTypes.includes(setType<LogType>(type)))
+        return { success: true, data: setType<TypeLog>(type) };
     }
 
-    // To avoid repeating LogType every time
-
-    // If a number is provided, you can convert it using a map:
+    // If a number is provided, convert it using a map
     const typeMap: Record<number, TypeLog> = {
       1: LogType.Info,
       2: LogType.Error,
@@ -100,7 +140,7 @@ export class LogFormatter {
    * @param {unknown} params.message - The log message. Can be an object or a string.
    * @param {LineType} params.line - The line type for formatting the log message.
    * @param {TypeLog} params.type - The type of the log.
-   * @param {string} params.category - The category of the log.
+   * @param {string[]} params.categories - The categories of the log.
    * @param {boolean} [params.event] - Whether to format the log as an event. Default is `false`.
    * @param {boolean} [params.logs] - Whether to log the formatted message. Default is `true`.
    * @param {() => string} [params.getTime=time] - A function to get the current time. Default is the `time` function from the `@utils` module.
@@ -127,7 +167,7 @@ export class LogFormatter {
           time: getTime(),
           message: editText,
           errorCode,
-          category: categories,
+          categories,
           type: typeof type === "number" ? this.formatterType(type) : type,
         },
         logText.out,
@@ -140,14 +180,10 @@ export class LogFormatter {
    * @param {unknown} message - The log message.
    * @returns {object} - Formatted log text.
    */
-  private static formatLogText(message: unknown): { in: string; out: unknown } {
+  private static formatLogText(message: unknown): FormattedLogText {
     return {
-      in: isObject(message)
-        ? ""
-        : typeof message === "string"
-          ? message
-          : String(message),
-      out: isObject(message) ? message : "",
+      in: isObject(message) ? JSON.stringify(message) : String(message),
+      out: isObject(message) ? message : ''
     };
   }
 
@@ -190,3 +226,5 @@ export class LogFormatter {
     };
   }
 }
+
+import { dateAndTime, time } from "./timeAndDate";
