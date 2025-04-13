@@ -1,23 +1,28 @@
-
+import { AbstractEvent } from "@abstract/AbstractEvent";
 import type { EmiliaClient } from "@client";
-import { AbstractEvent } from "@constants/abstract/AbstractEvent";
-import { prefix } from "@constants/config";
-import { CategoryEvents } from "@constants/enum/EventCategoryType";
-import { ErrorCode } from "@constants/enum/errorCode";
-import { LogType } from "@constants/enum/log";
+import { prefix } from "@core/config";
+import { CategoryEvents } from "@enum/EventCategoryType";
+import { ErrorCode } from "@enum/errorCode";
+import { LogType } from "@enum/log";
 import { Log } from "@log";
-import { logCaller } from "@utils/decorators/logCaller";
+import { LogFactory } from "@log/logFactory";
+import { LogMethod, Loggable } from "@utils/decorators/loggable";
 import { emiliaError } from "@utils/error/EmiliaError";
-import { random } from "@utils/other/random";
+import { random } from "@utils/helpers/random";
 import { REST, Routes } from "discord.js";
 
 let currentStatusIndex = 0;
 
+@Loggable(Log, {
+  type: LogType.Info, categories: ["global", "event"], tags: ["event", "ready"], code: ErrorCode.OK,
+  text: "Bot is ready!",
+})
 export default class Ready extends AbstractEvent<CategoryEvents.Bot, "ready"> {
   constructor() {
     super({ name: "ready", category: CategoryEvents.Bot });
   }
 
+  @LogMethod({ type: LogType.Info, categories: ["global", "event"], tags: ["event", "ready"] })
   public execute(client: EmiliaClient): void {
     if (!client || !client.user || !process.env.TOKEN) throw emiliaError("`client` not found or `TOKEN` empty in .env file!", process.env.TOKEN ? ErrorCode.CLIENT_NOT_FOUND : ErrorCode.ENV_REQUIRED);
 
@@ -30,17 +35,17 @@ export default class Ready extends AbstractEvent<CategoryEvents.Bot, "ready"> {
     const time_upd = 1000 * 60 * 60 * 1;
 
     // Register slash commands
-    rest.put(Routes.applicationCommands(client.user.id), { body: commands }).then(() => {
+    rest.put(Routes.applicationCommands(client.user.id), { body: commands }).then(async () => {
       const text = [`Loaded ${client.command.size} commands`, `Registered ${commands.length} slash commands`, `Loaded ${client.events.size} events`, `Default prefix: ${prefix}`];
 
       // Log the loaded commands and events
       for (const arr of text) {
-        new Log({ text: arr, type: LogType.Info, categories: ["global", "event"], tags: ["event", "ready"], code: ErrorCode.OK });
+        await LogFactory.log({ text: arr, type: LogType.Info, categories: ["global", "event"], tags: ["event", "ready"], code: ErrorCode.OK });
       }
 
       // Set bot status
       return this.myStatus(client);
-    }).catch(e => new Log({ text: e, type: 2, categories: ["global", "event"], tags: ["event", "ready"], code: ErrorCode.UNKNOWN_ERROR }));
+    }).catch(async (e) => await LogFactory.log({ text: e, type: 2, categories: ["global", "event"], tags: ["event", "ready"], code: ErrorCode.UNKNOWN_ERROR }));
 
     // Update bot status every hour (or other time)
     setInterval(() => this.myStatus(client), time_upd);
@@ -54,8 +59,8 @@ export default class Ready extends AbstractEvent<CategoryEvents.Bot, "ready"> {
    * @param client - The EmiliaClient instance for which to update the status.
    * @returns void This function doesn't return anything.
    */
-  @logCaller()
-  private myStatus(client: EmiliaClient): void {
+  @LogMethod({ type: LogType.Info, categories: ["global", "event"], tags: ["event", "ready", "myStatus"] })
+  myStatus(client: EmiliaClient): void {
     const status = [
       "Dark Souls 2",
       "Dark Souls 3",
@@ -78,7 +83,7 @@ export default class Ready extends AbstractEvent<CategoryEvents.Bot, "ready"> {
     client.user?.setActivity(random_status);
 
     // Log the status update
-    new Log({
+    LogFactory.log({
       text: `Я обновила статус (${currentStatusIndex++}) [${status.indexOf(random_status)}]`,
       type: LogType.Info,
       categories: ["global", "event"],

@@ -1,5 +1,4 @@
 import type { ErrorDetails, Result } from ".";
-import type { ClassWithLogCategories } from "./logCaller";
 
 export interface IFormatValidator {
   checkFormatFile(filePath: string): Result;
@@ -27,8 +26,7 @@ export interface IFileValidator
   IFileAccessValidator,
   ICheckFolder,
   IValidPath,
-  IJSONFile,
-  ClassWithLogCategories { }
+  IJSONFile { }
 
 /**
  * Result of checking a folder

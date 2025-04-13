@@ -1,4 +1,4 @@
-import type { IAbstractHandlerLogic } from "@type/constants/handler";
+import type { IAbstractHandlerLogic } from "@type";
 import type { ValidModule } from "./BaseModule";
 
 export interface IHandlerCore {

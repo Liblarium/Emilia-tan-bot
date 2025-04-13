@@ -1,6 +1,4 @@
-import type { ArrayNotEmpty, LimitedArray } from "@type";
-import type { ValidModule } from "@type/handler/BaseModule";
-
+import type { ArrayNotEmpty, LimitedArray, ValidModule } from "@type";
 
 export type HandlerPath = LimitedArray<ArrayNotEmpty<string>, 2>;
 

@@ -1,5 +1,5 @@
-import type { InlineType, LogType } from "@constants/enum/log";
-import type { LogEntry } from "@type/constants/log";
+import type { InlineType, LogType } from "@enum/log";
+import type { LogEntry } from "@type";
 
 /**
  * Interface for a logger.
@@ -26,6 +26,11 @@ export interface Logger {
    * @param message - The message to log.
    */
   debug(message: LoggerData): Promise<void>;
+  /**
+   * Logs a warning message.
+   * @param message - The message to log.
+   */
+  warning(message: LoggerData): Promise<void>;
 }
 
 export type LoggerData = Omit<LogEntry, "type">;

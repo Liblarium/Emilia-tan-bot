@@ -7,7 +7,13 @@ export type HandlerModule<T extends ValidModule> = {
 };
 
 export interface IModuleImporter {
-  /** Imports a module from the specified folder and file */
+  /** 
+   * Imports a module from the specified folder and file 
+   * 
+   * @param folder - The folder to import the module from
+   * @param file - The file to import the module from
+   * @param forceReload - Whether to force reload the module even if it is already cached
+   * */
   import<T extends ValidModule>(
     folder: string,
     file: string,

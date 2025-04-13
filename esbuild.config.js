@@ -14,14 +14,18 @@ build({
   target: "esnext",
   tsconfig: "tsconfig.json",
   alias: {
-    "@client/pg": resolve(__dirname, "src/client/postgres.ts"),
-    "@client": resolve(__dirname, "src/client/index.ts"),
-    "@constants/*": resolve(__dirname, "src/constants/*"),
-    "@db/*": resolve(__dirname, "src/database/*"),
+    "@type": resolve(__dirname, "types"),
+    "@client/pg": resolve(__dirname, "src/modules/client/postgres.ts"),
+    "@client": resolve(__dirname, "src/modules/client/index.ts"),
+    "@constants/*": resolve(__dirname, "src/modules/constants/*"),
+    "@db/*": resolve(__dirname, "src/modules/database/*"),
     "@utils/*": resolve(__dirname, "src/utils/*"),
-    "@log": resolve(__dirname, "src/log/index.ts"),
-    "@interaction/*": resolve(__dirname, "src/interaction/*"),
-    "@handlers/*": resolve(__dirname, "src/handlers/*")
+    "@log": resolve(__dirname, "src/modules/log/index.ts"),
+    "@log/*": resolve(__dirname, "src/modules/log/*"),
+    "@interaction/*": resolve(__dirname, "src/modules/interaction/*"),
+    "@handlers/*": resolve(__dirname, "src/modules/handlers/*"),
+    "@core/*": resolve(__dirname, "src/core/*"),
+    "@command/*": resolve(__dirname, "src/command/*")
   }
 }).then(() => console.log("Build succeeded!"))
   .catch((error) => {

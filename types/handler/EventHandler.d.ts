@@ -1,5 +1,5 @@
-import type { CategoryEvents } from "@constants/enum/EventCategoryType";
-import type { EventArgsType, EventForCategory } from "@type/constants/event";
+import type { CategoryEvents } from "@enum/EventCategoryType";
+import type { EventArgsType, EventForCategory } from "@type";
 
 export interface IEventHandler {
   /**
@@ -12,7 +12,7 @@ export interface IEventHandler {
   handler(): Promise<void>;
 }
 
-interface lLstener {
+interface lListener {
   /**
    * @param args The callback function
    */
@@ -36,7 +36,7 @@ export interface EventEmitterLike<
    * and called, multiple times.
    *
    * @param {string} eventName The name of the event
-   * @param {lLstener} listener The callback function
+   * @param {lListener} listener The callback function
    * @returns {EventEmitterLike} The emitter
    */
   on: (
@@ -48,7 +48,7 @@ export interface EventEmitterLike<
    * next time `eventName` is triggered, this listener is removed and then invoked.
    *
    * @param {string} eventName The name of the event
-   * @param {lLstener} listener The callback function
+   * @param {lListener} listener The callback function
    * @returns {EventEmitterLike} The emitter
    */
   once: (

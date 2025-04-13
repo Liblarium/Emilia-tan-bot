@@ -1,18 +1,18 @@
-import type { ErrorCode } from "@constants/enum/errorCode";
-import type { LogType } from "@constants/enum/log";
-import type { InlineType } from "@constants/enum/log";
-import type { ArrayNotEmpty } from "@type";
+import type { ErrorCode } from "@enum/errorCode";
+import type { LogType } from "@enum/log";
+import type { InlineType } from "@enum/log";
 import type {
+  ArrayNotEmpty,
   ClassWithFileManager,
   ClassWithJSONReader,
   ClassWithJSONWriter,
   ClassWithValidator,
-  Result,
-} from "@type/utils";
-import type { ILogFormatters } from "@type/utils/logFormatter";
+  ILogFormatters,
+  Result
+} from "@type";
 
 export type LineType = { news: "" | "\n"; last: "" | "\n" };
-export type LogTypeNumber = 1 | 2 | 3 | 4 | 5;
+export type LogTypeNumber = 1 | 2 | 3 | 4;
 
 export interface AbstractLogOptions {
   /**
@@ -22,7 +22,7 @@ export interface AbstractLogOptions {
   /**
    * Type of log
    */
-  type: TypeLog;
+  type: LogType;
   /**
    * Event mode. If true, log will be written in format: [time] [category] [type]: text
    */
@@ -46,7 +46,7 @@ export interface AbstractLogOptions {
   /**
    * Metadata of log. It is an object which can contain any information.
    * It will be written to log as a JSON string.
-   * @type {object}
+   * @type {Record<string, unknown>}
    * @default {undefined}
    * @example
    * {
@@ -54,19 +54,19 @@ export interface AbstractLogOptions {
    *   foo: "bar"
    * }
    */
-  metadata?: object;
+  metadata?: Record<string, unknown>;
   /**
    * Context of log. It is an object which can contain any information.
    * It will be written to log as a JSON string.
-   * @type {object}
-   * @default {object}
+   * @type {Record<string, unknown>}
+   * @default {{}}
    * @example
    * {
    *   key: "value",
    *   foo: "bar"
    * }
    */
-  context?: object;
+  context?: Record<string, unknown>;
   /**
    * Tags associated with the log.
    * It is an optional array of strings.
@@ -82,20 +82,15 @@ export interface IAbstractLogWithDependencies
   ClassWithJSONReader,
   ClassWithFileManager,
   ClassWithValidator,
-  СlassWithLogFormatter { }
+  ClassWithLogFormatter { }
 
 export interface AbstractLogOptionsExtended
   extends AbstractLogOptions,
   IAbstractLogWithDependencies { }
 
-export interface СlassWithLogFormatter {
+export interface ClassWithLogFormatter {
   logFormatter: ILogFormatters;
 }
-
-/**
- * Type of log. It is a union of LogType and LogTypeNumber
- */
-export type TypeLog = LogType | LogTypeNumber;
 
 /**
  * Type of text
@@ -114,40 +109,36 @@ export interface LogEntry {
   /**
    * Text of the log entry
    */
-  text: TypeText;
+  readonly text: TypeText;
   /**
    * Type of the log entry
    */
-  type: TypeLog;
+  readonly type: LogType;
   /**
    * Categories of the log entry
    */
-  categories: ArrayNotEmpty<string>;
+  readonly categories: ArrayNotEmpty<string>;
   /**
    * Metadata of the log entry
    */
-  metadata?: object;
+  readonly metadata?: object;
   /**
    * Context of the log entry
    */
-  context?: object;
-  /**
-   * Timestamp of the log entry
-   */
-  timestamp: string;
+  readonly context?: object;
   /**
    * Error code of the log entry
    */
-  errorCode: ErrorCode;
+  readonly errorCode: ErrorCode;
   /**
    * Tags associated with the log entry
    */
-  tags: string[];
+  readonly tags: LogTags;
 }
 
 export interface AddLogOptions {
   text: TypeText;
-  logType: TypeLog;
+  logType: LogType;
   tags?: string[];
   metadata?: object;
   context?: object;
@@ -161,3 +152,5 @@ export interface IAbstractLog extends IAbstractLogWithDependencies {
     month?: boolean,
   ): Promise<Result<LogEntry>[]>;
 }
+
+export type LogTags = string[];

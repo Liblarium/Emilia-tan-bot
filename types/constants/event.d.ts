@@ -1,5 +1,5 @@
 import type { EmiliaClient } from "@client";
-import type { CategoryEvents } from "@constants/enums/EventCategory";
+import type { CategoryEvents } from "@enums/EventCategory";
 import type { Keyof } from "@type";
 import type { ClientEvents } from "discord.js";
 
@@ -11,7 +11,7 @@ export type CategoryEventsMap = {
   bot: Keyof<ClientEvents>;
   /** Mongoose connection events */
   mongoose: Keyof<MongooseEvents>;
-  /** Custom event - you can create your own. Recomended: add there your category event */
+  /** Custom event - you can create your own. Recommended: add there your category event */
   custom: unknown;
   /** Custom events */
   none: unknown;

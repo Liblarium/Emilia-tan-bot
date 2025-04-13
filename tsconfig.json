@@ -18,33 +18,46 @@
         "types/*"
       ],
       "@client/pg": [
-        "src/client/postgres.ts"
+        "src/modules/client/postgres.ts"
       ],
       "@client": [
-        "src/client/index.ts"
+        "src/modules/client/index.ts"
       ],
-      "@constants/*": [
-        "src/constants/*"
+      "@enum/*": [
+        "src/modules/constants/enum/*"
+      ],
+      "@abstract/*": [
+        "src/modules/constants/abstract/*"
       ],
       "@db/*": [
-        "src/database/*"
+        "src/modules/database/*"
       ],
       "@utils/*": [
-        "src/utils/*"
+        "src/modules/utils/*"
       ],
       "@log": [
-        "src/log/index.ts"
+        "src/modules/log/index.ts"
       ],
       "@log/*": [
-        "src/log/*",
+        "src/modules/log/*"
       ],
       "@interaction/*": [
-        "src/interaction/*"
+        "src/modules/interaction/*"
       ],
       "@handlers/*": [
-        "src/handlers/*"
+        "src/modules/handlers/*"
+      ],
+      "@core/*": [
+        "src/core/*"
+      ],
+      "@command/*": [
+        "src/command/*"
       ]
-    }
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ]
   },
   "include": [
     "src",

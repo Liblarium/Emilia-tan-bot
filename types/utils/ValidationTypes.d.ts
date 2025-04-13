@@ -1,4 +1,4 @@
-import type { PrimitiveType } from "@constants/enum/ValidationEnums";
+import type { PrimitiveType } from "@enum/ValidationEnums";
 
 export interface ValidationOptions {
   strict?: boolean;

@@ -57,7 +57,7 @@ export interface CommandArguments {
    */
   aliases?: string[];
   /**
-   * Command type (both, messsage or slash command)
+   * Command type (both, message or slash command)
    * @default CommandType.Both
    */
   type?: CommandType;

@@ -1,4 +1,4 @@
-import type { AbstractAction } from "@constants/abstract/AbstractAction";
+import type { AbstractAction } from "@abstract/AbstractAction";
 
 /** Base interface for all handler modules */
 export interface IBaseModule {

@@ -21,7 +21,7 @@ export default [
       "eslint.config.ts",
       "oldCode",
       "dist",
-      "sanbox/*",
+      "sandbox/*",
       "__tests__/*",
       "types",
       "*/**/*.test.ts"

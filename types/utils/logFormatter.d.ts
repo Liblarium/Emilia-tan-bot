@@ -1,7 +1,6 @@
-import type { ErrorCode } from "@constants/enum/errorCode";
-import type { LogType } from "@constants/enum/log";
-import type { LineType, TypeLog } from "@type/constants/log";
-import type { Result } from "@type/utils";
+import type { ErrorCode } from "@enum/errorCode";
+import type { LogType } from "@enum/log";
+import type { LineType, Result, TypeLog } from "@type";
 import type { LogFormatter } from "@utils/formatters/LogFormatter";
 
 /**
@@ -13,7 +12,7 @@ export interface FormatterLogOption {
    */
   text: unknown;
   /**
-   * The type of the log. I.e. 'info', 'error', 'warning', 'debug' or 'test'.
+   * The type of the log. I.e. 'info', 'error', 'warning', 'debug'.
    */
   type: TypeLog;
   /**
@@ -93,7 +92,7 @@ export interface FormattingConsoleOptions {
   getTime?: () => string;
 }
 
-export type formatterTypeOption = (TypeLog | number) | string;
+export type formatterTypeOption = TypeLog | number;
 
 /**
  *
@@ -110,7 +109,7 @@ interface ILogFormatterStaticMethods {
    * Formats a log message with the given text, type and category.
    * @param {FormatterLogOption} options - Options for formatting the log message.
    * @param {unknown} options.text - The text to log. Can be an object or a string.
-   * @param {string} options.type - The type of the log. I.e. 'info', 'error', 'warning', 'debug' or 'test'.
+   * @param {string} options.type - The type of the log. I.e. 'info', 'error', 'warning', 'debug'.
    * @param {string[]} options.categories - The categories of the log. I.e. 'global', 'database' or any other category.
    * @param {boolean} [options.date=false] - If true, adds the date to the log message with date and time with `dateAndTime()`. If false or undefined, only adds the time with `time()`.
    * @param {(...args: unknown[]) => string} [options.processingLine] - A function to process the log message before logging.
@@ -132,7 +131,7 @@ interface ILogFormatterStaticMethods {
    * Formats a log message with the given text, type and category.
    * @param {FormatterLogOption} options - Options for formatting the log message.
    * @param {unknown} options.text - The text to log. Can be an object or a string.
-   * @param {string} options.type - The type of the log. I.e. 'info', 'error', 'warning', 'debug' or 'test'.
+   * @param {string} options.type - The type of the log. I.e. 'info', 'error', 'warning', 'debug'.
    * @param {string[]} options.categories - The categories of the log. I.e. 'global', 'database' or any other category.
    * @param {boolean} [options.date=false] - If true, adds the date to the log message with date and time with `dateAndTime()`. If false or undefined, only adds the time with `time()`.
    * @param {(...args: unknown[]) => string} [options.processingLine] - A function to process the log message before logging.
