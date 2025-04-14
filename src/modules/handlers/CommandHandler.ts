@@ -4,8 +4,8 @@ import { AbstractEmiliaError } from "@abstract/EmiliaAbstractError";
 import type { EmiliaClient } from "@client";
 import { CommandType } from "@enum/command";
 import { ErrorCode } from "@enum/errorCode";
-import { Log } from "@log";
 import { LogFactory } from "@log/logFactory";
+import { emiliaError } from "@utils/error/EmiliaError";
 
 export class CommandHandler extends AbstractHandler {
   /**
@@ -47,18 +47,33 @@ export class CommandHandler extends AbstractHandler {
    * @throws Catches any errors that occur during the process and passes them to the error handling function.
    */
 
-  setLogic(command: AbstractBaseCommand): void | Promise<void> {
+  setLogic(command: AbstractBaseCommand<string>): void | Promise<void> {
     const client = this.client;
 
     try {
       // Add the command to the client's command or slashCommand collection
-      if (command.type !== CommandType.Slash)
-        client.command.set(command.name, command);
-      if (command.type === CommandType.Slash)
-        client.slashCommand.set(command.name, command);
+      switch (command.type) {
+        case CommandType.Both:
+          client.command.set(command.name, command);
+          client.slashCommand.set(command.name, command);
+          break;
+        case CommandType.Command:
+          client.command.set(command.name, command);
+          break;
+        case CommandType.Slash:
+          client.slashCommand.set(command.name, command);
+          break;
+        default:
+          throw emiliaError(`[CommandHandler.setLogic]: Unknown command (${command.type}) type!`, ErrorCode.INVALID_TYPE);
+      }
 
       // Set up aliases for the command. Adds the command to the client's command collection with the alias.
-      command.aliases.forEach((alias) => client.command.set(alias, command));
+      command.aliases.forEach((alias) => {
+        if (this.client.command.has(alias)) {
+          throw emiliaError(`[CommandHandler.setLogic]: Alias conflict detected for "${alias}"!`, ErrorCode.INVALID_TYPE);
+        }
+        this.client.command.set(alias, command);
+      });
     } catch (e) {
       error(e);
     }

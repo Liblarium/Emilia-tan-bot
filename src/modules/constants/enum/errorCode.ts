@@ -59,6 +59,18 @@ export enum ErrorCode {
    */
   WRONG_DELIMITER = "WRONG_DELIMITER",
   /**
+   * Your array is not valid!
+   * 
+   * Please check the array.
+   */
+  INVALID_ARRAY = "INVALID_ARRAY",
+  /**
+   * Your array length have more or less min/max elements!
+   *  
+   * Please check the array.
+   */
+  INVALID_ARRAY_LENGTH = "INVALID_ARRAY_LENGTH",
+  /**
    * Invalid log type. Please use a valid log type from the LogType enum.
    */
   INVALID_LOG_TYPE = "INVALID_LOG_TYPE",
@@ -98,6 +110,12 @@ export enum ErrorCode {
    * Please check the arguments method/function.
    */
   ARGS_REQUIRED = "ARGS_REQUIRED",
+  /**
+   * Error to missed required options
+   * 
+   * Please check the options method/function/class.
+   */
+  MISSING_OPTION = "MISSING_OPTION",
   /**
    * Error to missed process.env.ENV_NAME
    * 
@@ -146,4 +164,22 @@ export enum ErrorCode {
    * Command not found
    */
   COMMAND_NOT_FOUND = "COMMAND_NOT_FOUND",
+  /**
+   * Max or min value is out of range
+   * 
+   * Please check the value.
+   */
+  OUT_OF_RANGE = "OUT_OF_RANGE",
+  /**
+   * Missing interaction
+   * 
+   * Please check the interaction.
+   */
+  MISSING_INTERACTION = "MISSING_INTERACTION",
+  /**
+   * Description or short description is too long!
+   * 
+   * Please check the description or short description.
+   */
+  DESCRIPTION_TOO_LONG = "DESCRIPTION_TOO_LONG"
 }
