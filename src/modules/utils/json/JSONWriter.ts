@@ -1,6 +1,5 @@
 import { ErrorCode } from "@enum/errorCode";
-import type { IFileManager, IFileValidator, IJSONWriter } from "@type";
-import type { Result } from "@type/utils";
+import type { IFileManager, IFileValidator, IJSONWriter, Result } from "@type";
 import { objectToString } from "@utils/formatters/objectToString";
 
 

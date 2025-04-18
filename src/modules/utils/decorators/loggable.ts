@@ -2,8 +2,7 @@ import { LogType } from "@enum/log";
 import type { Log } from "@log";
 import { PinoLogger } from "@log/PinoLogger";
 import { FileLogger } from "@log/FileLogger";
-import type { LogOptions, LogTags } from "@type";
-import type { PinoLoggerOptions } from "@type/log/pino";
+import type { LoggableOptions, LogTags, PinoLoggerOptions } from "@type";
 import { merge } from "lodash";
 
 /**
@@ -32,7 +31,7 @@ export function LogParam() {
     parameterIndex: number,
   ) => {
     const existingParams: number[] =
-      Reflect.getOwnMetadata("logParams", target, propertyKey) || [];
+      Reflect.getOwnMetadata("logParams", target, propertyKey) ?? [];
     existingParams.push(parameterIndex);
     Reflect.defineMetadata("logParams", existingParams, target, propertyKey);
   };
@@ -72,7 +71,7 @@ export function LogMethod(logOptions: {
       ...args: any[]
     ): Promise<any> {
       const logger = Reflect.getMetadata("logger", target);
-      const classOptions = Reflect.getMetadata("classLogOptions", target) || {};
+      const classOptions = Reflect.getMetadata("classLogOptions", target) ?? {};
 
       if (!logger) {
         console.warn(
@@ -89,9 +88,9 @@ export function LogMethod(logOptions: {
         await logger.logProcessing({
           text: `Calling method ${String(propertyKey)}${args.length ? ` with arguments: ${JSON.stringify(args)}` : ""
             }`,
-          type: mergedOptions.type || LogType.Debug,
-          categories: mergedOptions.categories || ["method_call"],
-          tags: mergedOptions.tags || [String(propertyKey), "method_logging"],
+          type: mergedOptions.type ?? LogType.Debug,
+          categories: mergedOptions.categories ?? ["method_call"],
+          tags: mergedOptions.tags ?? [String(propertyKey), "method_logging"],
           inline: 1,
         });
 
@@ -103,8 +102,8 @@ export function LogMethod(logOptions: {
           text: `Method ${String(propertyKey)} executed successfully${result !== undefined ? `. Result: ${JSON.stringify(result)}` : ""
             }`,
           type: LogType.Info,
-          categories: mergedOptions.categories || ["method_success"],
-          tags: mergedOptions.tags || [String(propertyKey), "method_logging"],
+          categories: mergedOptions.categories ?? ["method_success"],
+          tags: mergedOptions.tags ?? [String(propertyKey), "method_logging"],
           inline: 2,
         });
 
@@ -115,8 +114,8 @@ export function LogMethod(logOptions: {
           text: `Error in method ${String(propertyKey)}: ${error instanceof Error ? error.message : String(error)
             }`,
           type: LogType.Error,
-          categories: mergedOptions.categories || ["method_error"],
-          tags: mergedOptions.tags || [
+          categories: mergedOptions.categories ?? ["method_error"],
+          tags: mergedOptions.tags ?? [
             String(propertyKey),
             "method_logging",
             "error",
@@ -169,9 +168,9 @@ export function LogMethodWithParams(logOptions: {
       ...args: any[]
     ): Promise<any> {
       const logger = Reflect.getMetadata("logger", target);
-      const classOptions = Reflect.getMetadata("classLogOptions", target) || {};
+      const classOptions = Reflect.getMetadata("classLogOptions", target) ?? {};
       const paramIndices: number[] =
-        Reflect.getOwnMetadata("logParams", target, propertyKey) || [];
+        Reflect.getOwnMetadata("logParams", target, propertyKey) ?? [];
 
       if (!logger) {
         console.warn(
@@ -190,9 +189,9 @@ export function LogMethodWithParams(logOptions: {
           .join(", ");
         await logger.logProcessing({
           text: `Calling method ${String(propertyKey)}${paramLogs ? ` with parameters: ${paramLogs}` : ""}`,
-          type: mergedOptions.type || LogType.Debug,
-          categories: mergedOptions.categories || ["method_call"],
-          tags: mergedOptions.tags || [String(propertyKey), "method_logging"],
+          type: mergedOptions.type ?? LogType.Debug,
+          categories: mergedOptions.categories ?? ["method_call"],
+          tags: mergedOptions.tags ?? [String(propertyKey), "method_logging"],
           inline: 1,
         });
 
@@ -204,8 +203,8 @@ export function LogMethodWithParams(logOptions: {
           text: `Method ${String(propertyKey)} executed successfully${result !== undefined ? `. Result: ${JSON.stringify(result)}` : ""
             }`,
           type: LogType.Info,
-          categories: mergedOptions.categories || ["method_success"],
-          tags: mergedOptions.tags || [String(propertyKey), "method_logging"],
+          categories: mergedOptions.categories ?? ["method_success"],
+          tags: mergedOptions.tags ?? [String(propertyKey), "method_logging"],
           inline: 2,
         });
 
@@ -216,8 +215,8 @@ export function LogMethodWithParams(logOptions: {
           text: `Error in method ${String(propertyKey)}: ${error instanceof Error ? error.message : String(error)
             }`,
           type: LogType.Error,
-          categories: mergedOptions.categories || ["method_error"],
-          tags: mergedOptions.tags || [
+          categories: mergedOptions.categories ?? ["method_error"],
+          tags: mergedOptions.tags ?? [
             String(propertyKey),
             "method_logging",
             "error",
@@ -253,7 +252,7 @@ export function LogMethodWithParams(logOptions: {
  */
 export function Loggable<T extends new (...args: any[]) => {}>(
   logClass: typeof Log,
-  options: Omit<LogOptions, "logFormatter" | "consoleLogger" | "fileLogger">,
+  options: LoggableOptions,
   pinoOptions?: PinoLoggerOptions
 ) {
   return (constructor: T) =>

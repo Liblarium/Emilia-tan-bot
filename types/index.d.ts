@@ -70,8 +70,8 @@ export type Keyof<T> = keyof T;
  */
 export type ReadJSONFileResult<T extends object = object> = T | { error: string };
 
-export * from './constants';
-export * from './database';
-export * from './handler';
-export * from './log';
-export * from './utils';
+export * from './constants/index.d.ts';
+export * from './database/index.d.ts';
+export * from './handler/index.d.ts';
+export * from './log/index.d.ts';
+export * from './utils/index.d.ts';

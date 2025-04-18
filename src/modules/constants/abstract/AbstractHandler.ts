@@ -62,7 +62,7 @@ export abstract class AbstractHandler implements IAbstractHandler {
    *
    * @throws Will log an error if any issues occur during scanning, importing, or setting logic.
    */
-  protected async build(): Promise<void> {
+  public async build(): Promise<void> {
     try {
       await this.core.build(this);
     } catch (error) {

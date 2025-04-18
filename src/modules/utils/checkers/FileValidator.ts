@@ -165,7 +165,7 @@ export class FileValidator implements IFileValidator {
   /**
    * Checks if the given file path corresponds to a valid JSON file.
    * It checks if the file path is valid and if the file is a JSON file.
-   * It reads the file and checks if it starts with a '{' or '['.
+   * It reads the file and checks if it starts with a "{" or "[".
    * @param {string} filePath - The file path to check.
    * @returns {Promise<boolean>} - True if the file is a valid JSON file, otherwise false.
    * @example

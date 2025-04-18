@@ -1,4 +1,4 @@
-import type { ValidModule } from "./BaseModule";
+import type { ValidModule } from "./BaseModule.d.ts";
 
 /** Represents an imported module with a constructor */
 export type HandlerModule<T extends ValidModule> = {
@@ -19,6 +19,7 @@ export interface IModuleImporter {
     file: string,
     forceReload?: boolean,
   ): Promise<HandlerModule<T>>;
+
   /** Clears the module cache */
   clearCache?(): void;
 }

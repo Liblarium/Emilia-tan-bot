@@ -9,4 +9,4 @@ export interface IBaseModule {
 }
 
 /** Valid module type combining AbstractAction with IBaseModule */
-export type ValidModule = AbstractAction & IBaseModule;
+export type ValidModule<T = unknown> = AbstractAction<T> & IBaseModule;

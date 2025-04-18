@@ -1,4 +1,5 @@
 import type { JsonValue } from "@prisma/client/runtime/library";
+import { setType } from "@utils/helpers/setType";
 
 /**
  * Parse a JsonValue to a typed value.
@@ -18,5 +19,5 @@ import type { JsonValue } from "@prisma/client/runtime/library";
  * const parsedValue: Food = parseJsonValue<Food>(jsonValue); // parsedValue will be of type Food
  */
 export function parseJsonValue<T>(jsonValue: JsonValue): T {
-  return jsonValue as T;
+  return setType<T>(jsonValue);
 }

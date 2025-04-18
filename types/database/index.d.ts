@@ -1,2 +1,2 @@
-export * from "./addInDB";
-export * from "./levelManage";
+export * from "./addInDB.d.ts";
+export * from "./levelManage.d.ts";

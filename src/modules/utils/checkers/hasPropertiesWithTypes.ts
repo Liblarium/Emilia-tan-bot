@@ -10,7 +10,7 @@ import {
   validatePropInObj,
   validateSimpleTypes,
   validateValueIsNotNull
-} from "./validationUtils";
+} from "./validationUtils.js";
 
 /**
  * Validates an object against a map of property type checks.
@@ -51,7 +51,7 @@ export async function hasPropertiesWithTypes<T extends object>(
     errors: [createError("", "object", obj)],
   };
 
-  for await (const [prop, typeCheck] of Object.entries(propTypeMap)) {
+  for (const [prop, typeCheck] of Object.entries(propTypeMap)) {
     const value = obj[setType<keyof T>(prop)];
     const isNonNullValue = validateValueIsNotNull<T>(value);
 

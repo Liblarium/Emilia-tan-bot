@@ -23,7 +23,7 @@ export abstract class AbstractEmiliaError extends Error {
   constructor(message: string, code: ErrorCode, getTime: () => string) {
     super(message);
 
-    if (!this.errorType) this.errorType = "Error";
+    this.errorType ??= "Error";
 
     this.code = code;
     this.name = `[${getTime ? `${getTime()}][` : ""}Emilia | ${this.errorType}]`;

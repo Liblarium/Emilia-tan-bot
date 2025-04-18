@@ -1,9 +1,12 @@
 import type { AbstractBaseCommand } from "@abstract/AbstractBaseCommand";
 import type { CommandType } from "@enum/command";
+import { CommandHandler } from "@handlers/CommandHandler";
+import { EventHandler } from "@handlers/EventHandler";
 import { PrismaClient } from "@prisma/client";
 import { Client, type ClientOptions, Collection } from 'discord.js';
 
 export const db = new PrismaClient();
+
 export class EmiliaClient extends Client {
   /**
    * @type {Collection<string, AbstractBaseCommand>} - The collection of commands
@@ -77,3 +80,7 @@ export class EmiliaClient extends Client {
     return Array.from(commands);
   }
 }
+
+const client = new EmiliaClient({ intents: [] });
+
+Promise.all([CommandHandler, EventHandler].map(handler => new handler(client).build()));

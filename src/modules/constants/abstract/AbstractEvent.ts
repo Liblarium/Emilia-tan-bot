@@ -6,7 +6,7 @@ import type {
   EventForCategory,
   IAbstractEvent,
 } from "@type";
-import { AbstractAction } from "./AbstractAction";
+import { AbstractAction } from "./AbstractAction.js";
 
 /**
  * Represents an abstract event.

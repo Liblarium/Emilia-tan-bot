@@ -68,11 +68,11 @@ export interface ClassWithLogFormatter {
 }
 
 // Re-export all utils types
-export * from "./fileManager";
-export * from "./fileValidator";
-export * from "./isClass";
-export * from "./jsonReader";
-export * from "./jsonWriter";
-export * from "./logFormatter";
-export * from "./ValidationTypes";
-export * from "./components";
+export * from "./fileManager.d.ts";
+export * from "./fileValidator.d.ts";
+export * from "./isClass.d.ts";
+export * from "./jsonReader.d.ts";
+export * from "./jsonWriter.d.ts";
+export * from "./logFormatter.d.ts";
+export * from "./ValidationTypes.d.ts";
+export * from "./components.d.ts";

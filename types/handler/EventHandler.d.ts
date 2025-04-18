@@ -1,17 +1,6 @@
 import type { CategoryEvents } from "@enum/EventCategoryType";
 import type { EventArgsType, EventForCategory } from "@type";
 
-export interface IEventHandler {
-  /**
-   * Initializes the event handler by building the logic for all events.
-   *
-   * @returns A promise that resolves when the build process is complete.
-   *
-   * @throws Will log an error if any issues occur during scanning, importing, or setting logic.
-   */
-  handler(): Promise<void>;
-}
-
 interface lListener {
   /**
    * @param args The callback function

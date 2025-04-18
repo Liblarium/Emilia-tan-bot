@@ -108,7 +108,7 @@ export async function validateArray<T>(
           options.path ?? "",
           "array",
           typeof value,
-          `Expected array at path '${options.path ?? ""}'`,
+          `Expected array at path "${options.path ?? ""}"`,
         ),
       ],
     };
@@ -186,7 +186,7 @@ export async function validateObject<T extends object>(
           options.path ?? "",
           "object",
           typeof value,
-          `Expected object at path '${options.path ?? ""}'`,
+          `Expected object at path "${options.path ?? ""}"`,
         ),
       ],
     };

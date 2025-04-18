@@ -15,11 +15,11 @@ import {
   SlashCommandBuilder,
   type User
 } from "discord.js";
-import { AbstractAction } from "./AbstractAction";
+import { AbstractAction } from "./AbstractAction.js";
 import { emiliaError } from "@utils/error/EmiliaError";
 import { ErrorCode } from "@enum/errorCode";
 import type { EmiliaClient } from "@client";
-import { AbstractEmiliaError } from "./EmiliaAbstractError";
+import { AbstractEmiliaError } from "./EmiliaAbstractError.js";
 import { LogFactory } from "@log/logFactory";
 
 export abstract class AbstractBaseCommand<T extends string> extends AbstractAction<T> {
@@ -158,7 +158,7 @@ export abstract class AbstractBaseCommand<T extends string> extends AbstractActi
   ): Promise<unknown> {
     const isArray = Array.isArray(options);
 
-    if (isArray && options.length !== 2) throw emiliaError(`[AbstractBaseCommand.send]: Options must be an array of length 2! Your array: ${options.toString()} (length: ${options.length})`, ErrorCode.INVALID_ARRAY_LENGTH, "TypeError");
+    if (isArray && options.length !== 2) throw emiliaError(`[AbstractBaseCommand.send]: Options must be an array of length 2! Your array: ${JSON.stringify(options)} (length: ${options.length})`, ErrorCode.INVALID_ARRAY_LENGTH, "TypeError");
 
     // Determine the mode for each command type
     const mode = {

@@ -6,7 +6,8 @@ import type {
   ArrayNotEmpty,
   ClassWithLogFormatter,
   TypeLog,
-  TypeText
+  TypeText,
+  FileLoggerOptions
 } from "@type";
 
 /**
@@ -73,6 +74,15 @@ export interface LogOptions extends LogDeps {
    * Context to add to the log
    */
   context?: object;
+}
+
+export type LogFactoryOptions = Omit<LogOptions, "consoleLogger" | "fileLogger">;
+
+export type LoggableOptions = Omit<LogFactoryOptions, "logFormatter">;
+
+export interface LogFactoryOptionalOptions {
+  pinoOption: PinoLoggerOptions,
+  fileOption: FileLoggerOptions
 }
 
 export interface LogDeps {

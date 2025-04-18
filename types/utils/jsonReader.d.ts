@@ -1,4 +1,4 @@
-import type { ClassWithValidator, Result } from ".";
+import type { ClassWithValidator, Result } from "@type";
 
 export interface IJSONReadFile {
   readFile<T extends object>(filePath: string): Promise<Result<T>>;

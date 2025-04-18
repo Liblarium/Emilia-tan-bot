@@ -21,7 +21,6 @@ export function clipMessageLog(
 
     if (message.content.length > limit) return `${message.content.slice(0, limit - 3)}...`;
 
-
     return `${message.content}\u200b`;
   }
 

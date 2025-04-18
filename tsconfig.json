@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "nodenext",
     "mapRoot": "dist",
     "sourceMap": true,
     "declaration": true,
@@ -12,10 +12,10 @@
     "baseUrl": "./",
     "paths": {
       "@type": [
-        "types"
+        "types/index.d.ts"
       ],
       "@type/*": [
-        "types/*"
+        "types/*.d.ts"
       ],
       "@client/pg": [
         "src/modules/client/postgres.ts"
@@ -24,34 +24,34 @@
         "src/modules/client/index.ts"
       ],
       "@enum/*": [
-        "src/modules/constants/enum/*"
+        "src/modules/constants/enum/*.ts"
       ],
       "@abstract/*": [
-        "src/modules/constants/abstract/*"
+        "src/modules/constants/abstract/*.ts"
       ],
       "@db/*": [
-        "src/modules/database/*"
+        "src/modules/database/*.ts"
       ],
       "@utils/*": [
-        "src/modules/utils/*"
+        "src/modules/utils/*.ts"
       ],
       "@log": [
         "src/modules/log/index.ts"
       ],
       "@log/*": [
-        "src/modules/log/*"
+        "src/modules/log/*.ts"
       ],
       "@interaction/*": [
-        "src/modules/interaction/*"
+        "src/modules/interaction/*.ts"
       ],
       "@handlers/*": [
-        "src/modules/handlers/*"
+        "src/modules/handlers/*.ts"
       ],
       "@core/*": [
-        "src/core/*"
+        "src/core/*.ts"
       ],
       "@command/*": [
-        "src/command/*"
+        "src/command/*.ts"
       ]
     },
     "typeRoots": [

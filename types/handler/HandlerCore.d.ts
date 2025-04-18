@@ -1,5 +1,5 @@
 import type { IAbstractHandlerLogic } from "@type";
-import type { ValidModule } from "./BaseModule";
+import type { ValidModule } from "./BaseModule.d.ts";
 
 export interface IHandlerCore {
   /**

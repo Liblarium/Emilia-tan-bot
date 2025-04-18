@@ -1,4 +1,4 @@
-import { hexToDecimal } from './convert';
+import { hexToDecimal } from "./convert.js";
 
 /**
  * Replaces a color with another color if it is 0.

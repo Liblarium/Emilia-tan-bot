@@ -11,11 +11,11 @@ export enum CategoryEvents {
    */
   Mongoose = "mongoose",
   /**
-   * Custom event - you can create your own. Recomended: add there your category event
+   * Custom event - you can create your own. Recommended: add there your category event
    */
   Custom = "custom",
   /**
-   * Unknowns events (`[key: stirng]: unknown[]`)
+   * Unknowns events (`[key: string]: unknown[]`)
    */
   Unknown = "unknown"
 }

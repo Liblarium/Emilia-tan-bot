@@ -1,4 +1,4 @@
-import type { ClassWithFileManager, ClassWithValidator, Result } from ".";
+import type { ClassWithFileManager, ClassWithValidator, Result } from "@type";
 
 export interface IJSONWriteFile {
   writeFile<T extends object>(filePath: string, data: T): Promise<Result<void>>;

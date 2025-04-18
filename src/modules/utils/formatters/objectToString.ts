@@ -1,5 +1,5 @@
 import { ErrorCode } from "@enum/errorCode";
-import type { Result } from "@type/utils";
+import type { Result } from "@type";
 import { emiliaError } from "@utils/error/EmiliaError";
 
 /**

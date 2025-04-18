@@ -4,8 +4,8 @@ import type {
   ValidModule
 } from "@type";
 import { isClass } from "@utils/checkers/isClass";
-import type { FolderScanner } from "./FolderScanner";
-import type { ModuleImporter } from "./ModuleImporter";
+import type { FolderScanner } from "./FolderScanner.js";
+import type { ModuleImporter } from "./ModuleImporter.js";
 
 export class HandlerCore
   implements IHandlerCore {

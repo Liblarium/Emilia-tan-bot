@@ -1,6 +1,5 @@
 import type { LogType } from "@enum/log";
-import type { LogOptions, LoggerData } from "@type";
-import type { Result } from "@type/utils";
+import type { LogOptions, LoggerData, Result } from "@type";
 
 /**
  * Class for logging data to a file and console

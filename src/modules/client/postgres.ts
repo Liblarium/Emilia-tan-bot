@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { resolve } from "node:path";
-import { offNewLine } from "../utils/formatters/offNewLine";
+import { offNewLine } from "../utils/formatters/offNewLine.js";
 
 /**
  * @file postgres.ts
@@ -39,5 +39,5 @@ function run_pg() {
   }
 }
 
-// Run the сluster management function
+// Run the cluster management function
 run_pg();

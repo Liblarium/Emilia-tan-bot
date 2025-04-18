@@ -1,25 +1,26 @@
-import type { PinoLoggerOptions } from "@type/log/pino";
-import pino from "pino";
+import type { PinoLoggerOptions } from "@type";
+import { pino } from "pino";
 import pinoRoll from "pino-roll";
-import { BasePinoLogger } from "./BasePinoLogger";
+import { AbstractPinoLogger } from "@abstract/AbstractPinoLogger";
+import { date } from "@utils/formatters/timeAndDate";
 
 /**
  * Implementation of Logger using Pino with console output
  */
-export class PinoLogger extends BasePinoLogger {
+export class PinoLogger extends AbstractPinoLogger {
   constructor(options: PinoLoggerOptions = {}) {
     const {
-      timezone = 'Europe/Kiev',
-      logDir = 'logs',
-      rotateInterval = '1d',
-      rotateSize = '10m',
+      timezone = "Europe/Kiev",
+      logDir = "logs",
+      rotateInterval = "1d",
+      rotateSize = "10m",
       pretty = true,
-      timestampFormat = 'DD.MM.YYYY HH:mm:ss'
+      timestampFormat = "DD.MM.YYYY HH:mm:ss"
     } = options;
 
     // Create rolling file stream
     const fileStream = pinoRoll({
-      file: `${logDir}/app.log`,
+      file: `${logDir}/${date()}.log`,
       size: rotateSize,
       interval: rotateInterval,
       mkdir: true,
@@ -31,7 +32,7 @@ export class PinoLogger extends BasePinoLogger {
     // Add pretty console stream if enabled
     if (pretty) {
       const prettyStream = pino.transport({
-        target: 'pino-pretty',
+        target: "pino-pretty",
         options: {
           colorize: true,
           translateTime: { format: timestampFormat, timezone },

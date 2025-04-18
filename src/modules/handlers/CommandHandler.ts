@@ -4,6 +4,7 @@ import { AbstractEmiliaError } from "@abstract/EmiliaAbstractError";
 import type { EmiliaClient } from "@client";
 import { CommandType } from "@enum/command";
 import { ErrorCode } from "@enum/errorCode";
+import { LogType } from "@enum/log";
 import { LogFactory } from "@log/logFactory";
 import { emiliaError } from "@utils/error/EmiliaError";
 
@@ -29,9 +30,6 @@ export class CommandHandler extends AbstractHandler {
 
     // Set up the folder path for commands.
     this.setFolderPath(["dist", "commands"]);
-
-    // Build the commands from the specified directory.
-    this.build().catch(error);
   }
 
   /**
@@ -93,7 +91,7 @@ export class CommandHandler extends AbstractHandler {
 function error(e: unknown) {
   LogFactory.log({
     text: e,
-    type: 2,
+    type: LogType.Error,
     categories: ["global", "handler", "command"],
     tags: ["handler", "command"],
     metadata: { error: e },

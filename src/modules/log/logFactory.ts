@@ -1,7 +1,7 @@
 import { Log } from "@log";
 import { FileLogger } from "@log/FileLogger";
-import type { FileLoggerOptions, LogOptions, PinoLoggerOptions } from "@type";
-import { PinoLogger } from "./PinoLogger";
+import type { LogFactoryOptions, LogFactoryOptionalOptions } from "@type";
+import { PinoLogger } from "./PinoLogger.js";
 
 export class LogFactory {
   private static instance: Log;
@@ -12,7 +12,12 @@ export class LogFactory {
     return this.instance;
   }
 
-  public static async log(logOptions: Omit<LogOptions, "consoleLogger" | "fileLogger">, optionalOption?: { pinoOption?: PinoLoggerOptions, fileOption?: FileLoggerOptions }): Promise<void> {
+  /**
+   * Logs the given logOptions using the logger instance.
+   * @param logOptions - Options for logging. See {@link LogFactoryOptions}.
+   * @param optionalOption - Optional options. See {@link LogFactoryOptionalOptions}.
+   */
+  public static async log(logOptions: LogFactoryOptions, optionalOption?: Partial<LogFactoryOptionalOptions>): Promise<void> {
     const logger = this.getInstance;
     await logger.logProcessing({
       ...logOptions,

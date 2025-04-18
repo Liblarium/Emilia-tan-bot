@@ -1,7 +1,8 @@
 {
   "name": "emilia-tan-bot",
   "private": true,
-  "version": "11.0.0",
+  "type": "module",
+  "version": "11.1.0",
   "description": "",
   "main": "dist/core/index.js",
   "scripts": {
@@ -54,10 +55,10 @@
     "@types/module-alias": "^2.0.4",
     "@types/node": "^22.14.1",
     "@types/node-fetch": "^2.6.12",
-    "@types/pg": "^8.11.12",
-    "@typescript-eslint/eslint-plugin": "^8.29.1",
-    "@typescript-eslint/parser": "^8.29.1",
-    "@typescript-eslint/types": "^8.29.1",
+    "@types/pg": "^8.11.13",
+    "@typescript-eslint/eslint-plugin": "^8.30.1",
+    "@typescript-eslint/parser": "^8.30.1",
+    "@typescript-eslint/types": "^8.30.1",
     "esbuild": "^0.25.2",
     "eslint": "^9.24.0",
     "eslint-config-biome": "^1.9.4",
@@ -69,6 +70,6 @@
     "pino-roll": "^3.1.0",
     "tsc-watch": "^6.2.1",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.29.1"
+    "typescript-eslint": "^8.30.1"
   }
 }

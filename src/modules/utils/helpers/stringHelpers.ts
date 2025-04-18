@@ -41,7 +41,7 @@ export function isValidUrl(str: string): boolean {
  * @returns The given string in camel case
  */
 export function toCamelCase(str: string): string {
-  return str.toLowerCase().replace(/[^a-zA-Zа-яА-Я0-9]+(.)/g, (_, chr) => chr.toUpperCase());
+  return str.toLowerCase().replace(/[^a-zA-Zа-яА-Я0-9]+(.)/g, (_, chr: string): string => chr.toUpperCase());
 }
 
 /**
@@ -50,10 +50,12 @@ export function toCamelCase(str: string): string {
  * @returns A string representing the file size in the largest possible unit 
  *   (Bytes, KB, MB, GB, or TB), rounded to the nearest integer.
  */
-
 export function formatFileSize(bytes: number): string {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+
   if (bytes === 0) return '0 Byte';
+
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
+
   return `${Math.round(bytes / 1024 ** i)} ${sizes[i]}`;
 }

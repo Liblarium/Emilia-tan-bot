@@ -1,16 +1,18 @@
 import { ErrorCode } from "@enum/errorCode";
 import { LogType } from "@enum/log";
-import type { ArrayNotEmpty, LineType } from "@type";
-import type { ClassWithJSONWriter, Result } from "@type/utils";
 import type {
+  ArrayNotEmpty,
+  LineType,
+  ClassWithJSONWriter,
+  Result,
   FormattedLogText,
   FormatterLogOption,
   FormattingConsoleOptions,
   formatterTypeOption,
-} from "@type/utils/logFormatter";
+} from "@type";
 import { isObject } from "@utils/checkers/isObject";
-//import { logCaller } from "@utils/decorators/logCaller";
 import { setType } from "@utils/helpers/setType";
+import { dateAndTime, time } from "./timeAndDate.js";
 
 export class LogFormatter {
   public static readonly logCategories: ArrayNotEmpty<string> = [
@@ -22,8 +24,8 @@ export class LogFormatter {
    * Formats a log message with the given text, type and categories.
    * @param {FormatterLogOption} options - Options for formatting the log message.
    * @param {unknown} options.text - The text to log. Can be an object or a string.
-   * @param {string} options.type - The type of the log. I.e. 'info', 'error', 'warning', 'debug' or 'test'.
-   * @param {string[]} options.categories - The categories of the log. I.e. 'global', 'database' or any other category.
+   * @param {string} options.type - The type of the log. I.e. "info", "error", "warning", "debug" or "test".
+   * @param {string[]} options.categories - The categories of the log. I.e. "global", "database" or any other category.
    * @param {boolean} [options.date=false] - If true, adds the date to the log message with date and time with `dateAndTime()`. If false or undefined, only adds the time with `time()`.
    * @param {(...args: unknown[]) => string} [options.processingLine] - A function to process the log message before logging.
    * @returns {string} The formatted log message as a string.
@@ -103,7 +105,7 @@ export class LogFormatter {
  */
   // @logCaller()
   static formatterType(type: formatterTypeOption): Result<LogType> {
-    // If the type is already a string, validate it's a valid LogType value
+    // If the type is already a string, validate it"s a valid LogType value
     if (typeof type !== "number") {
       const validLogTypes = Object.values(LogType);
 
@@ -181,7 +183,7 @@ export class LogFormatter {
   private static formatLogText(message: unknown): FormattedLogText {
     return {
       in: isObject(message) ? JSON.stringify(message) : String(message),
-      out: isObject(message) ? message : ''
+      out: isObject(message) ? message : ""
     };
   }
 
@@ -224,5 +226,3 @@ export class LogFormatter {
     };
   }
 }
-
-import { dateAndTime, time } from "./timeAndDate";

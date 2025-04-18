@@ -43,7 +43,6 @@ export class FileManager implements IFileManager {
    * //   path: "/path/to/folder/newFolder"
    * // }
    */
-  //@logCaller()
   async createFolder(
     path: string,
     folderName: string,
@@ -98,7 +97,6 @@ export class FileManager implements IFileManager {
    * //   data: undefined
    * // }
    */
-  //@logCaller()
   @validateFileOperation()
   async writeFile(filePath: string, data: string): Promise<Result<void>> {
     try {
@@ -128,7 +126,6 @@ export class FileManager implements IFileManager {
    * //   error: undefined
    * // }
    */
-  //@logCaller()
   @validateFileOperation<ClassWithValidator>()
   async deleteFile(fileName: string): Promise<Result<void>> {
     try {
@@ -160,7 +157,6 @@ export class FileManager implements IFileManager {
    * //   success: true
    * // }
    */
-  //@logCaller()
   @validateFileOperation<ClassWithValidator>()
   async appendFile(fileName: string, data: string): Promise<Result<void>> {
     try {

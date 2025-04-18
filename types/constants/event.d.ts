@@ -1,5 +1,5 @@
 import type { EmiliaClient } from "@client";
-import type { CategoryEvents } from "@enums/EventCategory";
+import type { CategoryEvents } from "@enum/EventCategoryType";
 import type { Keyof } from "@type";
 import type { ClientEvents } from "discord.js";
 

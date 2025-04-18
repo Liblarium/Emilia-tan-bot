@@ -1,4 +1,4 @@
-import type { ErrorDetails, Result } from ".";
+import type { ErrorDetails, Result } from "@type";
 
 export interface IFormatValidator {
   checkFormatFile(filePath: string): Result;

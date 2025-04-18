@@ -35,7 +35,7 @@ export interface IAbstractHandler extends IHandlerLogic {
   setFolderPath(path: HandlerPath): void;
 }
 
-export interface IAbstractHandlerLogic {
+export interface IAbstractHandlerLogic<T = unknown> {
   /**
    * Sets the logic for the handler.
    * @param module - The module to set as the logic for the handler.
@@ -51,7 +51,7 @@ export interface IAbstractHandlerLogic {
    * }
    * ```
    */
-  setLogic(module: ValidModule): void | Promise<void>;
+  setLogic(module: ValidModule<T>): void | Promise<void>;
 }
 
 export interface IAbstractHandlerInjection {

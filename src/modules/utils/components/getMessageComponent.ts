@@ -3,10 +3,10 @@ import type {
   ActionRow,
   MessageActionRowComponent,
   AnyComponent
-} from 'discord.js';
-import type { ComponentPosition, ComponentResult } from '@type';
-import { validateComponentPosition } from './validateComponentPosition';
-import { ErrorCode } from '@enum/errorCode';
+} from "discord.js";
+import type { ComponentPosition, ComponentResult } from "@type";
+import { validateComponentPosition } from "./validateComponentPosition.js";
+import { ErrorCode } from "@enum/errorCode";
 
 /**
  * Finds a component in a message by its position.
@@ -23,7 +23,7 @@ export function getMessageComponent(
     success: false,
     error: {
       code: ErrorCode.MISSING_INTERACTION,
-      message: 'Interaction или компоненты отсутствуют'
+      message: "Interaction или компоненты отсутствуют"
     }
   };
 
@@ -46,12 +46,14 @@ export function getMessageComponent(
         ? components[row].components[index]
         : components[row]
     };
-  } catch (err) {
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+
     return {
       success: false,
       error: {
         code: ErrorCode.OUT_OF_RANGE,
-        message: 'Компонент не найден по указанной позиции'
+        message: `Компонент не найден по указанной позиции: ${errorMessage}`
       }
     };
   }

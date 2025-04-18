@@ -5,28 +5,15 @@ import type { CategoryEvents } from "@enum/EventCategoryType";
 import type {
   EventArgsType,
   EventEmitterLike,
-  EventForCategory,
-  IEventHandler
+  EventForCategory
 } from "@type";
 import { mongoose } from "@typegoose/typegoose";
 import { setType } from "@utils/helpers/setType";
 
 export class EventHandler
-  extends AbstractHandler
-  implements IEventHandler {
+  extends AbstractHandler {
   constructor(public client: EmiliaClient) {
     super(client);
-  }
-
-  /**
-   * Initializes the event handler by building the logic for all events.
-   *
-   * @returns A promise that resolves when the build process is complete.
-   *
-   * @throws Will log an error if any issues occur during the build process.
-   */
-  public async handler() {
-    await this.build();
   }
 
   /**
