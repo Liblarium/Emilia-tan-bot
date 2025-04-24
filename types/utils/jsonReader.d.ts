@@ -1,7 +1,8 @@
 import type { ClassWithValidator, Result } from "@type";
+import type { Observable } from "rxjs";
 
 export interface IJSONReadFile {
-  readFile<T extends object>(filePath: string): Promise<Result<T>>;
+  readFile<T extends object>(filePath: string): Observable<Result<T>>;
 }
 
 export interface IJSONReadLine {

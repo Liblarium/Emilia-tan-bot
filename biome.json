@@ -1,81 +1,94 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-	"vcs": {
-		"enabled": false,
-		"clientKind": "git",
-		"useIgnoreFile": false
-	},
-	"files": {
-		"ignoreUnknown": true,
-		"include": ["src/*", "types/*", "sanbox/*"],
-		"ignore": [
-			"dist/*",
-			"sanbox/*.js",
-			"prisma/*",
-			"package.json",
-			"package-lock.json",
-			"node_modules/*",
-			"oldCode/*"
-		]
-	},
-	"javascript": {
-		"parser": {
-			"unsafeParameterDecoratorsEnabled": true
-		}
-	},
-	"linter": {
-		"enabled": true,
-		"include": ["src/*", "types/*", "sanbox/*"],
-		"ignore": [
-			"dist/*",
-			"sanbox/*.js",
-			"prisma/*",
-			"package.json",
-			"package-lock.json",
-			"node_modules/*",
-			"oldCode/*"
-		],
-		"rules": {
-			"recommended": true,
-			"complexity": {
-				"noForEach": "off",
-				"noStaticOnlyClass": "off",
-				"noThisInStatic": "off",
-				"noUselessConstructor": "off",
-				"noBannedTypes": "off"
-			},
-			"style": {
-				"noCommaOperator": "off",
-				"noParameterAssign": "off",
-				"useDefaultParameterLast": "off",
-				"useLiteralEnumMembers": "off",
-				"noInferrableTypes": "off",
-				"useShorthandFunctionType": "off"
-			},
-			"suspicious": {
-				"noConfusingVoidType": "off",
-				"noAssignInExpressions": "off",
-				"noExplicitAny": "off",
-				"useValidTypeof": "off",
-				"noShadowRestrictedNames": "off"
-			}
-		}
-	},
-	"formatter": {
-		"enabled": true,
-		"indentStyle": "tab",
-		"include": ["src/*", "types/*", "sanbox/*"],
-		"ignore": [
-			"dist/*",
-			"sanbox/*.js",
-			"prisma/*",
-			"package.json",
-			"package-lock.json",
-			"node_modules/*",
-			"oldCode/*"
-		]
-	},
-	"organizeImports": {
-		"enabled": true
-	}
+  "$schema": "https://biomejs.dev/schemas/latest/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "include": [
+      "src/*",
+      "types/*",
+      "sandbox/*"
+    ],
+    "ignore": [
+      "dist/*",
+      "sandbox/*.js",
+      "prisma/*",
+      "package.json",
+      "package-lock.json",
+      "node_modules/*",
+      "oldCode/*"
+    ]
+  },
+  "javascript": {
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "include": [
+      "src/*",
+      "types/*",
+      "sandbox/*"
+    ],
+    "ignore": [
+      "dist/*",
+      "sandbox/*.js",
+      "prisma/*",
+      "package.json",
+      "package-lock.json",
+      "node_modules/*",
+      "oldCode/*"
+    ],
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "noForEach": "off",
+        "noStaticOnlyClass": "off",
+        "noThisInStatic": "off",
+        "noUselessConstructor": "off",
+        "noBannedTypes": "off"
+      },
+      "style": {
+        "noCommaOperator": "off",
+        "noParameterAssign": "off",
+        "useDefaultParameterLast": "off",
+        "useLiteralEnumMembers": "off",
+        "noInferrableTypes": "off",
+        "useShorthandFunctionType": "off"
+      },
+      "suspicious": {
+        "noConfusingVoidType": "off",
+        "noAssignInExpressions": "off",
+        "noExplicitAny": "off",
+        "useValidTypeof": "off",
+        "noShadowRestrictedNames": "off"
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "useEditorconfig": true,
+    "indentStyle": "tab",
+    "include": [
+      "src/*",
+      "types/*",
+      "sandbox/*"
+    ],
+    "ignore": [
+      "dist/*",
+      "sandbox/*.js",
+      "prisma/*",
+      "package.json",
+      "package-lock.json",
+      "node_modules/*",
+      "oldCode/*"
+    ]
+  },
+  "organizeImports": {
+    "enabled": true
+  }
 }

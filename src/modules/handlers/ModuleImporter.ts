@@ -5,6 +5,7 @@ import type {
   IModuleImporter,
   ValidModule
 } from "@type";
+import { from, map, Observable } from "rxjs";
 import { setType } from "@utils/helpers/setType";
 
 export class ModuleImporter implements IModuleImporter {
@@ -19,38 +20,43 @@ export class ModuleImporter implements IModuleImporter {
    * @param file - The file to import the module from
    * @param forceReload - Whether to force reload the module even if it is already cached
    *
-   * @returns A promise that resolves with an object with a default property that is the constructor of the imported module
+   * @returns An observable that emits an object with a default property that is the constructor of the imported module
    *
    * @throws An error if the module does not have a default export or does not implement the required interface
    */
-  async import<T extends ValidModule>(
+  import<T extends ValidModule>(
     folder: string,
     file: string,
     forceReload = false,
-  ): Promise<HandlerModule<T>> {
+  ): Observable<HandlerModule<T>> {
     const modulePath = resolve(...this.folderPath, folder, file);
 
     if (!forceReload && this.moduleCache.has(modulePath)) {
-      return setType<HandlerModule<T>>(this.moduleCache.get(modulePath));
+      return from([setType<HandlerModule<T>>(this.moduleCache.get(modulePath))]);
     }
 
-    const moduleDefault = await import(modulePath);
-    if (!moduleDefault.default) {
-      const error = new Error(`Module ${modulePath} does not have a default export`);
-      console.error(error);
-      throw error;
-    }
+    return from(import(modulePath)).pipe(
+      map((moduleDefault: { default?: new () => unknown }) => {
+        const moduleConstructor = moduleDefault?.default;
 
-    const moduleConstructor = moduleDefault.default;
-    if (!this.isValidModuleConstructor(moduleConstructor)) {
-      const error = new Error(`Module ${modulePath} does not implement required interface`);
-      console.error(error);
-      throw error;
-    }
+        if (!moduleConstructor) {
+          const error = new Error(`Module ${modulePath} does not have a default export`);
+          console.error(error);
+          throw error;
+        }
 
-    const result = { default: moduleConstructor };
-    this.moduleCache.set(modulePath, result);
-    return setType<HandlerModule<T>>(result);
+        if (!this.isValidModuleConstructor(moduleConstructor)) {
+          const error = new Error(`Module ${modulePath} does not implement required interface`);
+          console.error(error);
+          throw error;
+        }
+
+        const result = { default: moduleConstructor };
+        this.moduleCache.set(modulePath, result);
+
+        return setType<HandlerModule<T>>(result);
+      }),
+    );
   }
 
   /**

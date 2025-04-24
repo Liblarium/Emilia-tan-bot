@@ -28,10 +28,7 @@ export interface EventEmitterLike<
    * @param {lListener} listener The callback function
    * @returns {EventEmitterLike} The emitter
    */
-  on: (
-    event: T,
-    listener: ListenerFunction<T, K>,
-  ) => unknown;
+  on: EmitterFunction<T, K, unknown>;
   /**
    * Adds a **one-time** `listener` function for the event named `eventName`. The
    * next time `eventName` is triggered, this listener is removed and then invoked.
@@ -40,12 +37,15 @@ export interface EventEmitterLike<
    * @param {lListener} listener The callback function
    * @returns {EventEmitterLike} The emitter
    */
-  once: (
-    event: T,
-    listener: ListenerFunction<T, K>,
-  ) => unknown;
+  once: EmitterFunction<T, K, unknown>;
+  off?: EmitterFunction<T, K, void>;
 }
 
+type EmitterFunction<
+  T extends CategoryEvents,
+  K extends EventForCategory<T>,
+  R extends unknown = void
+> = (event: T, listener: ListenerFunction<T, K>) => R;
 /**
  * A type that represents a listener function
  * 
@@ -54,4 +54,4 @@ export interface EventEmitterLike<
 type ListenerFunction<
   T extends CategoryEvents,
   K extends EventForCategory<T>
-> = (...args: EventArgsType<T, K>) => unknown;
+> = (args: EventArgsType<T, K>) => unknown;

@@ -1,7 +1,8 @@
 import type { ClassWithFileManager, ClassWithValidator, Result } from "@type";
+import type { Observable } from "rxjs";
 
 export interface IJSONWriteFile {
-  writeFile<T extends object>(filePath: string, data: T): Promise<Result<void>>;
+  writeFile<T extends object>(filePath: string, data: T): Observable<Result<void>>;
 }
 
 export interface IJSONAppendLine {
@@ -9,7 +10,7 @@ export interface IJSONAppendLine {
     filePath: string,
     data: T,
     delimiter: string = "\n",
-  ): Promise<Result<void>>;
+  ): Observable<Result<void>>;
 }
 
 export interface IJSONStringify {

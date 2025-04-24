@@ -55,6 +55,10 @@ export enum ErrorCode {
    */
   FILE_FORMAT_ERROR = "FILE_FORMAT_ERROR",
   /**
+   * Failed to read file.
+   */
+  FILE_READ_ERROR = "FILE_READ_ERROR",
+  /**
    * Why you use delimiter on .json file? Use JSONWriter.writeFile method for .json files.
    */
   WRONG_DELIMITER = "WRONG_DELIMITER",

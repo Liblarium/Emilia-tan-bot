@@ -1,12 +1,10 @@
 import type { AbstractBaseCommand } from "@abstract/AbstractBaseCommand";
 import { AbstractHandler } from "@abstract/AbstractHandler";
-import { AbstractEmiliaError } from "@abstract/EmiliaAbstractError";
 import type { EmiliaClient } from "@client";
 import { CommandType } from "@enum/command";
 import { ErrorCode } from "@enum/errorCode";
-import { LogType } from "@enum/log";
-import { LogFactory } from "@log/logFactory";
 import { emiliaError } from "@utils/error/EmiliaError";
+import { Observable } from "rxjs";
 
 export class CommandHandler extends AbstractHandler {
   /**
@@ -39,13 +37,13 @@ export class CommandHandler extends AbstractHandler {
    * @param command - The command object to be added to the client's command collection.
    *                  It should be an instance of AbstractBaseCommand or its subclass.
    *
-   * @returns void or a Promise that resolves to void. The function doesn't return a value,
-   *          but it may be asynchronous, hence the possibility of returning a Promise<void>.
+   * @returns void or a Observable that resolves to void. The function doesn't return a value,
+   *          but it may be asynchronous, hence the possibility of returning a Observable<void>.
    *
    * @throws Catches any errors that occur during the process and passes them to the error handling function.
    */
 
-  setLogic(command: AbstractBaseCommand<string>): void | Promise<void> {
+  setLogic(command: AbstractBaseCommand<string>): void | Observable<void> {
     const client = this.client;
 
     try {
@@ -73,29 +71,8 @@ export class CommandHandler extends AbstractHandler {
         this.client.command.set(alias, command);
       });
     } catch (e) {
-      error(e);
+      client.errorHandler(e);
     }
   }
 }
 
-/**
- * Handles and logs errors encountered during command processing.
- *
- * This function creates a new Log instance to record the error information.
- * It's typically used to capture and log errors that occur in the CommandHandler.
- *
- * @param e - The error object or message to be logged. Can be of any type.
- *
- * @returns void This function doesn't return a value.
- */
-function error(e: unknown) {
-  LogFactory.log({
-    text: e,
-    type: LogType.Error,
-    categories: ["global", "handler", "command"],
-    tags: ["handler", "command"],
-    metadata: { error: e },
-    context: { error: e },
-    code: e instanceof AbstractEmiliaError ? e.code : ErrorCode.UNKNOWN_ERROR,
-  });
-}

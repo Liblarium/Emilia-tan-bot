@@ -38,9 +38,9 @@ export type EventForCategory<T extends CategoryEvents> = CategoryEventsMap[T];
  * Otherwise, it defaults to an array of unknown types.
  */
 export type EventArgsType<T extends CategoryEvents, K extends EventForCategory<T>> =
-  T extends "bot" ? [...ClientArgumentOnEvent, ...ClientEvents[K]] :
-  T extends "mongoose" ? [...MongooseEvents[K]] :
-  [...UnknownEvents[K]];
+  T extends "bot" ? { client: EmiliaClient; eventArgs: ClientEvents[K] } :
+  T extends "mongoose" ? { mongooseArgs: MongooseEvents[K] } :
+  { unknownArgs: UnknownEvents[K] };
 
 /**
  * Represents an abstract event
@@ -70,7 +70,7 @@ export interface IAbstractEvent<T extends CategoryEvents, K extends EventForCate
    */
   once?: boolean;
 
-  execute(...args: EventArgsType<T, K>): unknown | Promise<unknown>;
+  execute(args: EventArgsType<T, K>): unknown | Promise<unknown>;
 }
 
 /**

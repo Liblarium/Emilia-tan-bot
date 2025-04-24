@@ -1,4 +1,5 @@
 import type { ArrayNotEmpty, LimitedArray, ValidModule } from "@type";
+import type { Observable } from "rxjs";
 
 export type HandlerPath = LimitedArray<ArrayNotEmpty<string>, 2>;
 
@@ -39,19 +40,19 @@ export interface IAbstractHandlerLogic<T = unknown> {
   /**
    * Sets the logic for the handler.
    * @param module - The module to set as the logic for the handler.
-   * @returns A promise that resolves when the logic is set.
+   * @returns A observable that resolves when the logic is set.
    * @example
    * ```ts
    * class SomeHandler extends AbstractHandler {
    *   // ...
    *
-   *   async setLogic(module: ValidModule): Promise<void> {
+   *   async setLogic(module: ValidModule): Observable<void> {
    *   // your logic
    *   }
    * }
    * ```
    */
-  setLogic(module: ValidModule<T>): void | Promise<void>;
+  setLogic(module: ValidModule<T>): void | Observable<void>;
 }
 
 export interface IAbstractHandlerInjection {

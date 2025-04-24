@@ -1,4 +1,5 @@
 import type { ValidModule } from "./BaseModule.d.ts";
+import type { Observable } from "rxjs";
 
 /** Represents an imported module with a constructor */
 export type HandlerModule<T extends ValidModule> = {
@@ -18,7 +19,7 @@ export interface IModuleImporter {
     folder: string,
     file: string,
     forceReload?: boolean,
-  ): Promise<HandlerModule<T>>;
+  ): Observable<HandlerModule<T>>;
 
   /** Clears the module cache */
   clearCache?(): void;

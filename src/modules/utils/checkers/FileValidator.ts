@@ -16,6 +16,8 @@ import type {
   Result,
 } from "@type";
 import { emiliaError } from "@utils/error/EmiliaError";
+import { combineLatest, from, lastValueFrom, Observable, of } from "rxjs";
+import { catchError, map, switchMap } from "rxjs/operators";
 
 export class FileValidator implements IFileValidator {
   public logCategories: ArrayNotEmpty<string> = ["file_validator"];
@@ -31,54 +33,67 @@ export class FileValidator implements IFileValidator {
    * console.log(result); // { success: true }
    * ```
    */
-  public async validateFileOperation(filePath: string): Promise<Result<void>> {
+  public validateFileOperation(filePath: string): Observable<Result<void>> {
     const checkResult = this.checkFormatFile(filePath);
-    if (!checkResult.success) return checkResult;
+    if (!checkResult.success) return of(checkResult);
 
-    const existsResult = await this.checkFolder(filePath);
-
-    if (!existsResult.exists)
-      return {
-        success: false,
-        error: {
-          code: ErrorCode.FILE_NOT_FOUND,
-          message: `File ${filePath} does not exist!`,
-        },
-      };
-    if (!existsResult.writable)
-      return {
-        success: false,
-        error: {
-          code: ErrorCode.FILE_NOT_WRITABLE,
-          message: `File ${filePath} is not writable!`,
-        },
-      };
-
-    return { success: true, data: undefined };
+    return from(this.checkFolder(filePath)).pipe(
+      map(existsResult => {
+        if (!existsResult.exists) {
+          return {
+            success: false as const,
+            error: {
+              code: ErrorCode.FILE_NOT_FOUND,
+              message: `File ${filePath} does not exist!`,
+            },
+          };
+        }
+        if (!existsResult.writable) {
+          return {
+            success: false as const,
+            error: {
+              code: ErrorCode.FILE_NOT_WRITABLE,
+              message: `File ${filePath} is not writable!`,
+            },
+          };
+        }
+        return { success: true as const, data: undefined };
+      })
+    );
   }
 
   /**
    * Validates if the file path meets all restrictions.
    * @param {string} filePath - Path to validate
-   * @returns {boolean} - True if valid
+   * @returns {Observable<boolean>} - True if valid
    * @throws {EmiliaError} 
    * - `ErrorCode.INVALID_PATH` if path is empty
    * - `ErrorCode.FILE_FORMAT_ERROR` if config is empty
    * 
    * @example
    * // Returns true for valid path
-   * isValidPath("src/utils/validFile.ts");
+   * isValidPath("src/utils/validFile.ts").subscribe(result => {
+   *   console.log(result);
+   * });
    * 
    * // Throws for empty path
-   * isValidPath(""); 
+   * isValidPath("").subscribe({
+   *   next: result => console.log(result),
+   *   error: err => console.error(err),
+   * });
    */
-  public isValidPath(filePath: string): boolean {
-    this.validateConfig(filePath);
-
-    return (
-      this.isExtensionValid(filePath) &&
-      this.isFolderValid(filePath) &&
-      this.isFileValid(filePath)
+  public isValidPath(filePath: string): Observable<boolean> {
+    return from(this.validateConfig(filePath)).pipe(
+      switchMap(() =>
+        combineLatest([
+          this.isExtensionValid(filePath),
+          this.isFolderValid(filePath),
+          this.isFileValid(filePath),
+        ])
+      ),
+      map(([isExtensionValid, isFolderValid, isFileValid]) =>
+        isExtensionValid && isFolderValid && isFileValid
+      ),
     );
   }
 
@@ -89,64 +104,83 @@ export class FileValidator implements IFileValidator {
    * extensions, folders, and files are not empty. Throws an error if any of these conditions are not met.
    *
    * @param {string} filePath - The file path to validate.
-   * @throws {EmiliaError} If the file path is empty or if the configuration arrays are empty.
+   * @returns {Observable<void>} - An observable that emits void and throws an error if the validation fails.
    */
-  private validateConfig(filePath: string): void {
-    if (!filePath) {
-      throw emiliaError(
-        "File path is empty!",
-        ErrorCode.INVALID_PATH,
-        "InternalError",
-      );
-    }
+  private validateConfig(filePath: string): Observable<void> {
+    return from(
+      Promise.resolve()
+        .then(() => {
+          if (!filePath) {
+            throw emiliaError(
+              "File path is empty!",
+              ErrorCode.INVALID_PATH,
+              "InternalError",
+            );
+          }
 
-    const isEmptyConfig = [
-      FORBIDDEN_EXTENSIONS,
-      ALLOWED_EXTENSIONS,
-      FORBIDDEN_FOLDERS,
-      ALLOWED_FOLDERS,
-      FORBIDDEN_FILES,
-    ].every((arr) => arr.length === 0);
+          const isEmptyConfig = [
+            FORBIDDEN_EXTENSIONS,
+            ALLOWED_EXTENSIONS,
+            FORBIDDEN_FOLDERS,
+            ALLOWED_FOLDERS,
+            FORBIDDEN_FILES,
+          ].every((arr) => arr.length === 0);
 
-    if (isEmptyConfig) {
-      throw emiliaError(
-        "Forbidden or allowed extensions are empty! See constants/ts!",
-        ErrorCode.FILE_FORMAT_ERROR,
-        "InternalError",
-      );
-    }
+          if (isEmptyConfig) {
+            throw emiliaError(
+              "Forbidden or allowed extensions are empty! See constants/ts!",
+              ErrorCode.FILE_FORMAT_ERROR,
+              "InternalError",
+            );
+          }
+        })
+        .catch((err) => {
+          throw err;
+        }),
+    ).pipe(catchError((err) => {
+      throw err;
+    }));
   }
 
-  private isExtensionValid(filePath: string): boolean {
-    const isForbidden = FORBIDDEN_EXTENSIONS.some((ext) =>
-      filePath.endsWith(ext),
-    );
-    const isAllowed = ALLOWED_EXTENSIONS.some((ext) =>
-      filePath.endsWith(ext),
-    );
+  /**
+   * Checks if the given file path has a valid extension.
+   *
+   * Returns an observable that emits true if the file path has a valid extension, otherwise false.
+   *
+   * @param {string} filePath - The file path to check.
+   * @returns {Observable<boolean>} - An observable that emits true or false.
+   */
+  private isExtensionValid(filePath: string): Observable<boolean> {
+    const isForbidden = FORBIDDEN_EXTENSIONS.some((ext) => filePath.endsWith(ext));
+    const isAllowed = ALLOWED_EXTENSIONS.some((ext) => filePath.endsWith(ext));
 
-    return !isForbidden && isAllowed;
+    return of(!isForbidden && isAllowed);
   }
 
-  private isFolderValid(filePath: string): boolean {
-    const isForbiddenFolder = FORBIDDEN_FOLDERS.some((folder) =>
-      filePath.includes(folder),
-    );
-    const isAllowedFolder = ALLOWED_FOLDERS.some((folder) =>
-      filePath.includes(folder),
-    );
+  /**
+   * Checks if the given file path is in a valid folder.
+   *
+   * Returns an observable that emits true if the file path is in a valid folder, otherwise false.
+   *
+   * @param {string} filePath - The file path to check.
+   * @returns {Observable<boolean>} - An observable that emits true or false.
+   */
+  private isFolderValid(filePath: string): Observable<boolean> {
+    const isNotForbidden = !FORBIDDEN_FOLDERS.some((folder) => filePath.includes(folder));
+    const isAllowed = ALLOWED_FOLDERS.length === 0 ? true :
+      ALLOWED_FOLDERS.some((folder) => filePath.includes(folder));
 
-    return !isForbiddenFolder && isAllowedFolder;
+    return of(isNotForbidden && isAllowed);
   }
 
-  private isFileValid(filePath: string): boolean {
+  private isFileValid(filePath: string): Observable<boolean> {
     const isForbiddenFile = FORBIDDEN_FILES.some((file) =>
       filePath.includes(file),
     );
     const isAllowedFile = ALLOWED_FILES.length === 0 ? true :
       ALLOWED_FILES.some((file) => filePath.includes(file));
 
-    return !isForbiddenFile && isAllowedFile;
+    return of(!isForbiddenFile && isAllowedFile);
   }
 
   /**
@@ -213,21 +247,9 @@ export class FileValidator implements IFileValidator {
       : { success: true, data: undefined };
   }
 
-  /**
-   * Checks if the given folder exists and is writable.
-   * @param {string} path - Path to the folder
-   * @returns {Promise<FolderCheckResult>}
-   * @example
-   * const result = await FileHandler.checkFolder("path/to/folder");
-   * console.log(result);
-   * // {
-   * //   exists: true,
-   * //   writable: true
-   * // }
-   */
   async checkFolder(path: string): Promise<FolderCheckResult> {
-    if (!this.isValidPath(path))
-      return {
+    if (!this.isValidPath(path)) {
+      return Promise.resolve({
         exists: false,
         writable: false,
         error: {
@@ -235,26 +257,29 @@ export class FileValidator implements IFileValidator {
           message:
             "You checked folder with black list folders! Please - see at allow/deny folders on config file.",
         },
-      };
-    try {
-      const patchFolder = resolve(path);
-      await access(patchFolder, constants.F_OK | constants.W_OK);
-      return {
-        exists: true,
-        writable: true,
-        error: undefined,
-      };
-    } catch (e) {
-      emiliaError(e, ErrorCode.FOLDER_INVALID);
-      return {
-        exists: false,
-        writable: false,
-        error: {
-          code: ErrorCode.FOLDER_INVALID,
-          message:
-            "Folder does not exist or is not writable! Please check the folder path and permissions.",
-        },
-      };
+      });
     }
+
+    return lastValueFrom(
+      from(access(resolve(path), constants.F_OK | constants.W_OK)).pipe(
+        map(() => ({
+          exists: true,
+          writable: true,
+          error: undefined,
+        })),
+        catchError((e) => {
+          emiliaError(e, ErrorCode.FOLDER_INVALID);
+          return of({
+            exists: false,
+            writable: false,
+            error: {
+              code: ErrorCode.FOLDER_INVALID,
+              message:
+                "Folder does not exist or is not writable! Please check the folder path and permissions.",
+            },
+          });
+        })
+      )
+    );
   }
 }

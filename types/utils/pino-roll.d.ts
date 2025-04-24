@@ -1,3 +1,8 @@
+/**
+ * @see {@link https://github.com/pinojs/pino-roll Pino-roll}
+ * 
+ * @see {@link https://github.com/pinojs/pino/blob/main/docs/api.md Pino}
+ */
 declare module 'pino-roll' {
   interface PinoRollOptions {
     /** The file to write logs to */

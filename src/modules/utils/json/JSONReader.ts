@@ -1,7 +1,4 @@
-import { createReadStream } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { Transform } from "node:stream";
-import { pipeline } from "node:stream/promises";
 import { DELIMITER_LOG_FILE } from "@core/config";
 import { ErrorCode } from "@enum/errorCode";
 import type {
@@ -14,6 +11,10 @@ import type {
 import { validateFileOperation } from "@utils/decorators/validateFileOperation";
 import { emiliaError } from "@utils/error/EmiliaError";
 import { objectFromString } from "@utils/transform/objectForString";
+import { Transform } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import { createReadStream } from "node:fs";
+import { Observable } from "rxjs";
 
 export class JSONReader implements IJSONReader {
   /**
@@ -22,88 +23,146 @@ export class JSONReader implements IJSONReader {
   public logCategories: ArrayNotEmpty<string> = ["jsonReader"];
 
   constructor(public fileValidator: IFileValidator) { }
+  readLines<T extends object>(filePath: string, delimiter: string): Promise<Result<T>[]> {
+    throw new Error("Method not implemented.");
+  }
+
 
   /**
-   * Reads a file containing a single JSON object and parses it.
+   * Reads a file containing a single JSON object and parses it using RxJS.
    *
-   * If you need read non .json file - use {@link JSONReader.readLines} method.
+   * If you need to read a non .json file - use {@link JSONReader.readLines} method.
    * 
    * @param filePath - The path to the JSON file.
    * @template T - The type of the JSON object to parse. Default is `unknown`.
-   * @returns {Promise<Result<T>>} - A promise that resolves with a parsed JSON object. If the file is not a JSON file, returns an error.
+   * @returns {Observable<Result<T>>} - An observable that emits the parsed JSON object. If the file is not a JSON file, emits an error.
    * 
    * @example
    * ```ts
-   *  const filePath = "data.json"; //don't use at non .json file
-   *  const result = await JSONReader.readFile(filePath);
-   *  console.log(result); // { success: true, data: { name: "John", age: 30 } } if current file is a .json file
+   *  const result$ = JSONReader.readFileRx(filePath);
+   *  result$.subscribe({
+   *    next: result => console.log(result), // { success: true, data: { name: "John", age: 30 } }
+   *    error: err => console.error(err),
+   *  });
    * ```
    */
   @validateFileOperation<ClassWithValidator>()
-  async readFile<T extends object>(filePath: string): Promise<Result<T>> {
-    if (!this.fileValidator.isJSONFile(filePath)) return { success: false, error: { code: ErrorCode.FILE_FORMAT_ERROR, message: "You use this method about non .json file. You mistake. Use readLines method." } };
+  readFile<T extends object>(filePath: string): Observable<Result<T>> {
+    return new Observable<Result<T>>(subscriber => {
+      if (!this.fileValidator.isJSONFile(filePath)) {
+        subscriber.error({
+          success: false,
+          error: {
+            code: ErrorCode.FILE_FORMAT_ERROR,
+            message: "You use this method about non .json file. You mistake. Use readLines method."
+          }
+        });
+        return;
+      }
 
-    const fileContent = await readFile(filePath, "utf-8");
-
-    return this.parse<T>(fileContent);
+      readFile(filePath, "utf-8")
+        .then(fileContent => {
+          const result = this.parse<T>(fileContent);
+          subscriber.next(result);
+          subscriber.complete();
+        })
+        .catch(err => {
+          subscriber.error({
+            success: false,
+            error: {
+              code: ErrorCode.FILE_READ_ERROR,
+              message: `Failed to read file: ${err.message}`
+            }
+          });
+        });
+    });
   }
 
   /**
-   * Reads a file containing JSON objects and parses its entries.
+   * Reads a file containing JSON objects and parses its entries using RxJS.
    * 
    * If need read .json file - use {@link JSONReader.readFile} method.
    * 
    * @param filePath - The path to the JSON file.
    * @param delimiter - The delimiter used to split the file content into individual JSON objects. Default is `\n`.
    * @template T - The type of the JSON objects to parse. Default is `unknown`.
-   * @returns {Promise<Result<T>[]>} - A promise that resolves with an array of parsed JSON objects.
+   * @returns {Observable<Result<T>>} - An observable that emits parsed JSON objects one by one.
    * 
    * @example
-   * ```
+   * ```ts
    *  const filePath = "data.log"; //don't use at .json file
    *  const delimiter = "\n";
-   *  const result = await JSONReader.readLines(filePath, delimiter);
-   *  console.log(result); // [{ key: 'value' }, { key: 'value' }] or [{ key: value }, { error: 'Error message' }, { key: 'value' }]
+   *  const result$ = JSONReader.readLinesRx(filePath, delimiter);
+   *  result$.subscribe({
+   *    next: result => console.log(result), // { success: true, data: { key: 'value' } }
+   *    error: err => console.error(err),
+   *    complete: () => console.log("Completed"),
+   *  });
    * ```
    */
   @validateFileOperation<ClassWithValidator>()
-  async readLines<T extends object>(
+  readLinesRx<T extends object>(
     filePath: string,
     delimiter: string = "\n",
-  ): Promise<Result<T>[]> {
-    let buffer = "";
-    const lines: string[] = [];
+  ): Observable<Result<T>> {
+    return new Observable<Result<T>>(subscriber => {
+      let buffer = "";
 
-    const transformStream = new Transform({
-      transform(chunk, _encoding, callback) {
-        buffer += chunk.toString();
-        const parts = buffer.split(delimiter);
-        buffer = parts.pop() ?? ""; // We store the unfinished fragment
-        lines.push(...parts.filter(line => line.trim()));
-        callback();
-      },
-      flush(callback) {
-        if (buffer.trim()) lines.push(buffer.trim()); // Add the last fragment
-        callback();
-      },
+      const jsonReaderInstance = this; // Capture the JSONReader instance
+      const transformStream = new Transform({
+        transform(chunk, _encoding, callback) {
+          buffer += chunk.toString();
+          const parts = buffer.split(delimiter);
+          buffer = parts.pop() ?? ""; // Store the unfinished fragment
+          parts
+            .filter(line => line.trim())
+            .forEach(line => {
+              try {
+                const result = jsonReaderInstance.parse<T>(line); // Use the captured instance
+                subscriber.next(result);
+              } catch (err) {
+                subscriber.next({
+                  success: false,
+                  error: {
+                    code: ErrorCode.JSON_PARSE_ERROR,
+                    message: `Parsing error: ${err.message}`,
+                  },
+                });
+              }
+            });
+          callback();
+        },
+        flush(callback) {
+          if (buffer.trim()) {
+            try {
+              const result = jsonReaderInstance.parse<T>(buffer.trim()); // Use the captured instance
+              subscriber.next(result);
+            } catch (err) {
+              subscriber.next({
+                success: false,
+                error: {
+                  code: ErrorCode.JSON_PARSE_ERROR,
+                  message: `Parsing error: ${err.message}`,
+                },
+              });
+            }
+          }
+          callback();
+        },
+      });
+
+      pipeline(createReadStream(filePath), transformStream)
+        .then(() => subscriber.complete())
+        .catch(err => {
+          subscriber.error({
+            success: false,
+            error: {
+              code: ErrorCode.FILE_READ_ERROR,
+              message: `Failed to read file: ${err.message}`,
+            },
+          });
+        });
     });
-
-    await pipeline(
-      createReadStream(filePath),
-      transformStream,
-    );
-
-    const result = lines.map(line => this.parse<T>(line));
-
-    // Check for error's on the result
-    result.forEach((res, index) => {
-      if (!res.success) {
-        console.error(`Invalid object on ${index + 1} line in ${filePath} file. Error: ${res.error.message}, Code: ${res.error.code}`);
-      }
-    });
-
-    // And return result;
-    return result;
   }
 
   /**
@@ -111,7 +170,7 @@ export class JSONReader implements IJSONReader {
    *
    * @template T - The type of the object to parse the JSON string into.
    * @param {string} jsonParse - The JSON string to parse.
-   * @returns {Result<T>[]} - The result of the parsing operation, containing either the parsed object or an error message.
+   * @returns {Result<T>} - The result of the parsing operation, containing either the parsed object or an error message.
    * @throws {emiliaError} - Throws an error if the jsonParse string is empty or not provided.
    * @example
    * ```ts
@@ -121,14 +180,27 @@ export class JSONReader implements IJSONReader {
    * ```
    */
   public parse<T = unknown>(jsonParse: string): Result<T> {
-    if (!jsonParse || jsonParse.length === 0)
-      throw emiliaError(
-        "[JSONReader.parse]: jsonParse is required!",
-        ErrorCode.ARGS_REQUIRED,
-        "TypeError",
-      );
+    if (!jsonParse || jsonParse.length === 0) {
+      const error = {
+        code: ErrorCode.ARGS_REQUIRED,
+        message: "[JSONReader.parse]: jsonParse is required!",
+      };
+      console.error(error.message);
 
-    return objectFromString<T>(jsonParse);
+      throw emiliaError(error.message, error.code, "TypeError");
+    }
+
+    try {
+      return objectFromString<T>(jsonParse);
+    } catch (e) {
+      const error = {
+        code: ErrorCode.JSON_PARSE_ERROR,
+        message: `Parsing error: ${e.message}`,
+      };
+      console.error(error.message);
+
+      return { success: false, error };
+    }
   }
 
   /**
@@ -136,7 +208,7 @@ export class JSONReader implements IJSONReader {
    * 
    * @template T - The type of the object to parse the JSON string into.
    * @param {string} jsonParse - The JSON string to parse.
-   * @returns {Result<T>} - An array of results. If all the parts are valid, it only returns successful results, otherwise all results with mistakes.
+   * @returns {Result<T>[]} - An array of results. If all the parts are valid, it only returns successful results, otherwise all results with mistakes.
    * @throws {emiliaError} - Throws an error if the jsonParse string is empty or not provided.
    * @example
    * ```ts

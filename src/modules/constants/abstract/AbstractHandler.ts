@@ -10,6 +10,7 @@ import type {
   IAbstractHandlerInjection,
   ValidModule
 } from "@type";
+import { Observable } from "rxjs";
 
 export abstract class AbstractHandler implements IAbstractHandler {
   public readonly logCategories: ArrayNotEmpty<string> = ["handler"];
@@ -40,7 +41,7 @@ export abstract class AbstractHandler implements IAbstractHandler {
     ),
   ) { }
 
-  abstract setLogic(module: ValidModule): void | Promise<void>;
+  abstract setLogic(module: ValidModule): void | Observable<void>;
 
   setFilter(filter: RegExp): void {
     if (filter instanceof RegExp) {

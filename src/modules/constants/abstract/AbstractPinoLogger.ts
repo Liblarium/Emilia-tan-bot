@@ -2,6 +2,8 @@ import { AbstractLogger } from "@abstract/AbstractLogger";
 import { LogType } from "@enum/log";
 import type { LoggerData, PinoLogLevel } from "@type";
 import type pino from "pino";
+import { from, Observable } from "rxjs";
+import { map } from "rxjs/operators";
 
 export abstract class AbstractPinoLogger extends AbstractLogger {
   protected readonly logger: pino.Logger;
@@ -23,14 +25,13 @@ export abstract class AbstractPinoLogger extends AbstractLogger {
    */
   protected _mapLogLevel(type: LogType): PinoLogLevel {
     switch (type) {
-      case LogType.Info:
-        return "info";
       case LogType.Error:
         return "error";
       case LogType.Warning:
         return "warn";
       case LogType.Debug:
         return "debug";
+      case LogType.Info:
       default:
         return "info";
     }
@@ -59,46 +60,49 @@ export abstract class AbstractPinoLogger extends AbstractLogger {
    * Logs the given log data using the given log type
    * @param {LoggerData} message - The log data to log
    * @param {LogType} typeLog - The type of the log
-   * @returns {Promise<void>} The promise of the log operation
+   * @returns {Observable<void>} The observable of the log operation
    */
-  async log(message: LoggerData, typeLog: LogType): Promise<void> {
-    const level = this._mapLogLevel(typeLog);
-    this.logger[level](this._formatLogData(message));
+  log(message: LoggerData, typeLog: LogType): Observable<void> {
+    return from([{ message, level: this._mapLogLevel(typeLog) }]).pipe(
+      map(({ message, level }) => {
+        this.logger[level](this._formatLogData(message));
+      })
+    );
   }
 
   /**
    * Logs the given log data as an info type
    * @param {LoggerData} message - The log data to log
-   * @returns {Promise<void>} The promise of the log operation
+   * @returns {Observable<void>} The observable of the log operation
    */
-  async info(message: LoggerData): Promise<void> {
+  info(message: LoggerData): Observable<void> {
     return this.log(message, LogType.Info);
   }
 
   /**
    * Logs the given log data as an error type
    * @param {LoggerData} message - The log data to log
-   * @returns {Promise<void>} The promise of the log operation
+   * @returns {Observable<void>} The observable of the log operation
    */
-  async error(message: LoggerData): Promise<void> {
+  error(message: LoggerData): Observable<void> {
     return this.log(message, LogType.Error);
   }
 
   /**
    * Logs the given log data as a debug type
    * @param {LoggerData} message - The log data to log
-   * @returns {Promise<void>} The promise of the log operation
+   * @returns {Observable<void>} The observable of the log operation
    */
-  async debug(message: LoggerData): Promise<void> {
+  debug(message: LoggerData): Observable<void> {
     return this.log(message, LogType.Debug);
   }
 
   /**
    * Logs the given log data as a warning type
    * @param {LoggerData} message - The log data to log
-   * @returns {Promise<void>} The promise of the log operation
+   * @returns {Observable<void>} The observable of the log operation
    */
-  async warning(message: LoggerData): Promise<void> {
+  warning(message: LoggerData): Observable<void> {
     return this.log(message, LogType.Warning);
   }
 }

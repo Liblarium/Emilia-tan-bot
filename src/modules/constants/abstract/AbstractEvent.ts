@@ -27,18 +27,18 @@ export abstract class AbstractEvent<
   implements IAbstractEvent<T, K> {
   public readonly category: T;
   public logCategories: ArrayNotEmpty<string> = ["event"];
-  public readonly once: boolean = false;
+  public readonly once: boolean;
 
   constructor({
     name,
     category,
-    once,
-    logCategories,
+    once = false,
+    logCategories = ["event"],
   }: AbstractEventOptions<T, K>) {
     super(name);
     this.category = category;
-    this.once = once ?? false;
-    this.logCategories = logCategories ?? ["event"];
+    this.once = once;
+    this.logCategories = logCategories;
   }
 
   /**
@@ -47,6 +47,6 @@ export abstract class AbstractEvent<
    * @param args The arguments to pass to the event
    */
   public abstract execute(
-    ...args: EventArgsType<T, K>
+    args: EventArgsType<T, K>
   ): unknown | Promise<unknown>;
 }

@@ -11,6 +11,7 @@ import type {
 } from "@type";
 import { validateFileOperation } from "@utils/decorators/validateFileOperation";
 import { emiliaError } from "@utils/error/EmiliaError";
+import { catchError, from, map, Observable, of, switchMap } from "rxjs";
 
 
 export class FileManager implements IFileManager {
@@ -27,158 +28,201 @@ export class FileManager implements IFileManager {
    * ```
    */
   constructor(public fileValidator: IFileValidator) { }
+
   /**
    * Method for create folder
    * @param {string} path - Path to folder
    * @param {string} folderName - Name of folder
-   * @returns {Promise<CreateFolderResult>}
+   * @returns {Observable<CreateFolderResult>}
    * @example
-   * const result = await FileHandler.createFolder("/path/to/folder", "newFolder");
-   * 
-   * if (!result) return console.error(result.error); // { success: false, error: { code: "CREATE_FOLDER_ERROR" or "INVALID_PATH", message: or "Invalid path or folder name!" } }
-   * 
-   * console.log(result);
-   * // {
-   * //   success: true,
-   * //   path: "/path/to/folder/newFolder"
-   * // }
+   * FileHandler.createFolder("/path/to/folder", "newFolder")
+   *   .subscribe({
+   *     next: result => {
+   *       if (result.success) {
+   *         console.log(`Folder created: ${result.data.path}`);
+   *       } else {
+   *         console.error(result.error);
+   *       }
+   *     },
+   *     error: err => console.error(err),
+   *   });
    */
-  async createFolder(
-    path: string,
-    folderName: string,
-  ): Promise<Result<{ path: string }>> {
-    if (!path || !folderName)
-      return { success: false, error: { code: ErrorCode.INVALID_PATH, message: "Invalid path or folder name!" } };
-
-    const pathFolder = resolve(path);
-    const folder = resolve(pathFolder, folderName);
-
-    const [isPathValid, isFolderValid] = [pathFolder, folder].map(async (check) => await this.fileValidator.checkFolder(check));
-
-    if (!(await isPathValid) || !(await isFolderValid)) return {
-      success: false, error: {
-        code: ErrorCode.CREATE_FOLDER_ERROR,
-        message: `Invalid path or folder name: ${folder}. Maybe this path/folder on black list or exist/not writable!`,
-      }
-    };
-
-    try {
-
-      await mkdir(folder, { recursive: true });
-      return {
-        success: true,
-        data: { path: folder },
-      };
-    } catch (e) {
-      const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
-      const errorCode = e instanceof AbstractEmiliaError && e.code.length > 0 ? e.code : ErrorCode.CREATE_FOLDER_ERROR;
-      emiliaError(errorMessage, errorCode);
-
-      return {
-        success: false,
+  createFolder(path: string, folderName: string): Observable<Result<{ path: string }>> {
+    if (!path || !folderName) {
+      return of({
+        success: false as const,
         error: {
-          code: errorCode,
-          message: `Failed to create folder: ${errorMessage}`
-        }
-      };
+          code: ErrorCode.CREATE_FOLDER_ERROR,
+          message: "Invalid path or folder name",
+        },
+      });
     }
+
+    const fullPath = resolve(path, folderName);
+
+    return from(this.fileValidator.checkFolder(fullPath)).pipe(
+      switchMap((isFolderValid): Observable<Result<{ path: string }>> => {
+        if (!isFolderValid) {
+          return of({
+            success: false as const,
+            error: {
+              code: ErrorCode.CREATE_FOLDER_ERROR,
+              message: `Invalid path or folder name: ${fullPath}. Maybe this path/folder is on the blacklist or exists/not writable!`,
+            },
+          });
+        }
+
+        return from(mkdir(fullPath, { recursive: true })).pipe(
+          map(() => ({
+            success: true as const,
+            data: { path: fullPath },
+          }))
+        );
+      }),
+      catchError((e): Observable<Result<{ path: string }>> => {
+        const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
+        const errorCode = e instanceof AbstractEmiliaError && e.code.length > 0 ? e.code : ErrorCode.CREATE_FOLDER_ERROR;
+        emiliaError(errorMessage, errorCode);
+
+        return of({
+          success: false as const,
+          error: {
+            code: errorCode,
+            message: `Failed to create folder: ${errorMessage}`,
+          },
+        });
+      })
+    );
   }
 
   /**
-   * Method for write file
-   * @param {string} filePath - Path to file
+   * Method for writing a file using RxJS.
+   * @param {string} filePath - Path to the file
    * @param {string} data - Data to write
-   * @returns {Promise<WriteFileResult>}
+   * @returns {Observable<Result<void>>}
    * @example
-   * const result = await FileHandler.writeFile("/path/to/file.txt", "Hello, world!");
-   * console.log(result);
-   * // {
-   * //   success: true,
-   * //   data: undefined
-   * // }
+   * FileHandler.writeFile("/path/to/file.txt", "Hello, world!")
+   *   .subscribe({
+   *     next: result => {
+   *       if (result.success) {
+   *         console.log("File written successfully");
+   *       } else {
+   *         console.error(result.error);
+   *       }
+   *     },
+   *     error: err => console.error(err),
+   *   });
    */
   @validateFileOperation()
-  async writeFile(filePath: string, data: string): Promise<Result<void>> {
-    try {
-      await writeFile(filePath, data);
-      return { success: true, data: undefined };
-    } catch (e) {
-      const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
+  writeFile(filePath: string, data: string): Observable<Result<void>> {
+    return from(writeFile(filePath, data)).pipe(
+      map(() => ({ success: true as const, data: undefined })),
+      catchError(e => {
+        const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
+        emiliaError(`FileHandler.writeFile: ${errorMessage}`, ErrorCode.FILE_NOT_WRITABLE);
+        console.error(e);
 
-      emiliaError(`FileHandler.writeFile: ${errorMessage}`, ErrorCode.FILE_NOT_WRITABLE);
-      console.error(e);
-      return {
-        success: false,
-        error: { code: ErrorCode.FILE_NOT_WRITABLE, message: `Failed to write file: ${errorMessage}` },
-      };
-    }
+        return of({
+          success: false as const,
+          error: { code: ErrorCode.FILE_NOT_WRITABLE, message: `Failed to write file: ${errorMessage}` }
+        });
+      })
+    );
   }
 
   /**
-   * Deletes a file by the given name.
+   * Deletes a file by the given name using RxJS.
    * @param {string} fileName - Name of the file to delete
-   * @returns {Promise<Result<void>>}
+   * @returns {Observable<Result<void>>}
    * @example
-   * const result = await FileHandler.deleteFile("path/to/file.txt");
-   * console.log(result);
-   * // {
-   * //   success: true,
-   * //   error: undefined
-   * // }
+   * FileHandler.deleteFile("path/to/file.txt")
+   *   .subscribe({
+   *     next: result => {
+   *       if (result.success) {
+   *         console.log("File deleted successfully");
+   *       } else {
+   *         console.error(result.error);
+   *       }
+   *     },
+   *     error: err => console.error(err),
+   *   });
    */
   @validateFileOperation<ClassWithValidator>()
-  async deleteFile(fileName: string): Promise<Result<void>> {
-    try {
-      const filePath = resolve(fileName);
+  deleteFile(fileName: string): Observable<Result<void>> {
+    return from(unlink(fileName)).pipe(
+      map(() => ({ success: true as const, data: undefined })),
+      catchError(e => {
+        const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
+        emiliaError(`FileHandler.deleteFile: ${errorMessage}`, ErrorCode.FILE_NOT_WRITABLE);
+        console.error(e);
 
-      await unlink(filePath);
-
-      return { success: true, data: undefined };
-    } catch (e) {
-      const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
-      emiliaError(`FileHandler.deleteFile: ${errorMessage}`, ErrorCode.FILE_NOT_WRITABLE);
-      console.error(e);
-      return {
-        success: false,
-        error: { code: ErrorCode.FILE_NOT_WRITABLE, message: `Failed to delete file: ${errorMessage}!` },
-      };
-    }
+        return of({
+          success: false as const,
+          error: { code: ErrorCode.FILE_NOT_WRITABLE, message: `Failed to delete file: ${errorMessage}!` },
+        });
+      })
+    );
   }
 
   /**
-   * Appends the given data to the given file.
-   * @param {string} fileName - Path to the file
-   * @param {string} data - Data to append to the file
-   * @returns {Promise<AppendFileResult>}
+   * Appends the given data to the specified file using RxJS.
+   * 
+   * This function will append the data to the file if it is writable.
+   * It handles errors gracefully and returns an observable with the result.
+   * 
+   * @param {string} fileName - The path to the file to append data to.
+   * @param {string} data - The data to append to the file.
+   * @returns {Observable<Result<void>>} - An observable that emits the result of the append operation.
+   * 
    * @example
-   * const result = await FileHandler.appendFile("path/to/file.txt", "some data");
-   * console.log(result);
-   * // {
-   * //   success: true
-   * // }
+   * FileHandler.appendFile("path/to/file.txt", "some data")
+   *   .subscribe({
+   *     next: result => {
+   *       if (result.success) {
+   *         console.log("File appended successfully");
+   *       } else {
+   *         console.error(result.error);
+   *       }
+   *     },
+   *     error: err => console.error(err),
+   *   });
    */
   @validateFileOperation<ClassWithValidator>()
-  async appendFile(fileName: string, data: string): Promise<Result<void>> {
-    try {
-      const filePath = resolve(fileName);
+  appendFile(fileName: string, data: string): Observable<Result<void>> {
+    return from(this.fileValidator.validateFileOperation(fileName) as Promise<Result<void>>).pipe(
+      switchMap((validation: Result<void>): Observable<Result<void>> => {
+        if (!validation.success) {
+          return of({ success: false as const, error: validation.error });
+        }
 
-      const validation =
-        await this.fileValidator.validateFileOperation(filePath);
-      if (!validation.success)
-        return { success: false, error: validation.error };
+        return from(access(fileName, constants.W_OK)).pipe(
+          catchError(e => {
+            const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
+            emiliaError(`FileHandler.appendFile: ${errorMessage}`, ErrorCode.APPEND_FILE_ERROR);
+            console.error(e);
 
-      await access(filePath, constants.W_OK);
-      await appendFile(filePath, data);
+            return of({
+              success: false as const,
+              error: { code: ErrorCode.APPEND_FILE_ERROR, message: `Failed to append data to file: ${errorMessage}` },
+            });
+          }),
+          switchMap(() => from(appendFile(fileName, data)).pipe(
+            map(() => ({ success: true as const, data: undefined })),
+            catchError(e => {
+              const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
+              emiliaError(`FileHandler.appendFile: ${errorMessage}`, ErrorCode.APPEND_FILE_ERROR);
+              console.error(e);
 
-      return { success: true, data: undefined };
-    } catch (e) {
-      const errorMessage = e instanceof AbstractEmiliaError ? e.message : "Unknown error";
-      emiliaError(`FileHandler.appendFile: ${errorMessage}`, ErrorCode.APPEND_FILE_ERROR);
-      console.error(e);
-      return {
-        success: false,
-        error: { code: ErrorCode.APPEND_FILE_ERROR, message: `Failed to append data to file: ${errorMessage}` },
-      };
-    }
+              return of({
+                success: false as const,
+                error: { code: ErrorCode.APPEND_FILE_ERROR, message: `Failed to append data to file: ${errorMessage}` },
+              });
+            })
+          ))
+        );
+      })
+    );
   }
 }
+
+

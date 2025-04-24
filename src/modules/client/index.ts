@@ -1,7 +1,11 @@
 import type { AbstractBaseCommand } from "@abstract/AbstractBaseCommand";
+import { AbstractEmiliaError } from "@abstract/EmiliaAbstractError";
 import type { CommandType } from "@enum/command";
+import { ErrorCode } from "@enum/errorCode";
+import { LogType } from "@enum/log";
 import { CommandHandler } from "@handlers/CommandHandler";
 import { EventHandler } from "@handlers/EventHandler";
+import { LogFactory } from "@log/logFactory";
 import { PrismaClient } from "@prisma/client";
 import { Client, type ClientOptions, Collection } from 'discord.js';
 
@@ -78,6 +82,28 @@ export class EmiliaClient extends Client {
     }
 
     return Array.from(commands);
+  }
+
+  /**
+   * Logs errors encountered during command processing.
+   *
+   * This method is called when an error occurs in the CommandHandler.
+   * It creates a new Log instance to record the error information.
+   *
+   * @param e - The error object or message to be logged. Can be of any type.
+   *
+   * @returns void This method doesn't return a value.
+   */
+  public errorHandler(e: unknown) {
+    LogFactory.log({
+      text: e,
+      type: LogType.Error,
+      categories: ["global", "handler", "command"],
+      tags: ["handler", "command"],
+      metadata: { error: e },
+      context: { error: e },
+      code: e instanceof AbstractEmiliaError ? e.code : ErrorCode.UNKNOWN_ERROR,
+    });
   }
 }
 

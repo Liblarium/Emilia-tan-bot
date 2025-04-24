@@ -1,20 +1,20 @@
 import type { ErrorDetails, Result } from "@type";
 
 export interface IFormatValidator {
-  checkFormatFile(filePath: string): Result;
+  checkFormatFile(filePath: string): Observable<Result>;
 }
 
 export interface IFileAccessValidator {
-  validateFileOperation(filePath: string): Promise<Result>;
+  validateFileOperation(filePath: string): Observable<Result>;
 }
 
 // checkFolder. Interface for method
 export interface ICheckFolder {
-  checkFolder(folderPath: string): Promise<FolderCheckResult>;
+  checkFolder(folderPath: string): Observable<FolderCheckResult>;
 }
 
 export interface IValidPath {
-  isValidPath(filePath: string): boolean;
+  isValidPath(filePath: string): Observable<boolean>;
 }
 
 export interface IJSONFile {

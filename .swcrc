@@ -1,0 +1,64 @@
+{
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "decorators": true,
+      "metadata": true,
+      "dynamicImport": true
+    },
+    "transform": {
+      "decoratorMetadata": true
+    },
+    "target": "esnext",
+    "baseUrl": "./",
+    "paths": {
+      "@type": [
+        "types"
+      ],
+      "@type/*": [
+        "types/*"
+      ],
+      "@client/pg": [
+        "src/modules/client/postgres.ts"
+      ],
+      "@client": [
+        "src/modules/client/index.ts"
+      ],
+      "@constants/*": [
+        "src/modules/constants/*"
+      ],
+      "@db/*": [
+        "src/modules/database/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@log": [
+        "src/modules/log/index.ts"
+      ],
+      "@log/*": [
+        "src/modules/log/*"
+      ],
+      "@interaction/*": [
+        "src/modules/interaction/*"
+      ],
+      "@handlers/*": [
+        "src/modules/handlers/*"
+      ]
+    }
+  },
+  "module": {
+    "type": "es6"
+  },
+  "sourceMaps": true,
+  "exclude": [
+    "node_modules",
+    "dist",
+    "oldCode",
+    "sandbox",
+    "prisma"
+  ],
+  "include": [
+    "src/**/*"
+  ]
+}

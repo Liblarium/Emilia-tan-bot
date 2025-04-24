@@ -129,7 +129,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# There old code this project. Wery old
+# There old code this project. Very old
 oldCode/
 
 # Some diff files

@@ -1,5 +1,5 @@
 import type { LogType } from "@enum/log";
-import type { LogOptions, LoggerData, Result } from "@type";
+import type { LogOptions, LoggerData } from "@type";
 
 /**
  * Class for logging data to a file and console
@@ -39,9 +39,7 @@ export class Log {
    * @param logOptions.metadata |?: metadata to add to the log
    * @param logOptions.context |?: context to add to the log
    */
-  public async logProcessing(
-    logOptions: LogOptions,
-  ): Promise<void | Result<LogType>> {
+  public logProcessing(logOptions: LogOptions): void {
     const {
       type,
       consoleLogger,
@@ -61,9 +59,9 @@ export class Log {
     const consoleData = { ...logData, inline };
 
     // If the console logger is enabled and logs is true
-    if (logs && consoleLogger) await consoleLogger[logType](consoleData);
+    if (logs && consoleLogger) consoleLogger[logType](consoleData);
 
     // If the file logger is enabled
-    if (fileLogger) await fileLogger[logType](logData);
+    if (fileLogger) fileLogger[logType](logData);
   }
 }
