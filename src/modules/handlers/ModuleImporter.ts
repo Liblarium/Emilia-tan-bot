@@ -5,7 +5,7 @@ import type {
   IModuleImporter,
   ValidModule
 } from "@type";
-import { from, map, Observable } from "rxjs";
+import { from, map, type Observable } from "rxjs";
 import { setType } from "@utils/helpers/setType";
 
 export class ModuleImporter implements IModuleImporter {

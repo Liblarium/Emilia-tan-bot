@@ -44,7 +44,7 @@ export interface EventEmitterLike<
 type EmitterFunction<
   T extends CategoryEvents,
   K extends EventForCategory<T>,
-  R extends unknown = void
+  R = void
 > = (event: T, listener: ListenerFunction<T, K>) => R;
 /**
  * A type that represents a listener function

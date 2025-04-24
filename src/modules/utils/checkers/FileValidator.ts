@@ -7,7 +7,7 @@ import {
   FORBIDDEN_EXTENSIONS,
   FORBIDDEN_FILES,
   FORBIDDEN_FOLDERS
-} from "@core/config";
+} from "@config";
 import { ErrorCode } from "@enum/errorCode";
 import type {
   ArrayNotEmpty,
@@ -16,7 +16,7 @@ import type {
   Result,
 } from "@type";
 import { emiliaError } from "@utils/error/EmiliaError";
-import { combineLatest, from, lastValueFrom, Observable, of } from "rxjs";
+import { combineLatest, from, lastValueFrom, type Observable, of } from "rxjs";
 import { catchError, map, switchMap } from "rxjs/operators";
 
 export class FileValidator implements IFileValidator {

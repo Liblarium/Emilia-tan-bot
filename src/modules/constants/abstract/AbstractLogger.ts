@@ -1,6 +1,6 @@
 import type { LogType } from "@enum/log";
 import type { LoggerData, Logger as LoggerType } from "@type";
-import { Observable } from "rxjs";
+import type { Observable } from "rxjs";
 
 /**
  * Logger class

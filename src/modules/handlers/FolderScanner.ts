@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { Observable, from, map } from "rxjs";
+import { type Observable, from, map } from "rxjs";
 import type { HandlerPath, IFolderScanner } from "@type";
 import { glob } from "glob";
 

@@ -1,6 +1,6 @@
 import { AbstractEvent } from "@abstract/AbstractEvent";
 import type { EmiliaClient } from "@client";
-import { prefix } from "@core/config";
+import { prefix } from "@config";
 import { CategoryEvents } from "@enum/EventCategoryType";
 import { ErrorCode } from "@enum/errorCode";
 import { LogType } from "@enum/log";
@@ -40,12 +40,12 @@ export default class Ready extends AbstractEvent<CategoryEvents.Bot, "ready"> {
 
       // Log the loaded commands and events
       for (const arr of text) {
-        await LogFactory.log({ text: arr, type: LogType.Info, categories: ["global", "event"], tags: ["event", "ready"], code: ErrorCode.OK });
+        LogFactory.log({ text: arr, type: LogType.Info, categories: ["global", "event"], tags: ["event", "ready"], code: ErrorCode.OK });
       }
 
       // Set bot status
       return this.myStatus(client);
-    }).catch(async (e) => await LogFactory.log({ text: e, type: 2, categories: ["global", "event"], tags: ["event", "ready"], code: ErrorCode.UNKNOWN_ERROR }));
+    }).catch(async (e) => LogFactory.log({ text: e, type: 2, categories: ["global", "event"], tags: ["event", "ready"], code: ErrorCode.UNKNOWN_ERROR }));
 
     // Update bot status every hour (or other time)
     setInterval(() => this.myStatus(client), time_upd);

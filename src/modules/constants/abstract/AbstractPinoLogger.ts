@@ -2,7 +2,7 @@ import { AbstractLogger } from "@abstract/AbstractLogger";
 import { LogType } from "@enum/log";
 import type { LoggerData, PinoLogLevel } from "@type";
 import type pino from "pino";
-import { from, Observable } from "rxjs";
+import { from, type Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
 export abstract class AbstractPinoLogger extends AbstractLogger {
@@ -25,13 +25,14 @@ export abstract class AbstractPinoLogger extends AbstractLogger {
    */
   protected _mapLogLevel(type: LogType): PinoLogLevel {
     switch (type) {
+      case LogType.Info:
+        return "info";
       case LogType.Error:
         return "error";
       case LogType.Warning:
         return "warn";
       case LogType.Debug:
         return "debug";
-      case LogType.Info:
       default:
         return "info";
     }

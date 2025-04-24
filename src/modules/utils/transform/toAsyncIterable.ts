@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'rxjs';
+import { type Observable, Subject } from 'rxjs';
 
 /**
  * Converts an RxJS Observable into an async iterable.
@@ -31,17 +31,16 @@ export function toAsyncIterable<T>(observable: Observable<T>): AsyncIterable<T> 
         try {
           while (true) {
             if (values.length > 0) {
-              yield values.shift()!;
-            } else if (subscription.closed) {
-              break;
-            } else {
-              await new Promise((resolve) => setTimeout(resolve, 10));
-            }
+              const value = values.shift();
+
+              if (value !== undefined) yield value;
+            } else if (subscription.closed) break;
+            else await new Promise((resolve) => setTimeout(resolve, 10));
           }
         } finally {
           subscription.unsubscribe();
         }
       })();
     }
-  }
+  };
 }

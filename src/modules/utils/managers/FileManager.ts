@@ -11,7 +11,7 @@ import type {
 } from "@type";
 import { validateFileOperation } from "@utils/decorators/validateFileOperation";
 import { emiliaError } from "@utils/error/EmiliaError";
-import { catchError, from, map, Observable, of, switchMap } from "rxjs";
+import { catchError, from, map, type Observable, of, switchMap } from "rxjs";
 
 
 export class FileManager implements IFileManager {

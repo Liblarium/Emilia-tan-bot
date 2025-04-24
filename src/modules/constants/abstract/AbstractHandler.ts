@@ -1,5 +1,5 @@
 import type { EmiliaClient } from "@client";
-import { defaultHandlerFileFilter } from "@core/config";
+import { defaultHandlerFileFilter } from "@config";
 import { FolderScanner } from "@handlers/FolderScanner";
 import { HandlerCore } from "@handlers/HandlerCore";
 import { ModuleImporter } from "@handlers/ModuleImporter";
@@ -10,7 +10,7 @@ import type {
   IAbstractHandlerInjection,
   ValidModule
 } from "@type";
-import { Observable } from "rxjs";
+import type { Observable } from "rxjs";
 
 export abstract class AbstractHandler implements IAbstractHandler {
   public readonly logCategories: ArrayNotEmpty<string> = ["handler"];

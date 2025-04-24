@@ -2,7 +2,7 @@
   "name": "emilia-tan-bot",
   "private": true,
   "type": "module",
-  "version": "12.0.0",
+  "version": "12.0.1",
   "description": "",
   "main": "dist/core/index.js",
   "scripts": {

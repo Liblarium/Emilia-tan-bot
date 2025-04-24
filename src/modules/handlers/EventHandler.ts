@@ -10,7 +10,7 @@ import type {
 import { mongoose } from "@typegoose/typegoose";
 import { setType } from "@utils/helpers/setType";
 import { fromEvent, Subject } from 'rxjs';
-import { JQueryStyleEventEmitter } from "rxjs/internal/observable/fromEvent";
+import type { JQueryStyleEventEmitter } from "rxjs/internal/observable/fromEvent";
 
 
 export class EventHandler

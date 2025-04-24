@@ -1,5 +1,5 @@
 import type { EmiliaClient } from "@client";
-import { prefix } from "@core/config";
+import { prefix } from "@config";
 import { ErrorCode } from "@enum/errorCode";
 import { LogFactory } from "@log/logFactory";
 import type { GuildPrefix } from "@type";
@@ -45,15 +45,15 @@ export class MessageCommand {
     const args = message.content.slice(pref.length).trim().split(/ +/);
     const argsShift = args.shift();
 
-    if (!argsShift) return await LogFactory.log({ text: "По неизвестным причинам argsShift == undefined", type: 2, categories: ["global", "event", "command"], tags: ["handler", "command"], code: ErrorCode.UNKNOWN_ERROR });
+    if (!argsShift) return LogFactory.log({ text: "По неизвестным причинам argsShift == undefined", type: 2, categories: ["global", "event", "command"], tags: ["handler", "command"], code: ErrorCode.UNKNOWN_ERROR });
 
     const commandName = argsShift.toLowerCase();
 
-    if (!commandName) return await LogFactory.log({ text: "Произошла ошибка. CommandName = undefined", type: 2, categories: ["global", "events"], tags: ["handler", "command"], code: ErrorCode.INVALID_DATA });
+    if (!commandName) return LogFactory.log({ text: "Произошла ошибка. CommandName = undefined", type: 2, categories: ["global", "events"], tags: ["handler", "command"], code: ErrorCode.INVALID_DATA });
 
     const command = client.command.get(commandName);
 
-    if (!command) return await LogFactory.log({ text: `${message.member?.user?.username ?? "[Ошибка]"} попытался(ась) заюзать ${commandName || pref} в ${message.guild?.name ?? "[Ошибка]"}`, type: 2, categories: ["global", "events"], tags: ["handler", "command"], code: ErrorCode.COMMAND_NOT_FOUND });
+    if (!command) return LogFactory.log({ text: `${message.member?.user?.username ?? "[Ошибка]"} попытался(ась) заюзать ${commandName || pref} в ${message.guild?.name ?? "[Ошибка]"}`, type: 2, categories: ["global", "events"], tags: ["handler", "command"], code: ErrorCode.COMMAND_NOT_FOUND });
 
     if (command.option.delete && message.channel.permissionsFor(cliUser.id)?.has(ManageMessages)) await message.delete();
 

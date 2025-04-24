@@ -50,6 +50,9 @@
       ],
       "@handlers/*": [
         "src/modules/handlers/*.ts"
+      ],
+      "@config": [
+        "src/core/config.ts"
       ]
     },
     "typeRoots": [

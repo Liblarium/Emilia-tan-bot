@@ -4,7 +4,7 @@ import type { EmiliaClient } from "@client";
 import { CommandType } from "@enum/command";
 import { ErrorCode } from "@enum/errorCode";
 import { emiliaError } from "@utils/error/EmiliaError";
-import { Observable } from "rxjs";
+import type { Observable } from "rxjs";
 
 export class CommandHandler extends AbstractHandler {
   /**

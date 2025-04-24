@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { DELIMITER_LOG_FILE } from "@core/config";
+import { DELIMITER_LOG_FILE } from "@config";
 import { ErrorCode } from "@enum/errorCode";
 import type {
   ArrayNotEmpty,

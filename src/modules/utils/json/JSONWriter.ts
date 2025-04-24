@@ -118,7 +118,7 @@ export class JSONWriter implements IJSONWriter {
           observer.next({ success: false, error });
           observer.complete();
         })
-      })
+      });
     });
   }
 
