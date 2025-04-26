@@ -1,1 +1,0 @@
-pm2 start pg.client.js --name pg_emilia

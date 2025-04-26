@@ -1,61 +1,77 @@
 /**
+ * Type for array with limited length and that cannot be empty.
+ * @example
+ * ```ts
+ * const arr: LimitedArray<string, 2> = ["a", "b"]; // [string, string]
+ * const arr2: LimitedArray<string, 3> = ["a", "b", "c"]; // [string, string, string]
+ * const arr3: LimitedArray<string, 2 | 3> = ["a", "b"]; // [string, string, (string | undefined)]
+ * ```
+ */
+export type ArrayPathLimit = LimitedArray<string, 2>;
+
+/**
  * Utility types for array handling.
  */
 
-// Type for an array that can be empty.
+/**
+ * Maybe this array is empty
+ * 
+ * @template T - The type of the elements in the array
+ */
 export type ArrayMaybeEmpty<T> = T[] | [];
 
 /**
- * Type for an array with limited length.
+ * This array should have at least 1 Element
  * 
- * @template T - The type of elements in the array.
- * @template N - The exact length of the array.
- * @example
- * const arr: PathArgsLimit<string, 2> = ["a", "b"]; // Valid
- * const arr2: PathArgsLimit<string, 3> = ["a", "b", "c"]; // Valid
- * const arr3: PathArgsLimit<string, 2> = ["a", "b", "c"]; // Invalid, error
+ * @template T - The type of the elements in the array
  */
-export type PathArgsLimit<T = string, N extends number = 1> = [T, ...T[]] & { length: N };
-
-// Type for an array that cannot be empty.
 export type ArrayNotEmpty<T> = [T, ...T[]] | [T];
 
 /**
- * Type for an array with limited length and that cannot be empty.
+ * It's a limit array that doesn't give you a whine than you pointed in the type
  * 
- * @template T - The type of elements in the array.
- * @template N - The exact length of the array.
- * @example
- * const arr: LimitedArrayArgs<number, 2> = [1, 2]; // Valid
- * const arr2: LimitedArrayArgs<number, 3> = [1, 2, 3]; // Valid
- * const arr3: LimitedArrayArgs<number, 2> = [1]; // Invalid, error
+ * @template T - The type of the elements in the array
+ * @template K - The type of the elements in the array
+ * @template TLength - The length of the array (default: 1)
  */
-export type LimitedArrayArgs<T, N extends number = 1> = ArrayNotEmpty<T> & { length: N };
+export type LimitedArray<
+  T extends ArrayMaybeEmpty | ArrayNotEmpty | Array,
+  TLength extends number = 1
+> = Tuple<T[number], TLength>;
 
 /**
- * Options for guild log.
+ * Create a tuple
  * 
- * This interface is used to specify the channel IDs for guild logs.
+ * @template T - The type of the elements in the tuple
+ * @template N - The length of the tuple
+ * @template R - The tuple
+ * 
+ * @returns {R}
+ * 
+ * @example
+ * ```ts
+ * type SomeArrayType = Tuple<string, 3>;
+ * // -> ['string', 'string', 'string']
+ * ```
  */
-export interface GuildLogOption {
-  /**
-   * delete channelId
-   */
-  delete?: string;
-  /**
-   * create channelId
-   */
-  create?: string;
-  /**
-   * update channelId
-   */
-  update?: string;
-  /** 
-   * join channelId
-   */
-  join?: string;
-  /**
-   * leave channelId
-   */
-  leave?: string;
-}
+type Tuple<T, N extends number, R extends T[] = []> = R["length"] extends N
+  ? R
+  : Tuple<T, N, [...R, T]>;
+
+/**
+ * Type for a key of an object
+ */
+export type Keyof<T> = keyof T;
+
+/**
+ * Result of reading a JSON file
+ * 
+ * @template T - The type of the JSON object
+ */
+export type ReadJSONFileResult<T extends object = object> = T | { error: string };
+
+export * from './constants/index.d.ts';
+export * from './database/index.d.ts';
+export * from './handler/index.d.ts';
+export * from './log/index.d.ts';
+export * from './utils/index.d.ts';

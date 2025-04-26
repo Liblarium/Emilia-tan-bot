@@ -1,56 +1,75 @@
 {
-  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "mapRoot": "srcJs",
+    "strict": true,
+    "useUnknownInCatchVariables": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node10",
+    "mapRoot": "dist",
     "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-    "outDir": "srcJs",
+    "outDir": "dist",
     "baseUrl": "./",
     "paths": {
       "@type": [
-        "types"
+        "types/index.d.ts"
       ],
       "@type/*": [
-        "types/*"
+        "types/*.d.ts"
+      ],
+      "@client/pg": [
+        "src/modules/client/postgres.ts"
       ],
       "@client": [
-        "srcTs/client"
+        "src/modules/client/index.ts"
       ],
-      "@base/*": [
-        "srcTs/base/*"
+      "@enum/*": [
+        "src/modules/constants/enum/*.ts"
       ],
-      "@util/*": [
-        "srcTs/util/*"
+      "@abstract/*": [
+        "src/modules/constants/abstract/*.ts"
       ],
-      "@util/s": [
-        "srcTs/utils.ts"
+      "@db/*": [
+        "src/modules/database/*.ts"
+      ],
+      "@utils/*": [
+        "src/modules/utils/*.ts"
       ],
       "@log": [
-        "srcTs/log"
+        "src/modules/log/index.ts"
+      ],
+      "@log/*": [
+        "src/modules/log/*.ts"
+      ],
+      "@interaction/*": [
+        "src/modules/interaction/*.ts"
       ],
       "@handlers/*": [
-        "srcTs/handlers/*"
+        "src/modules/handlers/*.ts"
+      ],
+      "@config": [
+        "src/core/config.ts"
       ]
-    }
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ]
   },
   "include": [
-    "./srcTs",
+    "src",
     "node_modules/@types",
-    "./types",
+    "types"
   ],
   "exclude": [
     "./node_modules",
-    "./srcJs",
-    "./target",
-    "./pg.client.js",
-    "./abyss",
-    "./graphql",
-    "srcTs/log",
-    "./drizzle",
-    "drizzle.config.ts"
+    "./dist",
+    "./oldCode",
+    "./sandbox",
+    "./prisma"
   ]
 }

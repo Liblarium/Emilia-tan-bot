@@ -1,22 +1,25 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/latest/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
   "files": {
     "ignoreUnknown": true,
     "include": [
-      "srcTs/**/*.ts",
-      "srcTs/**/*.js",
-      "srcTs/**/*.d.ts",
-      "types/**/*.d.ts",
-      "abyss/src/guild.tests.*"
+      "src/*",
+      "types/*",
+      "sandbox/*"
     ],
     "ignore": [
-      "srcJs/*",
-      "abyss/*.js",
-      "abyss/src/img.tests.ts",
-      "abyss/src/img.ts",
-      "drizzle",
+      "dist/*",
+      "sandbox/*.js",
+      "prisma/*",
       "package.json",
-      "node_modules/**"
+      "package-lock.json",
+      "node_modules/*",
+      "oldCode/*"
     ]
   },
   "javascript": {
@@ -25,56 +28,64 @@
     }
   },
   "linter": {
+    "enabled": true,
     "include": [
-      "srcTs/**/*.ts",
-      "srcTs/**/*.js",
-      "srcTs/**/*.d.ts",
-      "types/**/*.d.ts",
-      "abyss/src/guild.tests.*"
+      "src/*",
+      "types/*",
+      "sandbox/*"
     ],
     "ignore": [
-      "srcJs/*",
-      "abyss/*.js",
-      "abyss/src/img.tests.ts",
-      "abyss/src/img.ts",
+      "dist/*",
+      "sandbox/*.js",
+      "prisma/*",
       "package.json",
+      "package-lock.json",
       "node_modules/*",
-      "node_modules/*.*"
+      "oldCode/*"
     ],
     "rules": {
+      "recommended": true,
       "complexity": {
-        "noForEach": "off"
+        "noForEach": "off",
+        "noStaticOnlyClass": "off",
+        "noThisInStatic": "off",
+        "noUselessConstructor": "off",
+        "noBannedTypes": "off"
       },
       "style": {
         "noCommaOperator": "off",
         "noParameterAssign": "off",
         "useDefaultParameterLast": "off",
         "useLiteralEnumMembers": "off",
-        "noInferrableTypes": "off"
+        "noInferrableTypes": "off",
+        "useShorthandFunctionType": "off"
       },
       "suspicious": {
         "noConfusingVoidType": "off",
         "noAssignInExpressions": "off",
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "useValidTypeof": "off",
+        "noShadowRestrictedNames": "off"
       }
     }
   },
   "formatter": {
+    "enabled": true,
+    "useEditorconfig": true,
+    "indentStyle": "tab",
     "include": [
-      "srcTs/**/*.ts",
-      "srcTs/**/*.js",
-      "srcTs/**/*.d.ts",
-      "types/**/*.d.ts",
-      "abyss/src/guild.tests.*"
+      "src/*",
+      "types/*",
+      "sandbox/*"
     ],
-    "indentWidth": 2,
     "ignore": [
-      "srcJs/*",
-      "abyss/*.js",
-      "abyss/src/img.tests.ts",
-      "abyss/src/img.ts",
+      "dist/*",
+      "sandbox/*.js",
+      "prisma/*",
       "package.json",
-      "node_modules/*"
+      "package-lock.json",
+      "node_modules/*",
+      "oldCode/*"
     ]
   },
   "organizeImports": {

@@ -1,0 +1,78 @@
+import type { AbstractBaseCommand } from "@abstract/AbstractBaseCommand";
+import { AbstractHandler } from "@abstract/AbstractHandler";
+import type { EmiliaClient } from "@client";
+import { CommandType } from "@enum/command";
+import { ErrorCode } from "@enum/errorCode";
+import { emiliaError } from "@utils/error/EmiliaError";
+import type { Observable } from "rxjs";
+
+export class CommandHandler extends AbstractHandler {
+  /**
+   * Initializes a new instance of the CommandHandler class.
+   * Clears the existing commands in the client and sets up the folder path for commands.
+   * Triggers the build process to load commands from the specified directory.
+   * Catches and logs any errors encountered during the build process.
+   *
+   * @param client - The Emilia client instance to associate with this handler.
+   */
+
+  constructor(client: EmiliaClient) {
+    super(client);
+
+    // Clear existing commands and slash commands in the client.
+    client.command.clear();
+    client.slashCommand.clear();
+
+    // Associate the client with this handler.
+    this.client = client;
+
+    // Set up the folder path for commands.
+    this.setFolderPath(["dist", "commands"]);
+  }
+
+  /**
+   * Sets up the logic for handling a command in the client.
+   * This method adds the command to the client's command collection and sets up any aliases.
+   *
+   * @param command - The command object to be added to the client's command collection.
+   *                  It should be an instance of AbstractBaseCommand or its subclass.
+   *
+   * @returns void or a Observable that resolves to void. The function doesn't return a value,
+   *          but it may be asynchronous, hence the possibility of returning a Observable<void>.
+   *
+   * @throws Catches any errors that occur during the process and passes them to the error handling function.
+   */
+
+  setLogic(command: AbstractBaseCommand<string>): void | Observable<void> {
+    const client = this.client;
+
+    try {
+      // Add the command to the client's command or slashCommand collection
+      switch (command.type) {
+        case CommandType.Both:
+          client.command.set(command.name, command);
+          client.slashCommand.set(command.name, command);
+          break;
+        case CommandType.Command:
+          client.command.set(command.name, command);
+          break;
+        case CommandType.Slash:
+          client.slashCommand.set(command.name, command);
+          break;
+        default:
+          throw emiliaError(`[CommandHandler.setLogic]: Unknown command (${command.type}) type!`, ErrorCode.INVALID_TYPE);
+      }
+
+      // Set up aliases for the command. Adds the command to the client's command collection with the alias.
+      command.aliases.forEach((alias) => {
+        if (this.client.command.has(alias)) {
+          throw emiliaError(`[CommandHandler.setLogic]: Alias conflict detected for "${alias}"!`, ErrorCode.INVALID_TYPE);
+        }
+        this.client.command.set(alias, command);
+      });
+    } catch (e) {
+      client.errorHandler(e);
+    }
+  }
+}
+
