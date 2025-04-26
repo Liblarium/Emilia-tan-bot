@@ -19,7 +19,7 @@
   ],
   "cSpell.language": "en,ru,ru-RU,uk",
   "typescript.validate.enable": true,
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "sonarlint.exclude": [
     "./node_modules/**",
     "./oldCode/**"

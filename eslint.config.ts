@@ -51,6 +51,7 @@ export default [
     rules: {
       indent: "off",
       "prettier/prettier": "error",
+      "prettier/prettier/trailingComma": ["error", "es5"],
       "comma-dangle": ["error", "only-multiline"],
       "@typescript-eslint/no-explicit-any": "off", // You... you know what you are doing
       "@typescript-eslint/no-unsafe-call": "off",
@@ -72,6 +73,6 @@ export default [
       "@typescript-eslint/require-await": "off",
       "@typescript-eslint/no-unused-expressions": "off",
       "@typescript-eslint/no-empty-object-type": "off",
-    },
-  },
+    }
+  }
 ];
