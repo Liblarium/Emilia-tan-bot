@@ -8,7 +8,7 @@
     "start": "pnpm --filter ./apps/bot start",
     "lint": "pnpm -r run lint",
     "format": "pnpm -r run format",
-    "prepare": "husky",
+    "prepare": "husky init",
     "lint-staged": "lint-staged",
     "test": "pnpm -r run test",
     "docs": "pnpm --filter ./apps/bot run docs"

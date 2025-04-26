@@ -1,4 +1,3 @@
 #!/bin/sh
 
-pnpm run lint
-pnpm run format -- --check
+pnpm exec lint-staged
