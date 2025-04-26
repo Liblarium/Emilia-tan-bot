@@ -1,37 +1,42 @@
-import globals from "globals";
 import pluginJs from "@eslint/js";
 import tsparser from "@typescript-eslint/parser";
-import tseslint from "typescript-eslint";
 import biome from "eslint-config-biome";
+import prettier from "eslint-config-prettier/flat";
+import prettierPlugin from "eslint-plugin-prettier/recommended";
+import globals from "globals";
 
 export default [
   {
     ignores: [
       "node_modules",
+      "apps/*/node_modules",
+      "packages/*/node_modules",
       "dist/*",
+      "*/**/dist/*",
       "biome.json",
       "tsconfig.json",
+      "*/**/tsconfig.json",
       "package.json",
-      "package-lock.json",
-      "esbuild.config.js",
-      "jest.config.js",
+      "*/**/package.json",
+      "pnpm-lock.yaml",
+      ".swcrc",
       "*/**/*.deprecation",
       "tsconfig.*.json",
-      "prisma/*",
+      "*/**/prisma/*",
       "eslint.config.ts",
       "oldCode",
-      "dist",
       "sandbox/*",
-      "__tests__/*",
-      "types",
-      "*/**/*.test.ts"
-    ]
+      "*/**/__tests__/*",
+      "*/**/types",
+      "*/**/*.test.ts",
+    ],
   },
   pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
+  prettierPlugin,
+  prettier,
   biome,
   {
-    files: ["src/**/*.ts"],
+    files: ["apps/*/src/**/*.ts", "packages/*/src/**/*.ts", "*/src/**/*.ts"],
     languageOptions: {
       ecmaVersion: 2025,
       globals: {
@@ -39,23 +44,21 @@ export default [
         ...globals.vitest,
         ...globals.node,
         ...globals.builtin,
-        ...globals.es2025
+        ...globals.es2025,
       },
-      parser: tsparser
+      parser: tsparser,
     },
     rules: {
-      "indent": "off",
-      "comma-dangle": [
-        "error",
-        "only-multiline"
-      ],
+      indent: "off",
+      "prettier/prettier": "error",
+      "comma-dangle": ["error", "only-multiline"],
       "@typescript-eslint/no-explicit-any": "off", // You... you know what you are doing
       "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/restrict-template-expressions": "off",
       "@typescript-eslint/no-extraneous-class": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "import/no-unresolved": "off",
-      "semi": "error",
+      semi: "error",
       "no-unused-vars": "off",
       "@typescript-eslint/no-unsafe-function-type": "off",
       "@typescript-eslint/no-redundant-type-constituents": "off",
@@ -69,6 +72,6 @@ export default [
       "@typescript-eslint/require-await": "off",
       "@typescript-eslint/no-unused-expressions": "off",
       "@typescript-eslint/no-empty-object-type": "off",
-    }
-  }
+    },
+  },
 ];

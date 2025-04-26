@@ -1,0 +1,22 @@
+{
+  "name": "@emilia-tan-bot/rx-helpers",
+  "version": "0.0.1",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts || echo 'No files to lint.'",
+    "format": "prettier --write src/**/*.{ts,js,tsx,jsx} || echo 'No files to format.'",
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "eslint": "^9.25.1",
+    "prettier": "^3.5.3",
+    "@types/node": "^22.15.2"
+  }
+}

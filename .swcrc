@@ -12,53 +12,53 @@
     "target": "esnext",
     "baseUrl": "./",
     "paths": {
-      "@type": [
-        "types"
+      "@core/*": [
+        "packages/core/src/*"
       ],
-      "@type/*": [
-        "types/*"
+      "@config/*": [
+        "packages/core/src/config/*"
       ],
-      "@client/pg": [
-        "src/modules/client/postgres.ts"
+      "@core/interfaces/*": [
+        "packages/core/src/core/interfaces/*"
       ],
-      "@client": [
-        "src/modules/client/index.ts"
+      "@core/providers/*": [
+        "packages/core/src/core/providers/*"
       ],
-      "@constants/*": [
-        "src/modules/constants/*"
+      "@event/*": [
+        "packages/core/src/event/*"
       ],
-      "@db/*": [
-        "src/modules/database/*"
-      ],
-      "@utils/*": [
-        "src/utils/*"
-      ],
-      "@log": [
-        "src/modules/log/index.ts"
-      ],
-      "@log/*": [
-        "src/modules/log/*"
-      ],
-      "@interaction/*": [
-        "src/modules/interaction/*"
+      "@modules/*": [
+        "packages/core/src/modules/*"
       ],
       "@handlers/*": [
-        "src/modules/handlers/*"
+        "packages/core/src/modules/handlers/*"
+      ],
+      "@interaction/*": [
+        "packages/core/src/modules/interaction/*"
+      ],
+      "@log/*": [
+        "packages/core/src/modules/log/*"
+      ],
+      "@type": [
+        "packages/types/index.d.ts"
+      ],
+      "@type/*": [
+        "packages/types/*"
       ]
-    }
-  },
-  "module": {
-    "type": "es6"
-  },
-  "sourceMaps": true,
-  "exclude": [
-    "node_modules",
-    "dist",
-    "oldCode",
-    "sandbox",
-    "prisma"
-  ],
-  "include": [
-    "src/**/*"
-  ]
+    },
+    "module": {
+      "type": "es6"
+    },
+    "sourceMaps": true,
+    "exclude": [
+      "node_modules",
+      "dist",
+      "oldCode",
+      "sandbox",
+      "prisma"
+    ],
+    "include": [
+      "src/**/*"
+    ]
+  }
 }

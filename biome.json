@@ -8,18 +8,21 @@
   "files": {
     "ignoreUnknown": true,
     "include": [
-      "src/*",
-      "types/*",
+      "apps/*/src/**/*",
+      "packages/*/src/**/*",
+      "*/*/src/**/*",
       "sandbox/*"
     ],
     "ignore": [
       "dist/*",
       "sandbox/*.js",
-      "prisma/*",
+      "infrastructure/*",
       "package.json",
-      "package-lock.json",
+      "pnpm-lock.yaml",
       "node_modules/*",
-      "oldCode/*"
+      "*/**/node_modules/*",
+      "oldCode/*",
+      "biome.json"
     ]
   },
   "javascript": {
@@ -30,18 +33,21 @@
   "linter": {
     "enabled": true,
     "include": [
-      "src/*",
-      "types/*",
+      "apps/*/src/**/*",
+      "packages/*/src/**/*",
+      "*/*/src/**/*",
       "sandbox/*"
     ],
     "ignore": [
       "dist/*",
       "sandbox/*.js",
-      "prisma/*",
+      "infrastructure/*",
       "package.json",
-      "package-lock.json",
+      "pnpm-lock.yaml",
       "node_modules/*",
-      "oldCode/*"
+      "*/**/node_modules/*",
+      "oldCode/*",
+      "biome.json"
     ],
     "rules": {
       "recommended": true,
@@ -72,20 +78,23 @@
   "formatter": {
     "enabled": true,
     "useEditorconfig": true,
-    "indentStyle": "tab",
+    "indentStyle": "space",
     "include": [
-      "src/*",
-      "types/*",
+      "apps/*/src/**/*",
+      "packages/*/src/**/*",
+      "*/*/src/**/*",
       "sandbox/*"
     ],
     "ignore": [
       "dist/*",
       "sandbox/*.js",
-      "prisma/*",
+      "infrastructure/*",
       "package.json",
-      "package-lock.json",
+      "pnpm-lock.yaml",
       "node_modules/*",
-      "oldCode/*"
+      "*/**/node_modules/*",
+      "oldCode/*",
+      "biome.json"
     ]
   },
   "organizeImports": {

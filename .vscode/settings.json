@@ -27,5 +27,23 @@
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "codetogether.virtualCursorJoin": "sharedVirtualCursor",
-  "codetogether.virtualCursorRemember": true
+  "codetogether.virtualCursorRemember": true,
+  "prettier.requireConfig": true,
+  "prettier.configPath": ".prettierrc.json",
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "typescriptreact",
+    "json",
+    "yaml"
+  ],
+  "eslint.packageManager": "pnpm",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "files.exclude": {
+    "**/.pnpm": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.turbo": true,
+    "**/.next": true
+  }
 }
