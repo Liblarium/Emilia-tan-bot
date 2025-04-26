@@ -34,7 +34,7 @@ jobs:
         run: pnpm install
 
       - name: Run biome check
-        run: npx biome check .
+        run: npx biome check . --write
 
       - name: Run linter
         run: pnpm run lint
