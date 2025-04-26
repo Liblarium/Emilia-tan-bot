@@ -1,35 +1,22 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "sourceMap": true,
+    "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
-    "incremental": true,
-    "baseUrl": ".",
-    "paths": {
-      "@core/*": [
-        "packages/core/src/*"
-      ],
-      "@logger/*": [
-        "packages/logger/src/*"
-      ]
-    }
+    "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "apps/**/*",
-    "packages/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "oldCode",
-    "sandbox"
-  ]
+  "exclude": ["node_modules", "dist"],
+  "include": ["src"]
 }

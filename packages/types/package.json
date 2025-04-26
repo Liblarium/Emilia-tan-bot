@@ -1,11 +1,12 @@
 {
-  "name": "@emilia-tan-bot/types",
-  "version": "0.0.1",
+  "name": "@emilia-tan/types",
+  "version": "0.0.2",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "swc src -d dist && pnpm run typecheck",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts || echo 'No files to lint.'",
     "format": "prettier --write src/**/*.{ts,js,tsx,jsx} || echo 'No files to format.'",
     "test": "echo \"No tests yet\""

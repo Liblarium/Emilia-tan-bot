@@ -5,13 +5,14 @@
   "scripts": {
     "dev": "pnpm -r run dev",
     "build": "pnpm -r run build",
-    "start": "pnpm --filter ./apps/bot start",
+    "start": "pnpm --filter @emilia-tan/bot start",
     "lint": "pnpm -r run lint",
     "format": "pnpm -r run format",
-    "prepare": "husky init",
+    "prepare": "husky",
     "lint-staged": "lint-staged",
     "test": "pnpm -r run test",
-    "docs": "pnpm --filter ./apps/bot run docs"
+    "docs": "pnpm --filter @emilia-tan/bot run docs",
+    "typecheck": "pnpm -r run typecheck"
   },
   "lint-staged": {
     "**/*.{ts,tsx,js,jsx,json,yaml,yml,md}": [

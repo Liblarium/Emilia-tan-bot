@@ -1,9 +1,10 @@
 {
-  "name": "@emilia-tan/core",
-  "version": "0.0.2",
+  "name": "@emilia-tan/discord",
+  "version": "0.0.1",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "description": "This is just a lining over Discord.js. Is not the implementation of the original library",
   "scripts": {
     "build": "swc src -d dist && pnpm run typecheck",
     "typecheck": "tsc --noEmit",
@@ -11,8 +12,7 @@
     "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}' || echo 'No files to format.'"
   },
   "dependencies": {
-    "tsyringe": "^4.10.0",
-    "reflect-metadata": "^0.2.2"
+    "discord.js": "^14.19.1"
   },
   "devDependencies": {
     "typescript": "^5.8.3",

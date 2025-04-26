@@ -1,17 +1,19 @@
 {
-  "name": "@emilia-tan-bot/rx-helpers",
+  "name": "@emilia-tan/media",
   "version": "0.0.1",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "swc src -d dist && pnpm run typecheck",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts || echo 'No files to lint.'",
-    "format": "prettier --write src/**/*.{ts,js,tsx,jsx} || echo 'No files to format.'",
-    "test": "echo \"No tests yet\""
+    "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}' || echo 'No files to format.'"
   },
   "dependencies": {
-    "rxjs": "^7.8.2"
+    "@napi-rs/canvas": "^0.1.69",
+    "sharp": "^0.34.1",
+    "@resvg/resvg-js": "^2.6.2"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
