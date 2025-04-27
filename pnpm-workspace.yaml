@@ -3,7 +3,9 @@ packages:
   - packages/**/**
 
 onlyBuiltDependencies:
+  - '@biomejs/biome'
   - '@prisma/engines'
+  - '@swc/core'
   - esbuild
   - prisma
   - sharp

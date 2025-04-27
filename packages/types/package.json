@@ -1,6 +1,6 @@
 {
   "name": "@emilia-tan/types",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,5 +17,15 @@
     "eslint": "^9.25.1",
     "prettier": "^3.5.3",
     "@types/node": "^22.15.2"
+  },
+  "optionalDependencies": {
+    "@emilia-tan/core": "workspace:^",
+    "@emilia-tan/decorators": "workspace:^",
+    "@emilia-tan/media": "workspace:^",
+    "@emilia-tan/utlis": "workspace:^",
+    "@emilia-tan/logger": "workspace:^",
+    "@emilia-tan/discord": "workspace:^",
+    "@emilia-tan/database": "workspace:^",
+    "@emilia-tan/network": "workspace:^"
   }
 }

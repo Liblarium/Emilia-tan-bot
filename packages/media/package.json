@@ -1,6 +1,6 @@
 {
   "name": "@emilia-tan/media",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,12 +13,25 @@
   "dependencies": {
     "@napi-rs/canvas": "^0.1.69",
     "sharp": "^0.34.1",
-    "@resvg/resvg-js": "^2.6.2"
+    "@resvg/resvg-js": "^2.6.2",
+    "@emilia-tan/core": "workspace:^",
+    "@emilia-tan/types": "workspace:^",
+    "@emilia-tan/decorators": "workspace:^"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
     "eslint": "^9.25.1",
     "prettier": "^3.5.3",
     "@types/node": "^22.15.2"
+  },
+  "optionalDependencies": {
+    "@emilia-tan/core": "workspace:^",
+    "@emilia-tan/types": "workspace:^",
+    "@emilia-tan/decorators": "workspace:^",
+    "@emilia-tan/network": "workspace:^",
+    "@emilia-tan/utlis": "workspace:^",
+    "@emilia-tan/logger": "workspace:^",
+    "@emilia-tan/discord": "workspace:^",
+    "@emilia-tan/database": "workspace:^"
   }
 }

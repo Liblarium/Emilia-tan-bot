@@ -22,7 +22,9 @@
       "apps/*/src/**/*",
       "packages/*/src/**/*",
       "*/*/src/**/*",
-      "sandbox/*"
+      "sandbox/*",
+      "*.md",
+      "docs/**/*.md"
     ]
   },
   "javascript": {

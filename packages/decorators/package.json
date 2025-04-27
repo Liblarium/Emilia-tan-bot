@@ -1,6 +1,6 @@
 {
   "name": "@emilia-tan/decorators",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,12 +11,24 @@
     "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}' || echo 'No files to format.'"
   },
   "dependencies": {
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.10.0",
+    "rxjs": "^7.8.2",
+    "@emilia-tan/core": "workspace:^",
+    "@emilia-tan/types": "workspace:^"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
     "eslint": "^9.25.1",
     "prettier": "^3.5.3",
     "@types/node": "^22.15.2"
+  },
+  "optionalDependencies": {
+    "@emilia-tan/media": "workspace:^",
+    "@emilia-tan/utlis": "workspace:^",
+    "@emilia-tan/logger": "workspace:^",
+    "@emilia-tan/discord": "workspace:^",
+    "@emilia-tan/database": "workspace:^",
+    "@emilia-tan/network": "workspace:^"
   }
 }

@@ -48,8 +48,8 @@ oldCode/         # Archived legacy code (read-only)
 
 | Status | Milestone                           | Description                                |
 | :----: | ----------------------------------- | ------------------------------------------ |
-|   🟡    | Core structure setup                | Initialize monorepo structure and configs  |
-|   ⬜    | Logging service (Pino + decorators) | Create a shared logging module             |
+|   ✅    | Core structure setup                | Initialize monorepo structure and configs  |
+|   🟡    | Logging service (Pino + decorators) | Create a shared logging module             |
 |   ⬜    | Database integration                | Setup Prisma, migrations, and seeders      |
 |   ⬜    | Bot Client Initialization           | Basic Discord client with command handling |
 |   ⬜    | Command / Event architecture        | Abstract classes, decorators, loaders      |
@@ -65,6 +65,52 @@ oldCode/         # Archived legacy code (read-only)
 - New technologies or refactoring ideas may be added based on development needs.
 - All scripts and automation will target developer friendliness and scalability.
 - Contributions to the roadmap (ideas, improvements) are welcome!
+
+---
+
+## 🚀 Updated repository structure for stage 2
+
+```
+Emilia-tan-bot/            # Main root
+├── apps/                  # Main applications (bot and others)
+│   └── emilia-bot/        # Main bot
+├── packages/              # Shared packages
+│   ├── core/              # Core logic, DI container
+│   ├── decorators/        # Decorators for commands, injections, etc.
+│   ├── types/             # Shared types
+│   ├── logger/            # Logging (Pino + decorators)
+│   ├── utils/             # Utilities (formatters, validators)
+│   └── network/           # Network utilities, e.g. for API
+├── infrastructure/        # Database schemas, migrations, and services
+│   └── prisma/            #  Prisma settings, migrations, seed
+├── sandbox/               # Experimental prototypes and isolated tests
+├── tools/                 # Development scripts and utilities (CLI)
+├── oldCode/               # Archived old code
+├── docs/                  # Documentation
+└── .github/               # GitHub configurations (CI/CD, templates, etc.)
+```
+
+---
+
+## 🚀 Updated goals for stage 2
+
+1. **Modules:**
+   - Complete the main `BotCore` class.
+   - Implement command and event handling using classes and decorators.
+   - Create interfaces for logging, configs, utilities.
+
+   
+2. **CI/CD:**
+   - Add tests for command handler and main utilities.
+   - Set up integration with CI (GitHub Actions for automated testing, linting, build).
+
+3. **Logic implementation:**
+   - Logging using Pino, wrappers, and decorators.
+   - Implement database connection (Prisma).
+   - Set up interfaces for command and event handling.
+
+---
+Let's create something amazing together! 🚀
 
 ---
 

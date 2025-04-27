@@ -52,6 +52,7 @@ export default [
       indent: "off",
       "prettier/prettier": "error",
       "prettier/prettier/trailingComma": ["error", "es5"],
+      "prettier/prettier/singleQuote": ["error", false],
       "comma-dangle": ["error", "only-multiline"],
       "@typescript-eslint/no-explicit-any": "off", // You... you know what you are doing
       "@typescript-eslint/no-unsafe-call": "off",
