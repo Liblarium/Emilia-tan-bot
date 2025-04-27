@@ -2,63 +2,21 @@
   "jsc": {
     "parser": {
       "syntax": "typescript",
-      "decorators": true,
-      "metadata": true,
-      "dynamicImport": true
+      "tsx": true,
+      "decorators": true
     },
     "transform": {
       "decoratorMetadata": true
     },
-    "target": "esnext",
-    "baseUrl": "./",
-    "paths": {
-      "@core/*": [
-        "packages/core/src/*"
-      ],
-      "@config/*": [
-        "packages/core/src/config/*"
-      ],
-      "@core/interfaces/*": [
-        "packages/core/src/core/interfaces/*"
-      ],
-      "@core/providers/*": [
-        "packages/core/src/core/providers/*"
-      ],
-      "@event/*": [
-        "packages/core/src/event/*"
-      ],
-      "@modules/*": [
-        "packages/core/src/modules/*"
-      ],
-      "@handlers/*": [
-        "packages/core/src/modules/handlers/*"
-      ],
-      "@interaction/*": [
-        "packages/core/src/modules/interaction/*"
-      ],
-      "@log/*": [
-        "packages/core/src/modules/log/*"
-      ],
-      "@type": [
-        "packages/types/index.d.ts"
-      ],
-      "@type/*": [
-        "packages/types/*"
-      ]
-    },
-    "module": {
-      "type": "es6"
-    },
-    "sourceMaps": true,
-    "exclude": [
-      "node_modules",
-      "dist",
-      "oldCode",
-      "sandbox",
-      "prisma"
-    ],
-    "include": [
-      "src/**/*"
-    ]
-  }
+    "target": "es2022",
+    "loose": true,
+    "externalHelpers": true
+  },
+  "module": {
+    "type": "es6",
+    "strict": true,
+    "noInterop": false
+  },
+  "sourceMaps": true,
+  "minify": false
 }
