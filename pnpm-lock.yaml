@@ -117,6 +117,22 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
+    optionalDependencies:
+      '@emilia-tan/database':
+        specifier: workspace:^
+        version: link:../../packages/database
+      '@emilia-tan/discord':
+        specifier: workspace:^
+        version: link:../../packages/discord
+      '@emilia-tan/logger':
+        specifier: workspace:^
+        version: link:../../packages/logger
+      '@emilia-tan/media':
+        specifier: workspace:^
+        version: link:../../packages/media
+      '@emilia-tan/network':
+        specifier: workspace:^
+        version: link:../../packages/network
 
   packages/core:
     dependencies:
@@ -151,6 +167,22 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
+    optionalDependencies:
+      '@emilia-tan/database':
+        specifier: workspace:^
+        version: link:../database
+      '@emilia-tan/discord':
+        specifier: workspace:^
+        version: link:../discord
+      '@emilia-tan/logger':
+        specifier: workspace:^
+        version: link:../logger
+      '@emilia-tan/media':
+        specifier: workspace:^
+        version: link:../media
+      '@emilia-tan/network':
+        specifier: workspace:^
+        version: link:../network
 
   packages/database:
     dependencies:
@@ -182,6 +214,28 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
+    optionalDependencies:
+      '@emilia-tan/core':
+        specifier: workspace:^
+        version: link:../core
+      '@emilia-tan/decorators':
+        specifier: workspace:^
+        version: link:../decorators
+      '@emilia-tan/discord':
+        specifier: workspace:^
+        version: link:../discord
+      '@emilia-tan/logger':
+        specifier: workspace:^
+        version: link:../logger
+      '@emilia-tan/media':
+        specifier: workspace:^
+        version: link:../media
+      '@emilia-tan/network':
+        specifier: workspace:^
+        version: link:../network
+      '@emilia-tan/types':
+        specifier: workspace:^
+        version: link:../types
 
   packages/decorators:
     dependencies:
@@ -213,18 +267,25 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
+    optionalDependencies:
+      '@emilia-tan/database':
+        specifier: workspace:^
+        version: link:../database
+      '@emilia-tan/discord':
+        specifier: workspace:^
+        version: link:../discord
+      '@emilia-tan/logger':
+        specifier: workspace:^
+        version: link:../logger
+      '@emilia-tan/media':
+        specifier: workspace:^
+        version: link:../media
+      '@emilia-tan/network':
+        specifier: workspace:^
+        version: link:../network
 
   packages/discord:
     dependencies:
-      '@emilia-tan/core':
-        specifier: workspace:^
-        version: link:../core
-      '@emilia-tan/decorators':
-        specifier: workspace:^
-        version: link:../decorators
-      '@emilia-tan/types':
-        specifier: workspace:^
-        version: link:../types
       discord.js:
         specifier: ^14.19.1
         version: 14.19.1
@@ -241,18 +302,31 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
-
-  packages/logger:
-    dependencies:
+    optionalDependencies:
       '@emilia-tan/core':
         specifier: workspace:^
         version: link:../core
+      '@emilia-tan/database':
+        specifier: workspace:^
+        version: link:../database
       '@emilia-tan/decorators':
         specifier: workspace:^
         version: link:../decorators
+      '@emilia-tan/logger':
+        specifier: workspace:^
+        version: link:../logger
+      '@emilia-tan/media':
+        specifier: workspace:^
+        version: link:../media
+      '@emilia-tan/network':
+        specifier: workspace:^
+        version: link:../network
       '@emilia-tan/types':
         specifier: workspace:^
         version: link:../types
+
+  packages/logger:
+    dependencies:
       chalk:
         specifier: ^5.4.1
         version: 5.4.1
@@ -281,18 +355,28 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
-
-  packages/media:
-    dependencies:
+    optionalDependencies:
       '@emilia-tan/core':
         specifier: workspace:^
         version: link:../core
+      '@emilia-tan/database':
+        specifier: workspace:^
+        version: link:../database
       '@emilia-tan/decorators':
         specifier: workspace:^
         version: link:../decorators
+      '@emilia-tan/discord':
+        specifier: workspace:^
+        version: link:../discord
+      '@emilia-tan/media':
+        specifier: workspace:^
+        version: link:../media
       '@emilia-tan/types':
         specifier: workspace:^
         version: link:../types
+
+  packages/media:
+    dependencies:
       '@napi-rs/canvas':
         specifier: ^0.1.69
         version: 0.1.69
@@ -315,18 +399,31 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
-
-  packages/network:
-    dependencies:
+    optionalDependencies:
       '@emilia-tan/core':
         specifier: workspace:^
         version: link:../core
+      '@emilia-tan/database':
+        specifier: workspace:^
+        version: link:../database
       '@emilia-tan/decorators':
         specifier: workspace:^
         version: link:../decorators
+      '@emilia-tan/discord':
+        specifier: workspace:^
+        version: link:../discord
+      '@emilia-tan/logger':
+        specifier: workspace:^
+        version: link:../logger
+      '@emilia-tan/network':
+        specifier: workspace:^
+        version: link:../network
       '@emilia-tan/types':
         specifier: workspace:^
         version: link:../types
+
+  packages/network:
+    dependencies:
       axios:
         specifier: ^1.9.0
         version: 1.9.0
@@ -346,15 +443,30 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
-
-  packages/types:
-    dependencies:
+    optionalDependencies:
       '@emilia-tan/core':
         specifier: workspace:^
         version: link:../core
+      '@emilia-tan/database':
+        specifier: workspace:^
+        version: link:../database
       '@emilia-tan/decorators':
         specifier: workspace:^
         version: link:../decorators
+      '@emilia-tan/discord':
+        specifier: workspace:^
+        version: link:../discord
+      '@emilia-tan/logger':
+        specifier: workspace:^
+        version: link:../logger
+      '@emilia-tan/media':
+        specifier: workspace:^
+        version: link:../media
+      '@emilia-tan/types':
+        specifier: workspace:^
+        version: link:../types
+
+  packages/types:
     devDependencies:
       '@types/node':
         specifier: ^22.15.2
@@ -368,12 +480,37 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
+    optionalDependencies:
+      '@emilia-tan/core':
+        specifier: workspace:^
+        version: link:../core
+      '@emilia-tan/database':
+        specifier: workspace:^
+        version: link:../database
+      '@emilia-tan/decorators':
+        specifier: workspace:^
+        version: link:../decorators
+      '@emilia-tan/discord':
+        specifier: workspace:^
+        version: link:../discord
+      '@emilia-tan/logger':
+        specifier: workspace:^
+        version: link:../logger
+      '@emilia-tan/media':
+        specifier: workspace:^
+        version: link:../media
+      '@emilia-tan/network':
+        specifier: workspace:^
+        version: link:../network
 
   packages/utils:
     dependencies:
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
       tsyringe:
         specifier: ^4.10.0
         version: 4.10.0
@@ -390,6 +527,31 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
+    optionalDependencies:
+      '@emilia-tan/core':
+        specifier: workspace:^
+        version: link:../core
+      '@emilia-tan/database':
+        specifier: workspace:^
+        version: link:../database
+      '@emilia-tan/decorators':
+        specifier: workspace:^
+        version: link:../decorators
+      '@emilia-tan/discord':
+        specifier: workspace:^
+        version: link:../discord
+      '@emilia-tan/logger':
+        specifier: workspace:^
+        version: link:../logger
+      '@emilia-tan/media':
+        specifier: workspace:^
+        version: link:../media
+      '@emilia-tan/network':
+        specifier: workspace:^
+        version: link:../network
+      '@emilia-tan/types':
+        specifier: workspace:^
+        version: link:../types
 
 packages:
 
