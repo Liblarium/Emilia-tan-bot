@@ -45,5 +45,8 @@
     "**/build": true,
     "**/.turbo": true,
     "**/.next": true
+  },
+  "yaml.schemas": {
+    "https://json.schemastore.org/pnpm-workspace.json": "file:///c%3A/Users/Miia/F/My_Bots_in_Discord/A_group_bots/Emilia-tan-bot-ts-v14/pnpm-workspace.yaml"
   }
 }

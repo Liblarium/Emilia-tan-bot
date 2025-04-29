@@ -1,35 +1,34 @@
 {
   "name": "@emilia-tan/core",
-  "version": "0.1.0", 
+  "version": "1.0.0", 
   "private": true,
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "swc src -d dist && pnpm run typecheck",
+    "build:module": "swc src -d dist --config-file ../../.swcrc",
+    "build": "pnpm run build:module && pnpm run typecheck",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts || echo 'No files to lint.'",
     "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}' || echo 'No files to format.'"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
   },
   "dependencies": {
     "tsyringe": "^4.10.0",
     "discord.js": "^14.19.1",
     "dotenv": "^16.5.0",
     "reflect-metadata": "^0.2.2",
-    "@emilia-tan/decorators": "workspace:^",
-    "@emilia-tan/types": "workspace:^"
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
     "eslint": "^9.25.1",
     "prettier": "^3.5.3",
     "@types/node": "^22.15.2"
-  },
-  "optionalDependencies": {
-    "@emilia-tan/media": "workspace:^",
-    "@emilia-tan/utlis": "workspace:^",
-    "@emilia-tan/logger": "workspace:^",
-    "@emilia-tan/discord": "workspace:^",
-    "@emilia-tan/database": "workspace:^",
-    "@emilia-tan/network": "workspace:^"
   }
 }

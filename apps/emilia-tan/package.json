@@ -1,7 +1,8 @@
 {
   "name": "@emilia-tan/bot",
-  "version": "13.0.1",
+  "version": "15.0.0",
   "private": true,
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -20,8 +21,7 @@
     "rxjs": "^7.8.2",
     "reflect-metadata": "^0.2.2",
     "@emilia-tan/core": "workspace:^",
-    "@emilia-tan/types": "workspace:^",
-    "@emilia-tan/decorators": "workspace:^"
+    "@emilia-tan/types": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^22.15.2",
@@ -34,11 +34,5 @@
     "@biomejs/biome": "^1.9.4",
     "eslint-config-biome": "^1.9.4"
   },
-  "optionalDependencies": {
-    "@emilia-tan/logger": "workspace:^",
-    "@emilia-tan/discord": "workspace:^",
-    "@emilia-tan/media": "workspace:^",
-    "@emilia-tan/database": "workspace:^",
-    "@emilia-tan/network": "workspace:^"
-  }
+  "optionalDependencies": {}
 }

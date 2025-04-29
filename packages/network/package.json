@@ -1,7 +1,8 @@
 {
   "name": "@emilia-tan/network",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -9,6 +10,11 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts || echo 'No files to lint.'",
     "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}' || echo 'No files to format.'"
+  },"exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
   },
   "dependencies": {
     "axios": "^1.9.0",
@@ -19,15 +25,5 @@
     "eslint": "^9.25.1",
     "prettier": "^3.5.3",
     "@types/node": "^22.15.2"
-  },
-  "optionalDependencies": {
-    "@emilia-tan/core": "workspace:^",
-    "@emilia-tan/types": "workspace:^",
-    "@emilia-tan/decorators": "workspace:^",
-    "@emilia-tan/media": "workspace:^",
-    "@emilia-tan/utlis": "workspace:^",
-    "@emilia-tan/logger": "workspace:^",
-    "@emilia-tan/discord": "workspace:^",
-    "@emilia-tan/database": "workspace:^"
   }
 }

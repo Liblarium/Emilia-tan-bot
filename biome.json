@@ -1,9 +1,9 @@
 {
   "$schema": "https://biomejs.dev/schemas/latest/schema.json",
   "vcs": {
-    "enabled": false,
+    "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": false
+    "useIgnoreFile": true
   },
   "files": {
     "ignoreUnknown": true,
@@ -14,14 +14,15 @@
       "package.json",
       "pnpm-lock.yaml",
       "node_modules/*",
-      "*/**/node_modules/*",
+      "apps/**/node_modules/*",
+      "packages/**/node_modules/*",
       "oldCode/*",
       "biome.json"
     ],
     "include": [
-      "apps/*/src/**/*",
-      "packages/*/src/**/*",
-      "*/*/src/**/*",
+      "apps/**/src/**/*",
+      "packages/**/src/**/*",
+      "*/src/**/*",
       "sandbox/*",
       "*.md",
       "docs/**/*.md"
@@ -34,6 +35,26 @@
   },
   "linter": {
     "enabled": true,
+    "ignore": [
+      "dist/*",
+      "sandbox/*.js",
+      "infrastructure/*",
+      "package.json",
+      "pnpm-lock.yaml",
+      "node_modules/*",
+      "apps/**/node_modules/*",
+      "packages/**/node_modules/*",
+      "oldCode/*",
+      "biome.json"
+    ],
+    "include": [
+      "apps/**/src/**/*",
+      "packages/**/src/**/*",
+      "*/src/**/*",
+      "sandbox/*",
+      "*.md",
+      "docs/**/*.md"
+    ],
     "rules": {
       "recommended": true,
       "complexity": {
@@ -62,6 +83,27 @@
   },
   "formatter": {
     "enabled": true,
+    "ignore": [
+      "dist/*",
+      "sandbox/*.js",
+      "infrastructure/*",
+      "package.json",
+      "pnpm-lock.yaml",
+      "node_modules/*",
+      "apps/**/node_modules/*",
+      "packages/**/node_modules/*",
+      "*/node_modules/*",
+      "oldCode/*",
+      "biome.json"
+    ],
+    "include": [
+      "apps/**/src/**/*",
+      "packages/**/src/**/*",
+      "*/src/**/*",
+      "sandbox/*",
+      "*.md",
+      "docs/**/*.md"
+    ],
     "useEditorconfig": true,
     "indentStyle": "space",
     "lineEnding": "crlf",

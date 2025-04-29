@@ -36,7 +36,7 @@ export default [
   prettier,
   biome,
   {
-    files: ["apps/*/src/**/*.ts", "packages/*/src/**/*.ts", "*/src/**/*.ts"],
+    files: ["apps/**/src/**/*.ts", "packages/**/src/**/*.ts", "*/src/**/*.ts"],
     languageOptions: {
       ecmaVersion: 2025,
       globals: {
@@ -45,14 +45,24 @@ export default [
         ...globals.node,
         ...globals.builtin,
         ...globals.es2025,
+        "NodeJS": true,
       },
       parser: tsparser,
     },
     rules: {
       indent: "off",
-      "prettier/prettier": "error",
-      "prettier/prettier/trailingComma": ["error", "es5"],
-      "prettier/prettier/singleQuote": ["error", false],
+      "prettier/prettier": ["error", {
+        "semi": true,
+        "singleQuote": false,
+        "trailingComma": "es5",
+        "bracketSpacing": true,
+        "arrowParens": "always",
+        "useTabs": false,
+        "tabWidth": 2,
+        "printWidth": 80,
+        "endOfLine": "auto",
+        "quoteProps": "as-needed"
+      }],
       "comma-dangle": ["error", "only-multiline"],
       "@typescript-eslint/no-explicit-any": "off", // You... you know what you are doing
       "@typescript-eslint/no-unsafe-call": "off",

@@ -2,6 +2,7 @@
   "name": "emilia-tan-bot-monorepo",
   "private": true,
   "packageManager": "pnpm@10.9.0",
+  "type": "module",
   "scripts": {
     "dev": "pnpm -r run dev",
     "build": "pnpm run build:packages && pnpm run build:bot",
@@ -16,10 +17,11 @@
     "docs": "pnpm --filter @emilia-tan/bot run docs",
     "typecheck": "pnpm -r run typecheck",
     "new:package": "bash ./tools/scripts/new-package.sh",
-    "new:package:win": "cmd /c tools\\scripts\\new-package.bat"
+    "new:package:win": "cmd /c tools\\scripts\\new-package.bat",
+    "diff": "git diff > all_changes.diff"
   },
   "lint-staged": {
-    "**/*.{ts,tsx,js,jsx,json,yaml,yml,md}": [
+    "**/*.{ts,js,yaml,yml,md}": [
       "biome format --write",
       "eslint --fix"
     ]
@@ -27,8 +29,9 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@eslint/js": "^9.25.1",
+    "@swc-node/register": "^1.10.10",
     "@swc/cli": "^0.7.3",
-    "@swc/core": "^1.11.22",
+    "@swc/core": "^1.11.21",
     "@types/node": "^22.15.2",
     "@typescript-eslint/eslint-plugin": "^8.31.0",
     "@typescript-eslint/parser": "^8.31.0",

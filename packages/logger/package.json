@@ -1,7 +1,8 @@
 {
   "name": "@emilia-tan/logger",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -10,27 +11,27 @@
     "lint": "eslint src/**/*.ts || echo 'No files to lint.'",
     "format": "prettier --write src/**/*.{ts,js,tsx,jsx} || echo 'No files to format.'",
     "test": "echo \"No tests yet\""
+  },"exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
   },
   "dependencies": {
+    "@emilia-tan/utils": "workspace:*",
+    "chalk": "^5.4.1",
+    "glob": "^11.0.2",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
-    "glob": "^11.0.2",
-    "chalk": "^5.4.1",
-    "reflect-metadata": "^0.2.2"
+    "pino-roll": "^3.1.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
+    "@emilia-tan/types": "workspace:*",
+    "@types/node": "^22.15.2",
     "eslint": "^9.25.1",
     "prettier": "^3.5.3",
-    "@types/node": "^22.15.2"
-  },
-  "optionalDependencies": {
-    "@emilia-tan/core": "workspace:^",
-    "@emilia-tan/types": "workspace:^",
-    "@emilia-tan/decorators": "workspace:^",
-    "@emilia-tan/media": "workspace:^",
-    "@emilia-tan/utlis": "workspace:^",
-    "@emilia-tan/discord": "workspace:^",
-    "@emilia-tan/database": "workspace:^"
+    "typescript": "^5.8.3"
   }
 }

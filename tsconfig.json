@@ -1,15 +1,5 @@
 {
   "extends": "./tsconfig.base.json",
   "files": [],
-  "references": [
-    { "path": "./packages/core" },
-    { "path": "./packages/database" },
-    { "path": "./packages/decorators" },
-    { "path": "./packages/discord" },
-    { "path": "./packages/logger" },
-    { "path": "./packages/media" },
-    { "path": "./packages/network" },
-    { "path": "./packages/types" },
-    { "path": "./packages/utils" }
-  ]
+  "include": []
 }

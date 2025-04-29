@@ -1,9 +1,5 @@
-import { Injectable } from "@emilia-tan/decorators/src/barrel";
-import * as dotenv from "dotenv";
+import { Injectable } from "../decorators/barrel";
 import type { ConfigService } from "../interfaces/config";
-
-// Loading configurations from .env
-dotenv.config();
 
 @Injectable()
 export class ConfigServiceImpl implements ConfigService {
