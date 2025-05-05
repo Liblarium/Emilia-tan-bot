@@ -1,4 +1,4 @@
-import { container } from "tsyringe";
+import { container, injectable } from "tsyringe";
 import type { Constructor } from "../types";
 
 /**
@@ -11,6 +11,7 @@ import type { Constructor } from "../types";
  */
 export function Injectable<T>() {
   return (target: Constructor<T>) => {
+    injectable<T>()(target);
     container.register<T>(target, { useClass: target });
   };
 }

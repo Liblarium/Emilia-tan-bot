@@ -1,4 +1,4 @@
-import { type InjectionToken, container } from "tsyringe";
+import { type InjectionToken, container, injectable } from "tsyringe";
 import type { Constructor } from "../types";
 
 /**
@@ -14,6 +14,7 @@ import type { Constructor } from "../types";
  */
 export function Singleton<T>(token?: InjectionToken<T>, debug?: boolean) {
   return (target: Constructor<T>) => {
+    injectable<T>()(target);
     container.registerSingleton<T>(
       typeof token === "string" ? token : target,
       target
