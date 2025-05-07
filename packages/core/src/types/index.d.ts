@@ -1,9 +1,10 @@
 import type { SlashCommandBuilder } from "discord.js";
+import type { InjectionToken } from "tsyringe";
 
 /**
  * Represents a class constructor
  */
-export  type Constructor<T> = new (...args: any[]) => T;
+export  type Constructor<T> = new (...args: unknown[]) => T;
 
 export type CommandType = "command" | "slash" | "both";
 
@@ -146,3 +147,74 @@ export interface HelpCommandOptions {
    */
   examples: string[];
 }
+
+/**
+ * Type for the options object passed to the Module decorator
+ */
+export type ModuleServices = {
+  /**
+   * The service class to register
+   */
+  service: ServiceRegistration;
+  /**
+   * The scope of the service
+   *
+   * - "singleton": The service will be registered as a singleton in the container
+   * - "transient": The service will be registered as a transient in the container
+   *
+   * @default "singleton"
+   */
+  scope?: "singleton" | "transient";
+};
+
+/**
+ * Type for the service registration
+ */
+export type ServiceRegistration = {
+  /**
+   * The token representing the service
+   *
+   * If not provided, decorator use provider class as token
+   */
+  token?: InjectionToken<unknown>;
+  /**
+   * The service class
+   */
+  provider: Constructor<unknown>;
+};
+
+/**
+ * Type for the options object passed to the Module decorator
+ */
+export type ModuleOptions = {
+  /**
+   * The modules to import
+   */
+  imports?: InjectionToken<unknown>[];
+  /**
+   * The services to register
+   *
+   * Each service is an object with the following properties:
+   * - {Constructor<unknown>} service: The service class to register
+   * - {"singleton" | "transient"} scope (optional): The scope of the service
+   */
+  services?: ModuleServices[];
+  /**
+   * Register the module in the container
+   */
+  registerModule?: boolean;
+  /**
+   * Enable debug mode
+   *
+   * If true, the decorator will print logs (only) to the console
+   *
+   * @default false
+   */
+  debug?: boolean;
+};
+
+export type FullInjectionToken<T = unknown> = 
+  | InjectionToken<T>
+  | Constructor<T>
+  | string
+  | symbol;

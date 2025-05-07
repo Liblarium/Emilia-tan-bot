@@ -12,6 +12,6 @@ import type { Constructor } from "../types";
 export function Injectable<T>() {
   return (target: Constructor<T>) => {
     injectable<T>()(target);
-    container.register<T>(target, { useClass: target });
+    //container.register<T>(target, { useClass: target }); // Register as Module
   };
 }

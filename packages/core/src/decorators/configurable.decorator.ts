@@ -14,6 +14,6 @@ export function Configurable<T>(envPrefix: string, defaultValue = "UNDEFINED") {
     });
 
     Reflect.defineMetadata("configurable", envConfig, target);
-    container.register<T>(target, { useClass: target });
+    //container.register<T>(target, { useClass: target }); // Register as Module
   };
 }

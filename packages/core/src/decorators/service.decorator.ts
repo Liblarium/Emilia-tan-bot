@@ -24,6 +24,6 @@ import type { Constructor } from "../types";
 export function Service<T>() {
   return (target: Constructor<T>) => {
     Reflect.defineMetadata("service", true, target); // We mark as service
-    container.register<T>(target, { useClass: target }); // Automatically add to container
+    // container.register<T>(target, { useClass: target }); // Register as Module
   };
 }

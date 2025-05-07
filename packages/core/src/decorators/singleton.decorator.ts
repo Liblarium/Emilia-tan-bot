@@ -15,10 +15,11 @@ import type { Constructor } from "../types";
 export function Singleton<T>(token?: InjectionToken<T>, debug?: boolean) {
   return (target: Constructor<T>) => {
     injectable<T>()(target);
-    container.registerSingleton<T>(
+    // Register as Module
+    /*container.registerSingleton<T>(
       typeof token === "string" ? token : target,
       target
-    );
+    );*/
 
     if (debug)
       console.log(`Singleton registered: ${token?.toString() || target.name}`);
