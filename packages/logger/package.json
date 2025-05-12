@@ -29,8 +29,8 @@
   },
   "devDependencies": {
     "@emilia-tan/types": "workspace:*",
-    "@types/node": "^22.15.2",
-    "eslint": "^9.25.1",
+    "@types/node": "^22.15.17",
+    "eslint": "^9.26.0",
     "prettier": "^3.5.3",
     "typescript": "^5.8.3"
   }

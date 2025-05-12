@@ -74,8 +74,8 @@ oldCode
 # Prisma pgdata (local database)
 infrastructure/pgdata/*
 
-# Optional migrations (careful)
-# infrastructure/prisma/migrations/
+# Hidden files
+*.t.*
 
 # Test results
 apps/**/test-results/

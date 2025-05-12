@@ -17,14 +17,14 @@
     }
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.69",
+    "@napi-rs/canvas": "^0.1.70",
     "sharp": "^0.34.1",
     "@resvg/resvg-js": "^2.6.2"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
-    "eslint": "^9.25.1",
+    "eslint": "^9.26.0",
     "prettier": "^3.5.3",
-    "@types/node": "^22.15.2"
+    "@types/node": "^22.15.17"
   }
 }

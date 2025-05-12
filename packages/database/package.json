@@ -17,16 +17,16 @@
     }
   },
   "dependencies": {
-    "prisma": "^6.6.0",
+    "prisma": "^6.7.0",
     "pg": "^8.15.6",
-    "mysql2": "^3.14.0",
+    "mysql2": "^3.14.1",
     "mongodb": "^6.16.0"
   },
   "devDependencies": {
-    "@typegoose/typegoose": "^12.14.0",
+    "@typegoose/typegoose": "^12.15.1",
     "typescript": "^5.8.3",
-    "eslint": "^9.25.1",
+    "eslint": "^9.26.0",
     "prettier": "^3.5.3",
-    "@types/node": "^22.15.2"
+    "@types/node": "^22.15.17"
   }
 }

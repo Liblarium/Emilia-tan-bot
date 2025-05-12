@@ -16,6 +16,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Send notification
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d '{
+            "content": "**Новый коммит в репозитории!**",
+            "embeds": [{
+              "title": "${{ github.repository }}",
+              "description": "Коммит: ${{ github.event.head_commit.message }}",
+              "url": "${{ github.event.head_commit.url }}",
+              "color": 16711680
+            }]
+          }' ${{ secrets.DISCORD_WEBHOOK }}
+
+
       - name: Checkout code
         uses: actions/checkout@v3
 

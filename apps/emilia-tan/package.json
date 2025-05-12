@@ -15,7 +15,7 @@
     "test": "echo \"No tests yet\""
   },
   "dependencies": {
-    "discord.js": "^14.19.1",
+    "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
     "tsyringe": "^4.10.0",
     "rxjs": "^7.8.2",
@@ -24,13 +24,13 @@
     "@emilia-tan/types": "workspace:^"
   },
   "devDependencies": {
-    "@types/node": "^22.15.2",
+    "@types/node": "^22.15.17",
     "typescript": "^5.8.3",
-    "eslint": "^9.25.1",
+    "eslint": "^9.26.0",
     "prettier": "^3.5.3",
-    "typedoc": "^0.28.3",
-    "eslint-config-prettier": "^10.1.2",
-    "eslint-plugin-prettier": "^5.2.6",
+    "typedoc": "^0.28.4",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
     "@biomejs/biome": "^1.9.4",
     "eslint-config-biome": "^1.9.4"
   },
