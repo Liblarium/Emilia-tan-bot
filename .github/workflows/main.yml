@@ -44,10 +44,6 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Add "pnpm" in PATH
-        run: echo "PATH=$(npm root -g)\pnpm:$env:Path" >> $GITHUB_ENV
-        shell: pwsh
-
       - name: Check PATH and pnpm
         run: |
           echo $env:Path
