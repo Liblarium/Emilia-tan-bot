@@ -10,6 +10,9 @@ on:
       - main
       - dev
   workflow_dispatch:
+env:
+  PNPM_STORE_PATH: "AppData\\Local\\pnpm-store"
+  USERNAME: ""
 
 jobs:
   lint:
@@ -32,18 +35,26 @@ jobs:
             }]
           }' ${{ secrets.DISCORD_WEBHOOK }}
 
+      - name: Update USERNAME on env
+        run: echo "USERNAME=$env:USERNAME" >> $GITHUB_ENV
+
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Cache pnpm modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
+      - name: Add "pnpm" in PATH
+        run: |
+          export PATH=$(npm root -g)/pnpm:$PATH
+          pnpm install
+
+      - name: Cache usage 
+        uses: actions/cache@v3 
+        with: 
+          path: "${{ env.USERNAME }}\\${{ env.PNPM_STORE_PATH }}" 
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }} 
+          restore-keys: | 
             ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
