@@ -1,5 +1,7 @@
 # Emilia-tan-bot — Roadmap
 
+~~may change. The roadmap is not very accurate, because I myself do not know how to put it together correctly (I did not put it together)~~
+
 Welcome to the development roadmap for **Emilia-tan-bot**!  
 This document outlines the planned structure, goals, and important milestones for the project.
 
