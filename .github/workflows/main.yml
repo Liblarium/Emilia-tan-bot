@@ -37,6 +37,9 @@ jobs:
 
       - name: Update USERNAME on env
         run: echo "USERNAME=$env:USERNAME" >> $GITHUB_ENV
+      
+      - name: USERNAME debug
+        run: echo ${{ env.USERNAME }}
 
       - name: Checkout code
         uses: actions/checkout@v3
