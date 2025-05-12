@@ -12,7 +12,6 @@ on:
   workflow_dispatch:
 env:
   PNPM_STORE_PATH: "AppData\\Local\\pnpm-store"
-  USERNAME: ""
 
 jobs:
   lint:
@@ -35,12 +34,6 @@ jobs:
             }]
           }' ${{ secrets.DISCORD_WEBHOOK }}
 
-      - name: Update USERNAME on env
-        run: echo "USERNAME=$env:USERNAME" >> $GITHUB_ENV
-      
-      - name: USERNAME debug
-        run: echo "${{ env.USERNAME }}"
-
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -59,7 +52,7 @@ jobs:
       - name: Cache usage 
         uses: actions/cache@v3 
         with: 
-          path: "${{ env.USERNAME }}\\${{ env.PNPM_STORE_PATH }}" 
+          path: "${{ secrets.USERNAME }}\\${{ env.PNPM_STORE_PATH }}" 
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }} 
           restore-keys: | 
             ${{ runner.os }}-pnpm-
