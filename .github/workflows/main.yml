@@ -10,8 +10,6 @@ on:
       - main
       - dev
   workflow_dispatch:
-env:
-  PNPM_STORE_PATH: "AppData\\Local\\pnpm-store"
 
 jobs:
   lint:
@@ -40,6 +38,15 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
+      - name: Check Username
+        run: whoami
+        shell: pwsh
+
+      - name: Add pnpm in PATH
+        run: echo "PATH=$env:Path;C:\Users\${{ secrets.USERNAME }}\AppData\Roaming\pnpm" >> $GITHUB_ENV
+        shell: pwsh
+
+
       - name: Check PATH and pnpm
         run: |
           echo $env:Path
@@ -52,7 +59,7 @@ jobs:
       - name: Cache usage 
         uses: actions/cache@v3 
         with: 
-          path: "${{ secrets.USERNAME }}\\${{ env.PNPM_STORE_PATH }}" 
+          path: "${{ secrets.USERNAME }}\\AppData\\Roaming\\pnpm" 
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }} 
           restore-keys: | 
             ${{ runner.os }}-pnpm-
