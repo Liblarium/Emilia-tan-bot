@@ -45,10 +45,18 @@ jobs:
         run: npm install -g pnpm
 
       - name: Add "pnpm" in PATH
-        run: |
-          export PATH=$(npm root -g)/pnpm:$PATH
-          pnpm install
+        run: echo "PATH=$(npm root -g)\pnpm:$env:Path" >> $GITHUB_ENV
+        shell: pwsh
 
+      - name: Check PATH and pnpm
+        run: |
+          echo $env:Path
+          pnpm --version
+        shell: pwsh
+
+      - name: Install dependencies
+        run: pnpm install
+          
       - name: Cache usage 
         uses: actions/cache@v3 
         with: 
