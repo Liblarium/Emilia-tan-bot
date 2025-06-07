@@ -16,9 +16,6 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Debug timestamp
-        run: echo "${{github.event.head_commit.timestamp}}"
-
       - name: Send notification
         run: |
           curl -X POST -H "Content-Type: application/json" -d '{
