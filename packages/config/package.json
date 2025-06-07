@@ -1,31 +1,30 @@
 {
-  "name": "@emilia-tan/media",
-  "version": "0.0.4",
+  "name": "@emilia-tan/config",
+  "version": "1.0.0", 
   "private": true,
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "swc src -d dist && pnpm run typecheck",
+    "build:module": "swc src -d dist --config-file ../../.swcrc",
+    "build": "pnpm run build:module && pnpm run typecheck",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts || echo 'No files to lint.'",
-    "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}' || echo 'No files to format.'",
-    "upd-deps": "ncu -u"
-  },"exports": {
+    "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}' || echo 'No files to format.'"
+  },
+  "exports": {
     ".": {
       "import": "./src/index.ts",
       "types": "./src/index.ts"
     }
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.70",
-    "sharp": "^0.34.2",
-    "@resvg/resvg-js": "^2.6.2"
+    "dotenv": "^16.5.0"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
-    "eslint": "^9.28.0",
+    "eslint": "^9.26.0",
     "prettier": "^3.5.3",
-    "@types/node": "^22.15.30"
+    "@types/node": "^22.15.17"
   }
 }

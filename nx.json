@@ -1,0 +1,51 @@
+{
+  "npmScope": "emilia-tan",
+  "affected": {
+    "defaultBase": "main"
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/workspace/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "test", "lint", "e2e"]
+      }
+    }
+  },
+  "plugins": [{
+    "@nx/eslint/plugin": {
+      "options": { "targetName": "lint" }
+    }
+  }],
+  "projects": {
+    "emilia-tan": {
+      "tags": []
+    },
+    "config": {
+      "tags": []
+    },
+    "core": {
+      "tags": []
+    },
+    "database": {
+      "tags": []
+    },
+    "discord": {
+      "tags": []
+    },
+    "logger": {
+      "tags": []
+    },
+    "media": {
+      "tags": []
+    },
+    "network": {
+      "tags": []
+    },
+    "types": {
+      "tags": []
+    },
+    "utils": {
+      "tags": []
+    }
+  }
+}

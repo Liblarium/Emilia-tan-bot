@@ -64,6 +64,9 @@
         "noUselessConstructor": "off",
         "noBannedTypes": "off"
       },
+      "correctness": {
+        "noVoidTypeReturn": "off"
+      },
       "style": {
         "noCommaOperator": "off",
         "noParameterAssign": "off",

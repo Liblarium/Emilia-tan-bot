@@ -1,18 +1,6 @@
 import "reflect-metadata";
 import "dotenv/config";
-import { container } from "tsyringe";
-import { BotCore } from "./botCore";
-import { ConfigServiceImpl } from "./services/config.service";
+import { Container } from "inversify";
 
-// Make sure ConfigServiceImpl is registered
-// (the Injectable decorator has already done container.register(ConfigServiceImpl))
-container.resolve(ConfigServiceImpl);
-
-// Register the BotCore itself
-container.register(BotCore, { useClass: BotCore });
-
-// Create an instance and start
-const bot = container.resolve(BotCore);
-bot.start();
-
+export const container = new Container();
 export * from "./decorators/barrel";

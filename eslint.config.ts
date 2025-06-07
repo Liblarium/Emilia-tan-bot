@@ -3,6 +3,7 @@ import tsparser from "@typescript-eslint/parser";
 import biome from "eslint-config-biome";
 import prettier from "eslint-config-prettier/flat";
 import prettierPlugin from "eslint-plugin-prettier/recommended";
+import nx from "@nx/eslint";
 import globals from "globals";
 
 export default [
@@ -60,7 +61,7 @@ export default [
         "arrowParens": "always",
         "useTabs": false,
         "tabWidth": 2,
-        "printWidth": 80,
+        "printWidth": 100,
         "endOfLine": "auto",
         "quoteProps": "as-needed"
       }],

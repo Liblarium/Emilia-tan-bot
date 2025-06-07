@@ -77,5 +77,4 @@ export type ReadJSONFileResult<T extends object = object> =
 
 export type LineType = { news: "" | "\n"; last: "" | "\n" };
 
-export * from "./enums/barrel";
 export * from "./logger";

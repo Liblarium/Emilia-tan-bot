@@ -1,6 +1,6 @@
 {
   "name": "@emilia-tan/core",
-  "version": "1.0.0", 
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "main": "dist/index.js",
@@ -10,7 +10,8 @@
     "build": "pnpm run build:module && pnpm run typecheck",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/**/*.ts || echo 'No files to lint.'",
-    "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}' || echo 'No files to format.'"
+    "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx}' || echo 'No files to format.'",
+    "upd-deps": "ncu -u"
   },
   "exports": {
     ".": {
@@ -19,16 +20,16 @@
     }
   },
   "dependencies": {
-    "tsyringe": "^4.10.0",
     "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
-    "eslint": "^9.26.0",
+    "@types/node": "^22.15.30",
+    "eslint": "^9.28.0",
+    "inversify": "^7.5.2",
     "prettier": "^3.5.3",
-    "@types/node": "^22.15.17"
+    "typescript": "^5.8.3"
   }
 }
