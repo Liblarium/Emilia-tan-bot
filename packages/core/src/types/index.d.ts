@@ -4,19 +4,13 @@ import type { Container, Newable, ServiceIdentifier } from "inversify";
 /**
  * Represents a class constructor
  */
-export type Constructor<T = unknown, Args extends any[] = any[]> = new (
-  ...args: Args
-) => T;
+export type Constructor<T = unknown, Args extends any[] = any[]> = new (...args: Args) => T;
 
 /**
  * Represents the arguments of a class constructor
  */
-export type ConstructorArgs<T extends Constructor> = T extends Constructor<
-  any,
-  infer P
->
-  ? P
-  : never;
+export type ConstructorArgs<T extends Constructor> =
+  T extends Constructor<any, infer P> ? P : never;
 
 export type CommandType = "command" | "slash" | "both";
 
@@ -212,7 +206,6 @@ export interface FactoryProvider<T = unknown> extends BaseProvider<T> {
   useFactory: (container: Container) => T | Promise<T>;
 }
 
-
 /**
  * Bind options
  */
@@ -220,12 +213,12 @@ interface BindUse<T = unknown> {
   /**
    * Token for injection
    */
-  token: ServiceIdentifier<T>,
+  token: ServiceIdentifier<T>;
   /**
    * Debug flag
    */
   debug?: boolean;
-};
+}
 
 /**
  * Binding new Factory
@@ -236,14 +229,14 @@ export interface BindUseFactory<T = unknown> extends BindUse<T> {
    * Singleton or Transient
    */
   scope?: ModuleScope;
-};
+}
 
 /**
  * Binding new Value
  */
 export interface BindUseValue<T = unknown> extends BindUse<T> {
   useValue: ValueProvider<T>["useValue"];
-};
+}
 
 /**
  * Binding new Class
@@ -254,15 +247,12 @@ export interface BindUseClass<T = unknown> extends BindUse<T> {
    * Singleton or Transient
    */
   scope?: ModuleScope;
-};
+}
 
 /**
  * Провайдер, який використовує клас для створення залежності.
  */
-export type ModuleProvider<T = unknown> =
-  | ClassProvider<T>
-  | ValueProvider<T>
-  | FactoryProvider<T>;
+export type ModuleProvider<T = unknown> = ClassProvider<T> | ValueProvider<T> | FactoryProvider<T>;
 
 /**
 /**
@@ -332,11 +322,9 @@ export interface InjectableOptions<T = unknown> {
 /**
  * Command options
  */
-export type CommandOptions<T> = CommandDecoratorOptions<T> &
-  (MessageCommand | SlashOrBothCommand);
+export type CommandOptions<T> = CommandDecoratorOptions<T> & (MessageCommand | SlashOrBothCommand);
 
-export interface CommandDecoratorOptions<T = unknown>
-  extends InjectableOptions<T> {
+export interface CommandDecoratorOptions<T = unknown> extends InjectableOptions<T> {
   /**
    * Назва команди
    */

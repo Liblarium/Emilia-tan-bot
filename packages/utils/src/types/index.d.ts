@@ -74,5 +74,5 @@ export * from "./isClass";
 export * from "./jsonReader";
 export * from "./jsonWriter";
 export * from "./logFormatter";
-export * from "./ValidationTypes";
+export * from "./validationTypes";
 export * from "./components";

@@ -1,5 +1,4 @@
-//import type { TypeCheck, ValidationError, ValidationResult } from "@type";
-import { ErrorMessages } from "@emilia-tan/types";
+import { ErrorMessages } from "@emilia-tan/config";
 import { setType } from "../helpers/setType";
 import type { TypeCheck, ValidationError, ValidationResult } from "../types";
 import {
@@ -58,9 +57,7 @@ export async function hasPropertiesWithTypes<T extends object>(
     const isNonNullValue = validateValueIsNotNull<T>(value);
 
     if (!validatePropInObj(obj, prop) && isNonNullValue) {
-      const expected = isNonNullValue
-        ? ErrorMessages.UndefinedProp
-        : setType<string>(typeCheck);
+      const expected = isNonNullValue ? ErrorMessages.UndefinedProp : setType<string>(typeCheck);
       const received = isNonNullValue ? ErrorMessages.ValueNullable : value;
 
       errors.push(createError(prop, expected, received));
@@ -70,14 +67,7 @@ export async function hasPropertiesWithTypes<T extends object>(
 
     try {
       // Проверка примитивных типов
-      if (
-        await validateSimpleTypes(
-          prop,
-          value,
-          setType<TypeCheck<T>>(typeCheck),
-          errors
-        )
-      )
+      if (await validateSimpleTypes(prop, value, setType<TypeCheck<T>>(typeCheck), errors))
         continue;
 
       // Проверка массивов
@@ -102,11 +92,8 @@ export async function hasPropertiesWithTypes<T extends object>(
         });
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      errors.push(
-        createError(prop, ErrorMessages.Validation, `Error: ${errorMessage}`)
-      );
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      errors.push(createError(prop, ErrorMessages.Validation, `Error: ${errorMessage}`));
     }
   }
 

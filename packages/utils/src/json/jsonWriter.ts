@@ -1,12 +1,7 @@
-import { ErrorCode } from "@emilia-tan/types";
+import { ErrorCode } from "@emilia-tan/config";
 import { Observable } from "rxjs";
 import { objectToString } from "../format/objectToString";
-import type {
-  FileManagerInterface,
-  IFileValidator,
-  IJSONWriter,
-  Result,
-} from "../types";
+import type { FileManagerInterface, IFileValidator, IJSONWriter, Result } from "../types";
 
 export class JSONWriter implements IJSONWriter {
   constructor(
@@ -25,10 +20,7 @@ export class JSONWriter implements IJSONWriter {
    * @param {T} data - The JSON data to write.
    * @returns {Observable<Result<void>>} - A Observable that resolves with a result object that contains a success flag and a data field or an error field.
    */
-  writeFile<T extends object>(
-    filePath: string,
-    data: T
-  ): Observable<Result<void>> {
+  writeFile<T extends object>(filePath: string, data: T): Observable<Result<void>> {
     return this.appendFileLogic(filePath, data);
   }
 
@@ -74,8 +66,7 @@ export class JSONWriter implements IJSONWriter {
             success: false,
             error: {
               code: ErrorCode.WRONG_DELIMITER,
-              message:
-                "Why you use delimiter on .json file? Use writeFile method for .json files",
+              message: "Why you use delimiter on .json file? Use writeFile method for .json files",
             },
           });
           observer.complete();
@@ -117,18 +108,16 @@ export class JSONWriter implements IJSONWriter {
         return;
       }
 
-      this.fileManager
-        .appendFile(filePath, jsonData.data + separator)
-        .subscribe({
-          next: () => {
-            observer.next({ success: true, data: undefined });
-            observer.complete();
-          },
-          error: (error) => {
-            observer.next({ success: false, error });
-            observer.complete();
-          },
-        });
+      this.fileManager.appendFile(filePath, jsonData.data + separator).subscribe({
+        next: () => {
+          observer.next({ success: true, data: undefined });
+          observer.complete();
+        },
+        error: (error) => {
+          observer.next({ success: false, error });
+          observer.complete();
+        },
+      });
     });
   }
 
@@ -139,10 +128,7 @@ export class JSONWriter implements IJSONWriter {
    * @param pretty - Whether to format the JSON string with indentation. Default is `false`.
    * @returns A `Result` object containing the JSON string if successful, or an error message if the conversion fails.
    */
-  stringify<T extends object = object>(
-    data: T,
-    pretty: boolean = false
-  ): Result<string> {
+  stringify<T extends object = object>(data: T, pretty: boolean = false): Result<string> {
     return objectToString(data, pretty);
   }
 }

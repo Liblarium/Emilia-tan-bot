@@ -1,4 +1,4 @@
-import { ErrorCode } from "@emilia-tan/types";
+import { ErrorCode } from "@emilia-tan/config";
 import type { ComponentError, ComponentPosition } from "../types";
 
 /**
@@ -8,9 +8,7 @@ import type { ComponentError, ComponentPosition } from "../types";
  *
  * @returns The error if the position is invalid, otherwise null
  */
-export function validateComponentPosition(
-  position: ComponentPosition
-): ComponentError | null {
+export function validateComponentPosition(position: ComponentPosition): ComponentError | null {
   const { row, index } = position;
 
   if (typeof row !== "number") {

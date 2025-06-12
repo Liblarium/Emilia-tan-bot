@@ -1,23 +1,11 @@
-import {
-  constants,
-  access,
-  appendFile,
-  mkdir,
-  unlink,
-  writeFile,
-} from "node:fs/promises";
+import { constants, access, appendFile, mkdir, unlink, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { ErrorCode } from "@emilia-tan/config";
 import type { ArrayNotEmpty } from "@emilia-tan/types";
-import { ErrorCode } from "@emilia-tan/types";
 import { type Observable, catchError, from, map, of, switchMap } from "rxjs";
 import { EmiliaAbstractError } from "../core/emiliaAbstractError";
 import { emiliaError } from "../core/emiliaError";
-import type {
-  ClassWithValidator,
-  FileManagerInterface,
-  IFileValidator,
-  Result,
-} from "../types";
+import type { ClassWithValidator, FileManagerInterface, IFileValidator, Result } from "../types";
 import { validateFileOperation } from "../validate/validateFileOperation";
 
 export class FileManager implements FileManagerInterface {
@@ -53,10 +41,7 @@ export class FileManager implements FileManagerInterface {
    *     error: err => console.error(err),
    *   });
    */
-  createFolder(
-    path: string,
-    folderName: string
-  ): Observable<Result<{ path: string }>> {
+  createFolder(path: string, folderName: string): Observable<Result<{ path: string }>> {
     if (!path || !folderName) {
       return of({
         success: false as const,
@@ -89,8 +74,7 @@ export class FileManager implements FileManagerInterface {
         );
       }),
       catchError((e): Observable<Result<{ path: string }>> => {
-        const errorMessage =
-          e instanceof EmiliaAbstractError ? e.message : "Unknown error";
+        const errorMessage = e instanceof EmiliaAbstractError ? e.message : "Unknown error";
         const errorCode =
           e instanceof EmiliaAbstractError && e.code.length > 0
             ? e.code
@@ -131,12 +115,8 @@ export class FileManager implements FileManagerInterface {
     return from(writeFile(filePath, data)).pipe(
       map(() => ({ success: true as const, data: undefined })),
       catchError((e) => {
-        const errorMessage =
-          e instanceof EmiliaAbstractError ? e.message : "Unknown error";
-        emiliaError(
-          `FileHandler.writeFile: ${errorMessage}`,
-          ErrorCode.FILE_NOT_WRITABLE
-        );
+        const errorMessage = e instanceof EmiliaAbstractError ? e.message : "Unknown error";
+        emiliaError(`FileHandler.writeFile: ${errorMessage}`, ErrorCode.FILE_NOT_WRITABLE);
         console.error(e);
 
         return of({
@@ -172,12 +152,8 @@ export class FileManager implements FileManagerInterface {
     return from(unlink(fileName)).pipe(
       map(() => ({ success: true as const, data: undefined })),
       catchError((e) => {
-        const errorMessage =
-          e instanceof EmiliaAbstractError ? e.message : "Unknown error";
-        emiliaError(
-          `FileHandler.deleteFile: ${errorMessage}`,
-          ErrorCode.FILE_NOT_WRITABLE
-        );
+        const errorMessage = e instanceof EmiliaAbstractError ? e.message : "Unknown error";
+        emiliaError(`FileHandler.deleteFile: ${errorMessage}`, ErrorCode.FILE_NOT_WRITABLE);
         console.error(e);
 
         return of({
@@ -218,9 +194,7 @@ export class FileManager implements FileManagerInterface {
   appendFile(fileName: string, data: string): Observable<Result<void>> {
     return from(
       //FIXME: RXJS POWAR
-      this.fileValidator.validateFileOperation(fileName) as unknown as Promise<
-        Result<void>
-      >
+      this.fileValidator.validateFileOperation(fileName) as unknown as Promise<Result<void>>
     ).pipe(
       switchMap((validation: Result<void>): Observable<Result<void>> => {
         if (!validation.success) {
@@ -229,12 +203,8 @@ export class FileManager implements FileManagerInterface {
 
         return from(access(fileName, constants.W_OK)).pipe(
           catchError((e) => {
-            const errorMessage =
-              e instanceof EmiliaAbstractError ? e.message : "Unknown error";
-            emiliaError(
-              `FileHandler.appendFile: ${errorMessage}`,
-              ErrorCode.APPEND_FILE_ERROR
-            );
+            const errorMessage = e instanceof EmiliaAbstractError ? e.message : "Unknown error";
+            emiliaError(`FileHandler.appendFile: ${errorMessage}`, ErrorCode.APPEND_FILE_ERROR);
             console.error(e);
 
             return of({
@@ -249,14 +219,8 @@ export class FileManager implements FileManagerInterface {
             from(appendFile(fileName, data)).pipe(
               map(() => ({ success: true as const, data: undefined })),
               catchError((e) => {
-                const errorMessage =
-                  e instanceof EmiliaAbstractError
-                    ? e.message
-                    : "Unknown error";
-                emiliaError(
-                  `FileHandler.appendFile: ${errorMessage}`,
-                  ErrorCode.APPEND_FILE_ERROR
-                );
+                const errorMessage = e instanceof EmiliaAbstractError ? e.message : "Unknown error";
+                emiliaError(`FileHandler.appendFile: ${errorMessage}`, ErrorCode.APPEND_FILE_ERROR);
 
                 console.error(e);
 

@@ -11,9 +11,7 @@ import { type Observable, Subject } from "rxjs";
  *
  * @returns An async iterable that yields the values emitted by the Observable.
  */
-export function toAsyncIterable<T>(
-  observable: Observable<T>
-): AsyncIterable<T> {
+export function toAsyncIterable<T>(observable: Observable<T>): AsyncIterable<T> {
   return {
     [Symbol.asyncIterator]() {
       const subject = new Subject<T>();

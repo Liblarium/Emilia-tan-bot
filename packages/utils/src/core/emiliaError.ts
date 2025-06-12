@@ -1,4 +1,4 @@
-import type { ErrorCode } from "@emilia-tan/types";
+import type { ErrorCode } from "@emilia-tan/config";
 import { time } from "../format/timeAndDate";
 import { EmiliaAbstractError } from "./emiliaAbstractError";
 

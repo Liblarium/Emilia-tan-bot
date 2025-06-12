@@ -1,4 +1,4 @@
-import { PrimitiveType } from "@emilia-tan/types";
+import { PrimitiveType } from "@emilia-tan/config";
 import { setType } from "../helpers/setType";
 import type {
   ArrayTypeCheck,
@@ -45,15 +45,11 @@ export function isTypeCheckObject(check: unknown): check is { type: string } {
   return typeof check === "object" && check !== null && "type" in check;
 }
 
-export function isArrayTypeCheck<T>(
-  check: unknown
-): check is ArrayTypeCheck<T> {
+export function isArrayTypeCheck<T>(check: unknown): check is ArrayTypeCheck<T> {
   return isTypeCheckObject(check) && check.type === "array";
 }
 
-export function isObjectTypeCheck<T extends object>(
-  check: unknown
-): check is ObjectTypeCheck<T> {
+export function isObjectTypeCheck<T extends object>(check: unknown): check is ObjectTypeCheck<T> {
   return isTypeCheckObject(check) && check.type === "object";
 }
 
@@ -67,17 +63,12 @@ export function validatePrimitive(
 }
 
 // Проверка свойств объекта
-export function validatePropInObj(
-  obj: object,
-  prop: string
-): obj is { prop: string } {
+export function validatePropInObj(obj: object, prop: string): obj is { prop: string } {
   return prop in obj;
 }
 
 // Проверка null/undefined
-export function isValueDefined<T extends object>(
-  value: unknown
-): value is T[keyof T] {
+export function isValueDefined<T extends object>(value: unknown): value is T[keyof T] {
   return value != null;
 }
 
@@ -99,7 +90,7 @@ export function createError(
 // Валидация массивов
 export async function validateArray<T>(
   value: T,
-  check: TypeCheck<unknown>,
+  check: TypeCheck<object>,
   options: ValidationOptions = {}
 ): Promise<ValidationResult> {
   if (!Array.isArray(value))
@@ -118,27 +109,22 @@ export async function validateArray<T>(
   if (!check) return { isValid: true, errors: [] };
 
   if (typeof check === "function") {
-    const validationErrors = value.reduce<ValidationError[]>(
-      (acc, element, index) => {
-        const elementPath = options.path
-          ? `${options.path}[${index}]`
-          : `[${index}]`;
+    const validationErrors = value.reduce<ValidationError[]>((acc, element, index) => {
+      const elementPath = options.path ? `${options.path}[${index}]` : `[${index}]`;
 
-        if (!check(element, { ...options, path: elementPath })) {
-          acc.push(
-            createError(
-              elementPath,
-              check.name || "custom validation",
-              typeof element,
-              `Custom validation failed at ${elementPath}`
-            )
-          );
-        }
+      if (!check(element, { ...options, path: elementPath })) {
+        acc.push(
+          createError(
+            elementPath,
+            check.name || "custom validation",
+            typeof element,
+            `Custom validation failed at ${elementPath}`
+          )
+        );
+      }
 
-        return acc;
-      },
-      []
-    );
+      return acc;
+    }, []);
 
     return {
       isValid: validationErrors.length === 0,
@@ -146,31 +132,26 @@ export async function validateArray<T>(
     };
   }
 
-  const validationErrors = value.reduce<ValidationError[]>(
-    (acc, element, index) => {
-      const elementPath = options.path
-        ? `${options.path}[${index}]`
-        : `[${index}]`;
+  const validationErrors = value.reduce<ValidationError[]>((acc, element, index) => {
+    const elementPath = options.path ? `${options.path}[${index}]` : `[${index}]`;
 
-      if (
-        typeof check === "string" &&
-        check === PrimitiveType.String &&
-        !validatePrimitive(element, check)
-      ) {
-        acc.push(
-          createError(
-            elementPath,
-            check,
-            typeof element,
-            `Expected ${typeof check === "string" ? check : JSON.stringify(check)} at ${elementPath}`
-          )
-        );
-      }
+    if (
+      typeof check === "string" &&
+      check === PrimitiveType.String &&
+      !validatePrimitive(element, check)
+    ) {
+      acc.push(
+        createError(
+          elementPath,
+          check,
+          typeof element,
+          `Expected ${typeof check === "string" ? check : JSON.stringify(check)} at ${elementPath}`
+        )
+      );
+    }
 
-      return acc;
-    },
-    []
-  );
+    return acc;
+  }, []);
 
   return {
     isValid: validationErrors.length === 0,
@@ -263,9 +244,7 @@ export async function validateObject<T extends object>(
  * @param value - The value to check.
  * @returns true if the value is not null or undefined, false otherwise.
  */
-export function validateValueIsNotNull<T extends object>(
-  value: unknown
-): value is T[keyof T] {
+export function validateValueIsNotNull<T extends object>(value: unknown): value is T[keyof T] {
   return value != null;
 }
 
@@ -283,7 +262,7 @@ export function validateValueIsNotNull<T extends object>(
 export async function validateSimpleTypes(
   prop: string,
   value: unknown,
-  typeCheck: TypeCheck<unknown>,
+  typeCheck: TypeCheck<object>,
   errors: ValidationError[]
 ) {
   if (
@@ -296,10 +275,7 @@ export async function validateSimpleTypes(
     return false;
   }
 
-  if (
-    typeof typeCheck === "function" &&
-    !(await Promise.resolve(typeCheck(value)))
-  ) {
+  if (typeof typeCheck === "function" && !(await Promise.resolve(typeCheck(value)))) {
     errors.push(createError(prop, "custom validation", value));
 
     return false;

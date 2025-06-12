@@ -13,11 +13,7 @@ export class FileLogger extends AbstractPinoLogger {
     private readonly logDir: string = "logs",
     options: FileLoggerOptions = {}
   ) {
-    const {
-      rotateInterval = "1d",
-      rotateSize = "10m",
-      pretty = false,
-    } = options;
+    const { rotateInterval = "1d", rotateSize = "10m", pretty = false } = options;
 
     // Create rolling file stream
     const fileStream = pinoRoll({

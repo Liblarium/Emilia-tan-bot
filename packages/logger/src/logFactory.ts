@@ -1,8 +1,5 @@
-import {
-  type LogFactoryOptionalOptions,
-  type LogFactoryOptions,
-  LogType,
-} from "@emilia-tan/types";
+import type { LogFactoryOptionalOptions, LogFactoryOptions } from "@emilia-tan/types";
+import { LogType } from "@emilia-tan/config";
 import { Subject } from "rxjs";
 import { filter, map } from "rxjs/operators";
 import { Log } from "./";

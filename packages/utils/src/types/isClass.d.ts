@@ -13,7 +13,7 @@ interface IsClassOptions {
 }
 
 export interface IisClass {
-  /** 
+  /**
    * Check if an object is a class.
    * @param {unknown} obj - The object to check.
    * @param {boolean} [methods=false] - Whether to check if the class has methods. Default is `false`. Is a strict check
@@ -26,6 +26,6 @@ export interface IisClass {
    * isClass({}); // false
    * isClass(null); // false
    * ```
-  */
-  (obj: unknown, options?: IsClassOptions): boolean
+   */
+  (obj: unknown, options?: IsClassOptions): boolean;
 }

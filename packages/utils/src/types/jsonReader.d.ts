@@ -6,10 +6,7 @@ export interface IJSONReadFile {
 }
 
 export interface IJSONReadLine {
-  readLines<T extends object>(
-    filePath: string,
-    delimiter: string,
-  ): Promise<Result<T>[]>;
+  readLines<T extends object>(filePath: string, delimiter: string): Promise<Result<T>[]>;
 }
 
 export interface IJSONParse {
@@ -17,8 +14,4 @@ export interface IJSONParse {
   parse<T = unknown>(jsonParse: string): Result<T>;
 }
 
-export interface IJSONReader
-  extends IJSONReadFile,
-  IJSONReadLine,
-  IJSONParse,
-  ClassWithValidator { }
+export interface IJSONReader extends IJSONReadFile, IJSONReadLine, IJSONParse, ClassWithValidator {}

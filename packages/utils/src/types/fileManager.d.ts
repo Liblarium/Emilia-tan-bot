@@ -11,10 +11,7 @@ export interface FileManagerInterface extends ClassWithValidator {
    * const result = await fileManager.createFolder("path/to/folder", "myFolder");
    * console.log(result); // { success: true, data: { path: "path/to/folder/myFolder" } }
    */
-  createFolder(
-    path: string,
-    folderName: string,
-  ): Observable<Result<{ path: string }>>;
+  createFolder(path: string, folderName: string): Observable<Result<{ path: string }>>;
 
   /**
    * Deletes a file at the given path.

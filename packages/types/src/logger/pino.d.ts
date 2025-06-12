@@ -5,7 +5,7 @@ export type LoggerData = Omit<LogEntry, "type">;
 /**
  * Уровни логирования Pino
  */
-export type PinoLogLevel = 'info' | 'error' | 'warn' | 'debug';
+export type PinoLogLevel = "info" | "error" | "warn" | "debug";
 
 export interface PinoLoggerOptions {
   /**

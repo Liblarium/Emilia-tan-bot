@@ -18,7 +18,7 @@
     }
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.70",
+    "@napi-rs/canvas": "^0.1.71",
     "sharp": "^0.34.2",
     "@resvg/resvg-js": "^2.6.2"
   },
@@ -26,6 +26,6 @@
     "typescript": "^5.8.3",
     "eslint": "^9.28.0",
     "prettier": "^3.5.3",
-    "@types/node": "^22.15.30"
+    "@types/node": "^24.0.1"
   }
 }

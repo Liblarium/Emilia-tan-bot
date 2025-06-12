@@ -1,4 +1,4 @@
-import type { ErrorCode } from "../enums/errorCode";
+import type { ErrorCode } from "@emilia-tan/config";
 
 /**
  * Position of component. `row` is raw position (0-4), `index` is component position in row (0-4)

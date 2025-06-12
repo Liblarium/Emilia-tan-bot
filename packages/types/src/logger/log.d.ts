@@ -1,9 +1,7 @@
-import type { ArrayNotEmpty } from "@emilia-tan/types";
-import type { TypeInline, TypeLog } from "../enums/barrel";
-export type { TypeLog } from "./logger";
-import type { FileLogger } from "../fileLogger";
-import type { PinoLogger } from "../pinoLogger";
+import type { ErrorCode, InlineType, LogType } from "@emilia-tan/config";
+import type { ArrayNotEmpty } from "../index.type";
 import type { FileLoggerOptions } from "./fileLogger";
+import type { LoggerType } from "./logger";
 import type { PinoLoggerOptions } from "./pino";
 
 /**
@@ -21,7 +19,7 @@ import type { PinoLoggerOptions } from "./pino";
  *   categories: ["category1", "category2"],
  *   event: false,
  *   logs: true,
- *   inline: Enums.InlineType.Before,
+ *   inline: InlineType.Before,
  * };
  *
  * new Log(options); // [time]: Hello from LogOptions
@@ -38,11 +36,11 @@ export interface LogOptions extends LogDeps {
    *
    * @default LogType.Info = "info"
    */
-  type: Enums.LogType;
+  type: LogType;
   /**
    * The error code
    */
-  code: Enums.ErrorCode;
+  code: ErrorCode;
   /**
    * In which categories to write all specified logs. Outputted once in console.log(). Not necessarily global or database, string[] there
    */
@@ -54,9 +52,9 @@ export interface LogOptions extends LogDeps {
   logs?: boolean;
   /**
    * Affects only the text in the console. 0 - No change, 1 - wrap from top to bottom, 2 - from bottom, 3 - both.
-   * @default Enums.InlineType.None = 0
+   * @default InlineType.None = 0
    */
-  inline?: Enums.InlineType;
+  inline?: InlineType;
   /**
    * Tags to add to the log
    * @default []
@@ -79,19 +77,19 @@ export type LoggableOptions = Omit<LogFactoryOptions, "logFormatter">;
 export type TypeText = string | number | object | unknown[] | unknown;
 
 export interface LogFactoryOptionalOptions {
-  pinoOption: PinoLoggerOptions,
-  fileOption: FileLoggerOptions
+  pinoOption: PinoLoggerOptions;
+  fileOption: FileLoggerOptions;
 }
 
 export interface LogDeps {
   /**
    * The console logger
    */
-  consoleLogger: PinoLogger;
+  consoleLogger: LoggerType;
   /**
    * The file logger
    */
-  fileLogger: FileLogger;
+  fileLogger: LoggerType;
 }
 
 /**
@@ -105,7 +103,7 @@ export interface LogEntry {
   /**
    * Type of the log entry
    */
-  readonly type: Enums.LogType;
+  readonly type: LogType;
   /**
    * Categories of the log entry
    */
@@ -121,7 +119,7 @@ export interface LogEntry {
   /**
    * Error code of the log entry
    */
-  readonly errorCode: Enums.ErrorCode;
+  readonly errorCode: ErrorCode;
   /**
    * Tags associated with the log entry
    */

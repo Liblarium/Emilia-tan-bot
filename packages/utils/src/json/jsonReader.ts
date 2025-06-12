@@ -2,19 +2,14 @@ import { createReadStream } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
+import { ErrorCode } from "@emilia-tan/config";
 import type { ArrayNotEmpty } from "@emilia-tan/types";
-import { ErrorCode } from "@emilia-tan/types";
 import { Observable } from "rxjs";
 import { DELIMITER_LOG_FILE } from "../config";
 import { emiliaError } from "../core/emiliaError";
 import { getErrorMessage } from "../core/getErrorMessage";
 import { objectFromString } from "../transform/stringify";
-import type {
-  ClassWithValidator,
-  IFileValidator,
-  IJSONReader,
-  Result,
-} from "../types";
+import type { ClassWithValidator, IFileValidator, IJSONReader, Result } from "../types";
 import { validateFileOperation } from "../validate/validateFileOperation";
 
 export class JSONReader implements IJSONReader {
@@ -24,10 +19,7 @@ export class JSONReader implements IJSONReader {
   public logCategories: ArrayNotEmpty<string> = ["jsonReader"];
 
   constructor(public fileValidator: IFileValidator) {}
-  readLines<T extends object>(
-    filePath: string,
-    delimiter: string
-  ): Promise<Result<T>[]> {
+  readLines<T extends object>(filePath: string, delimiter: string): Promise<Result<T>[]> {
     throw new Error("Method not implemented.");
   }
 
@@ -57,8 +49,7 @@ export class JSONReader implements IJSONReader {
           success: false,
           error: {
             code: ErrorCode.FILE_FORMAT_ERROR,
-            message:
-              "You use this method about non .json file. You mistake. Use readLines method.",
+            message: "You use this method about non .json file. You mistake. Use readLines method.",
           },
         });
         return;
@@ -105,10 +96,7 @@ export class JSONReader implements IJSONReader {
    * ```
    */
   @validateFileOperation<ClassWithValidator>()
-  readLinesRx<T extends object>(
-    filePath: string,
-    delimiter: string = "\n"
-  ): Observable<Result<T>> {
+  readLinesRx<T extends object>(filePath: string, delimiter: string = "\n"): Observable<Result<T>> {
     return new Observable<Result<T>>((subscriber) => {
       let buffer = "";
 
@@ -256,8 +244,7 @@ export class JSONReader implements IJSONReader {
     });
 
     // If all parts are successful, return an array of data
-    if (results.every<Result<T>>((r) => r.success))
-      return [...results.filter((r) => r.success)];
+    if (results.every<Result<T>>((r) => r.success)) return [...results.filter((r) => r.success)];
 
     // Otherwise, return all results with errors
     return results;

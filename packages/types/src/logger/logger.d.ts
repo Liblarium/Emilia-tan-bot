@@ -1,4 +1,4 @@
-import type { Enums } from "@emilia-tan/utils";
+import type { InlineType, LogType } from "@emilia-tan/config";
 import type { Observable } from "rxjs";
 import type { LogEntry } from "./log";
 /**
@@ -10,7 +10,7 @@ export interface LoggerType {
    * @param message - The message to log.
    * @param typeLog - The type of the log entry.
    */
-  log(message: LoggerData, typeLog: Enums.LogType): Promise<void> | Observable<void>;
+  log(message: LoggerData, typeLog: LogType): Promise<void> | Observable<void>;
   /**
    * Logs an info message.
    * @param message - The message to log.
@@ -35,5 +35,5 @@ export interface LoggerType {
 
 export type LoggerData = Omit<LogEntry, "type">;
 export interface LoggerConsoleData extends LoggerData {
-  inline?: Enums.InlineType
+  inline?: InlineType;
 }

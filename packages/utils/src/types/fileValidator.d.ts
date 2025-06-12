@@ -24,10 +24,10 @@ export interface IJSONFile {
 
 export interface IFileValidator
   extends IFormatValidator,
-  IFileAccessValidator,
-  ICheckFolder,
-  IValidPath,
-  IJSONFile { }
+    IFileAccessValidator,
+    ICheckFolder,
+    IValidPath,
+    IJSONFile {}
 
 /**
  * Result of checking a folder

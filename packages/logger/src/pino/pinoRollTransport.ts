@@ -8,9 +8,7 @@ import pinoRoll from "pino-roll";
  * @param {TransportBaseOptions} [options={}] - Options for the transport.
  * @returns {NodeJS.WritableStream} - The rolling transport.
  */
-export const createRollTransport = (
-  options: TransportBaseOptions = {}
-): NodeJS.WritableStream => {
+export const createRollTransport = (options: TransportBaseOptions = {}): NodeJS.WritableStream => {
   return pinoRoll({
     file: resolve("logs", `${Format.date()}.log`),
     size: "10m",

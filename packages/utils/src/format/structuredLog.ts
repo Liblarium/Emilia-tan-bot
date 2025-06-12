@@ -1,5 +1,5 @@
+import { ErrorCode, LogType } from "@emilia-tan/config";
 import type { ArrayNotEmpty, LineType } from "@emilia-tan/types";
-import { ErrorCode, LogType } from "@emilia-tan/types";
 import { isObject } from "../core/isObject";
 import { setType } from "../helpers/setType";
 import type {
@@ -13,10 +13,7 @@ import type {
 import { dateAndTime, time } from "./timeAndDate.js";
 
 export class StructuredLog {
-  public static readonly logCategories: ArrayNotEmpty<string> = [
-    "utils",
-    "formatters",
-  ];
+  public static readonly logCategories: ArrayNotEmpty<string> = ["utils", "formatters"];
 
   /**
    * Formats a log message with the given text, type and categories.
@@ -78,19 +75,14 @@ export class StructuredLog {
     if (typeof type === "string") return { success: true, data: type };
 
     const typeResult = this.formatterType(type);
-    return typeResult.success
-      ? { success: true, data: typeResult.data.toString() }
-      : typeResult;
+    return typeResult.success ? { success: true, data: typeResult.data.toString() } : typeResult;
   }
 
   /**
    * Processes the text of the log, taking into account the processing function
    * @private
    */
-  private static processLogText(
-    text: unknown,
-    processingLine?: (text: unknown) => string
-  ): string {
+  private static processLogText(text: unknown, processingLine?: (text: unknown) => string): string {
     return processingLine ? processingLine(text) : String(text);
   }
 
@@ -112,8 +104,7 @@ export class StructuredLog {
     if (typeof type !== "number") {
       const validLogTypes = Object.values(LogType);
 
-      if (validLogTypes.includes(setType<LogType>(type)))
-        return { success: true, data: type };
+      if (validLogTypes.includes(setType<LogType>(type))) return { success: true, data: type };
     }
 
     // If a number is provided, convert it using a map
@@ -124,8 +115,7 @@ export class StructuredLog {
       4: LogType.Debug,
     };
 
-    if (typeof type === "number" && typeMap[type])
-      return { success: true, data: typeMap[type] };
+    if (typeof type === "number" && typeMap[type]) return { success: true, data: typeMap[type] };
 
     return {
       success: false,
@@ -197,11 +187,7 @@ export class StructuredLog {
    * @param {LogType} type - The type of the log.
    * @returns {string} - Formatted event text.
    */
-  private static formatEventText(
-    text: string,
-    event?: boolean,
-    type?: LogType
-  ): string {
+  private static formatEventText(text: string, event?: boolean, type?: LogType): string {
     if (event && text.length > 0 && type !== "error") {
       const splits = text.split(":");
 

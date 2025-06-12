@@ -1,5 +1,5 @@
-import type { LogOptions, LogType, LoggerData } from "@emilia-tan/types";
-
+import type { LogOptions, LoggerData } from "@emilia-tan/types";
+import type { LogType } from "@emilia-tan/config";
 /**
  * Class for logging data to a file and console
  *

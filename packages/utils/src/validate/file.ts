@@ -1,6 +1,7 @@
 import { constants, access, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { type ArrayNotEmpty, ErrorCode } from "@emilia-tan/types";
+import { ErrorCode } from "@emilia-tan/config";
+import type { ArrayNotEmpty } from "@emilia-tan/types";
 import { type Observable, combineLatest, from, lastValueFrom, of } from "rxjs";
 import { catchError, map, switchMap } from "rxjs/operators";
 import {
@@ -28,9 +29,7 @@ export class ValidateFile implements IFileValidator {
    * console.log(result); // { success: true }
    * ```
    */
-  public async validateFileOperation(
-    filePath: string
-  ): Promise<Observable<Result<void>>> {
+  public async validateFileOperation(filePath: string): Promise<Observable<Result<void>>> {
     const checkResult = await this.checkFormatFile(filePath);
     if (!checkResult.success) return of(checkResult);
 
@@ -109,11 +108,7 @@ export class ValidateFile implements IFileValidator {
       Promise.resolve()
         .then(() => {
           if (!filePath) {
-            throw emiliaError(
-              "File path is empty!",
-              ErrorCode.INVALID_PATH,
-              "InternalError"
-            );
+            throw emiliaError("File path is empty!", ErrorCode.INVALID_PATH, "InternalError");
           }
 
           const isEmptyConfig = [
@@ -151,9 +146,7 @@ export class ValidateFile implements IFileValidator {
    * @returns {Observable<boolean>} - An observable that emits true or false.
    */
   private isExtensionValid(filePath: string): Observable<boolean> {
-    const isForbidden = FORBIDDEN_EXTENSIONS.some((ext) =>
-      filePath.endsWith(ext)
-    );
+    const isForbidden = FORBIDDEN_EXTENSIONS.some((ext) => filePath.endsWith(ext));
     const isAllowed = ALLOWED_EXTENSIONS.some((ext) => filePath.endsWith(ext));
 
     return of(!isForbidden && isAllowed);
@@ -168,9 +161,7 @@ export class ValidateFile implements IFileValidator {
    * @returns {Observable<boolean>} - An observable that emits true or false.
    */
   private isFolderValid(filePath: string): Observable<boolean> {
-    const isNotForbidden = !FORBIDDEN_FOLDERS.some((folder) =>
-      filePath.includes(folder)
-    );
+    const isNotForbidden = !FORBIDDEN_FOLDERS.some((folder) => filePath.includes(folder));
     const isAllowed =
       ALLOWED_FOLDERS.length === 0
         ? true
@@ -180,13 +171,9 @@ export class ValidateFile implements IFileValidator {
   }
 
   private isFileValid(filePath: string): Observable<boolean> {
-    const isForbiddenFile = FORBIDDEN_FILES.some((file) =>
-      filePath.includes(file)
-    );
+    const isForbiddenFile = FORBIDDEN_FILES.some((file) => filePath.includes(file));
     const isAllowedFile =
-      ALLOWED_FILES.length === 0
-        ? true
-        : ALLOWED_FILES.some((file) => filePath.includes(file));
+      ALLOWED_FILES.length === 0 ? true : ALLOWED_FILES.some((file) => filePath.includes(file));
 
     return of(!isForbiddenFile && isAllowedFile);
   }
@@ -236,9 +223,7 @@ export class ValidateFile implements IFileValidator {
    * // { success: true }
    */
   public async checkFormatFile(filePath: string): Promise<Result<void>> {
-    const isForbidden = FORBIDDEN_EXTENSIONS.some((ext) =>
-      filePath.endsWith(ext)
-    );
+    const isForbidden = FORBIDDEN_EXTENSIONS.some((ext) => filePath.endsWith(ext));
     const isAllowed = ALLOWED_EXTENSIONS.some((ext) => filePath.endsWith(ext));
 
     return isForbidden && !isAllowed
@@ -246,8 +231,7 @@ export class ValidateFile implements IFileValidator {
           success: false,
           error: {
             code: ErrorCode.FILE_FORMAT_ERROR,
-            message:
-              "FileHandler: You cannot modify a file with this extension!",
+            message: "FileHandler: You cannot modify a file with this extension!",
           },
         }
       : { success: true, data: undefined };

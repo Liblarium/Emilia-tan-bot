@@ -1,3 +1,5 @@
+import type { Observable } from "rxjs";
+
 export interface FileLoggerOptions {
   /**
    * Rotate interval for log file

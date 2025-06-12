@@ -123,9 +123,7 @@ function countMethods(
 
     // Check if the depth has reached the maximum
     if (depth >= MAX_DEPTH) {
-      console.warn(
-        "Maximum depth (10) reached while counting methods. Stopping."
-      );
+      console.warn("Maximum depth (10) reached while counting methods. Stopping.");
       break;
     }
   } while (currentProto && currentProto !== Object.prototype);
@@ -134,16 +132,14 @@ function countMethods(
 
   // Check if the total number of methods is greater than or equal to the specified count
   if (typeof methodCount === "number") {
-    if (methodCount <= 0)
-      throw new Error("methodCount must be a number greater than 0");
+    if (methodCount <= 0) throw new Error("methodCount must be a number greater than 0");
 
     return total >= methodCount;
   }
 
   // Check if the total number of methods is within the specified range
   if (typeof methodCount === "number") {
-    if (methodCount <= 0)
-      throw new Error("methodCount must be a number greater than 0");
+    if (methodCount <= 0) throw new Error("methodCount must be a number greater than 0");
     return total >= methodCount;
   }
 
@@ -153,9 +149,7 @@ function countMethods(
 
     // Check if the range is valid
     if (min < 1 || max <= min)
-      throw new Error(
-        "Invalid methodCount range: min must be >= 1 and less than max"
-      );
+      throw new Error("Invalid methodCount range: min must be >= 1 and less than max");
 
     return total >= min && total <= max;
   }

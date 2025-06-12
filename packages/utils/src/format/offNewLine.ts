@@ -7,8 +7,7 @@ export const offNewLine = (text: string): string => {
   const newLinePattern = /\r?\n$/;
   const line = text.toString();
 
-  if (line.endsWith("\n") || newLinePattern.test(line))
-    return line.slice(0, -2);
+  if (line.endsWith("\n") || newLinePattern.test(line)) return line.slice(0, -2);
 
   return line;
 };

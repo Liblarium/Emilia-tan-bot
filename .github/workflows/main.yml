@@ -18,19 +18,18 @@ jobs:
     steps:
       - name: Send notification
         run: |
-          curl -X POST -H "Content-Type: application/json" -d '{
-            "content": "**Новый коммит в репозитории!**",
-            "embeds": [{
-              "title": "${{ github.repository }}",
-              "description": "${{ github.event.head_commit.message }}",
-              "url": "${{ github.event.head_commit.url }}",
-              "timestamp": "${{ github.event.head_commit.timestamp }}",
-              "footer": {
-                "text": "${{ github.event.head_commit.author.name }}"
-              },
-              "color": 5814783
+          curl -X POST -H "Content-Type: application/json" -d "$(jq -n --arg repo '${{ github.repository }}' --arg msg '${{ github.event.head_commit.message }}' --arg url '${{ github.event.head_commit.url }}' --arg time '${{ github.event.head_commit.timestamp }}' --arg author '${{ github.event.head_commit.author.name }}' '{
+            content: "**Новый коммит в репозитории!**",
+            embeds: [{
+              title: $repo,
+              description: $msg,
+              url: $url,
+              timestamp: $time,
+              footer: { text: $author },
+              color: 5814783
             }]
-          }' ${{ secrets.DISCORD_WEBHOOK }}
+          }')" ${{ secrets.DISCORD_WEBHOOK }}
+
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -38,19 +37,8 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Check Username
-        run: whoami
-        shell: pwsh
-
       - name: Add pnpm in PATH
         run: echo "PATH=$env:Path;C:\Users\${{ secrets.USERNAME }}\AppData\Roaming\pnpm" >> $GITHUB_ENV
-        shell: pwsh
-
-
-      - name: Check PATH and pnpm
-        run: |
-          echo $env:Path
-          pnpm --version
         shell: pwsh
 
       - name: Install dependencies

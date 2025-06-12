@@ -43,9 +43,7 @@ export function isValidUrl(str: string): boolean {
 export function toCamelCase(str: string): string {
   return str
     .toLowerCase()
-    .replace(/[^a-zA-Zа-яА-Я0-9]+(.)/g, (_, chr: string): string =>
-      chr.toUpperCase()
-    );
+    .replace(/[^a-zA-Zа-яА-Я0-9]+(.)/g, (_, chr: string): string => chr.toUpperCase());
 }
 
 /**

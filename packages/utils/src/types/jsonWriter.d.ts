@@ -9,7 +9,7 @@ export interface IJSONAppendLine {
   appendLine<T extends object>(
     filePath: string,
     data: T,
-    delimiter: string,
+    delimiter: string
   ): Observable<Result<void>>;
 }
 
@@ -19,7 +19,7 @@ export interface IJSONStringify {
 
 export interface IJSONWriter
   extends IJSONWriteFile,
-  IJSONAppendLine,
-  IJSONStringify,
-  ClassWithFileManager,
-  ClassWithValidator { }
+    IJSONAppendLine,
+    IJSONStringify,
+    ClassWithFileManager,
+    ClassWithValidator {}

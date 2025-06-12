@@ -1,4 +1,5 @@
-import { LogType, type LoggerData, type PinoLogLevel } from "@emilia-tan/types";
+import { LogType } from "@emilia-tan/config";
+import type { LoggerData, PinoLogLevel } from "@emilia-tan/types";
 import type pino from "pino";
 import { type Observable, from } from "rxjs";
 import { map } from "rxjs/operators";

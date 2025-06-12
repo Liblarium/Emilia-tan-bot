@@ -31,9 +31,7 @@ export interface HelpCommandOptions {
 
 export interface Command {
   handleMessage?: (message: Message) => EmbedBuilder | null;
-  handleInteraction?: (
-    interaction: ChatInputCommandInteraction,
-  ) => EmbedBuilder | null;
+  handleInteraction?: (interaction: ChatInputCommandInteraction) => EmbedBuilder | null;
 }
 
 export type CommandDecoratorOptions = MessageCommand | SlashOrBothCommand;

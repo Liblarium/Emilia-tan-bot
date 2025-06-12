@@ -1,0 +1,1 @@
+This library is in no way related to the `soma` library that is already available on `npm`.

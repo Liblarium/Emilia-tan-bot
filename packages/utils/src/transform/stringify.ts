@@ -1,4 +1,4 @@
-import { ErrorCode } from "@emilia-tan/types";
+import { ErrorCode } from "@emilia-tan/config";
 import { emiliaError } from "../core/emiliaError";
 import type { Result } from "../types";
 
@@ -12,11 +12,7 @@ export function objectFromString<T = unknown>(jsonString: string): Result<T> {
   try {
     return { success: true, data: JSON.parse(jsonString) };
   } catch (error) {
-    emiliaError(
-      "Error parsing JSON string!",
-      ErrorCode.JSON_PARSE_ERROR,
-      "TypeError"
-    );
+    emiliaError("Error parsing JSON string!", ErrorCode.JSON_PARSE_ERROR, "TypeError");
     console.error(error);
 
     return {

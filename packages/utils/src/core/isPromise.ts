@@ -10,7 +10,5 @@ export function isPromise<T>(obj: unknown): obj is Promise<T> {
 
   if (obj instanceof Promise) return true;
 
-  return (
-    typeof obj === "object" && "then" in obj && typeof obj.then === "function"
-  );
+  return typeof obj === "object" && "then" in obj && typeof obj.then === "function";
 }

@@ -1,4 +1,4 @@
-import { ErrorCode } from "@emilia-tan/types";
+import { ErrorCode } from "@emilia-tan/config";
 import { emiliaError } from "../core/emiliaError";
 
 /**

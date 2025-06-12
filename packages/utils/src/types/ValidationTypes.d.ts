@@ -1,4 +1,4 @@
-import type { PrimitiveType } from "../enums/validationEnums";
+import type { PrimitiveType } from "@emilia-tan/config";
 
 export interface ValidationOptions {
   strict?: boolean;
@@ -13,22 +13,17 @@ export interface ValidationError {
   message: string;
 }
 
-export type CustomValidator = (
-  value: unknown,
-  options?: ValidationOptions,
-) => boolean;
-export type ComplexCheck<T extends object> =
-  | ArrayTypeCheck<T>
-  | ObjectTypeCheck<T>;
+export type CustomValidator = (value: unknown, options?: ValidationOptions) => boolean;
+export type ComplexCheck<T extends object> = ArrayTypeCheck<T> | ObjectTypeCheck<T>;
 
 export type TypeCheck<T extends object = object> =
   | PrimitiveType
   | CustomValidator
   | ComplexCheck<T>
   | {
-    type: string;
-    elementCheck?: PrimitiveType;
-  };
+      type: string;
+      elementCheck?: PrimitiveType;
+    };
 
 export interface ArrayTypeCheck<T> extends ValidationOptions {
   type: "array";

@@ -13,10 +13,7 @@ export const FORBIDDEN_EXTENSIONS: Readonly<ArrayNotEmpty<string>> = [
 /**
  * File formats allowed extensions
  */
-export const ALLOWED_EXTENSIONS: Readonly<ArrayNotEmpty<string>> = [
-  ".txt",
-  ".log",
-];
+export const ALLOWED_EXTENSIONS: Readonly<ArrayNotEmpty<string>> = [".txt", ".log"];
 /**
  * Folders not allowed
  */

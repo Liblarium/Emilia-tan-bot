@@ -9,13 +9,9 @@ import { hexToDecimal } from "./convert.js";
  * @example
  * displayColor(0, "#FF0000"); // returns 16711680
  */
-export function displayColor(
-  color: number | string,
-  replacedColor: number | string
-): number {
+export function displayColor(color: number | string, replacedColor: number | string): number {
   if (typeof color === "string") color = hexToDecimal(color);
-  if (typeof replacedColor === "string")
-    replacedColor = hexToDecimal(replacedColor);
+  if (typeof replacedColor === "string") replacedColor = hexToDecimal(replacedColor);
 
   return color === 0 ? replacedColor : color;
 }

@@ -1,8 +1,7 @@
-import type { LineType } from "@emilia-tan/types"
-import type { ErrorCode } from "../enums/errorCode";
-import type { LogType } from "../enums/log";
+import type { ErrorCode, LogType } from "@emilia-tan/config";
+import type { LineType } from "@emilia-tan/types";
 import type { StructuredLog } from "../format/structuredLog";
-import type {  Result } from "./";
+import type { Result } from "./";
 
 /**
  * Formats a log message with the given text, type and category.
@@ -101,9 +100,7 @@ export type formatterTypeOption = LogType | number;
  *
  * {@link ILogFormatterStaticMethods static methods of LogFormatter types}
  */
-export interface ILogFormatters
-  extends ILogFormatterStaticMethods,
-  StructuredLog { }
+export interface ILogFormatters extends ILogFormatterStaticMethods, StructuredLog {}
 
 interface ILogFormatterStaticMethods {
   /**

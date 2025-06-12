@@ -1,4 +1,4 @@
-import { ErrorCode } from "@emilia-tan/types";
+import { ErrorCode } from "@emilia-tan/config";
 import { emiliaError } from "../core/emiliaError";
 import { getErrorMessage } from "../core/getErrorMessage";
 import type { Result } from "../types";
@@ -9,21 +9,14 @@ import type { Result } from "../types";
  * @param pretty - A boolean indicating whether to format the JSON string. Defaults to true.
  * @returns The formatted JSON string.
  */
-export function objectToString(
-  obj: object,
-  pretty: boolean = true
-): Result<string> {
+export function objectToString(obj: object, pretty: boolean = true): Result<string> {
   try {
     return {
       success: true,
       data: JSON.stringify(obj, null, pretty ? 2 : undefined),
     };
   } catch (error) {
-    emiliaError(
-      "Error converting object to JSON string!",
-      ErrorCode.INVALID_OBJECT,
-      "TypeError"
-    );
+    emiliaError("Error converting object to JSON string!", ErrorCode.INVALID_OBJECT, "TypeError");
 
     console.error(error);
 

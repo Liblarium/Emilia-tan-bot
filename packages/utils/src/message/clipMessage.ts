@@ -7,10 +7,7 @@ import type { Message, PartialMessage } from "discord.js";
  * @param {number} [limit=4000] - The maximum length of the content to clip to.
  * @returns {string} The clipped content.
  */
-export function clipMessageLog(
-  message: Message | PartialMessage,
-  limit: number = 4000
-): string {
+export function clipMessageLog(message: Message | PartialMessage, limit: number = 4000): string {
   const EMPTY_MESSAGE = "[Пустое сообщение]";
   const ATTACHMENT_MESSAGE = "[Тут было вложение]";
 
@@ -19,8 +16,7 @@ export function clipMessageLog(
   if (message.content) {
     if (message.content.length === 0) return EMPTY_MESSAGE;
 
-    if (message.content.length > limit)
-      return `${message.content.slice(0, limit - 3)}...`;
+    if (message.content.length > limit) return `${message.content.slice(0, limit - 3)}...`;
 
     return `${message.content}\u200b`;
   }

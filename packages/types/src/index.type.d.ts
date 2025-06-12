@@ -71,9 +71,7 @@ export type Keyof<T> = keyof T;
  *
  * @template T - The type of the JSON object
  */
-export type ReadJSONFileResult<T extends object = object> =
-  | T
-  | { error: string };
+export type ReadJSONFileResult<T extends object = object> = T | { error: string };
 
 export type LineType = { news: "" | "\n"; last: "" | "\n" };
 

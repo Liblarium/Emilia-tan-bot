@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { ErrorCode } from "@emilia-tan/types";
+import { ErrorCode } from "@emilia-tan/config";
 import { emiliaError } from "../core/emiliaError";
 import type { ClassWithValidator } from "../types";
 
@@ -35,8 +35,7 @@ export function validateFileOperation<T extends ClassWithValidator>() {
           "InternalError"
         );
 
-      const validation =
-        await target.fileValidator.validateFileOperation(filePath);
+      const validation = await target.fileValidator.validateFileOperation(filePath);
       //FIXME: RXJS POWAR
       //if (!validation.success) return validation;
 
