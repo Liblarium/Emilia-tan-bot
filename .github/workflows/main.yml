@@ -18,17 +18,26 @@ jobs:
     steps:
       - name: Send notification
         run: |
-          curl -X POST -H "Content-Type: application/json" -d "$(jq -n --arg repo '${{ github.repository }}' --arg msg '${{ github.event.head_commit.message }}' --arg url '${{ github.event.head_commit.url }}' --arg time '${{ github.event.head_commit.timestamp }}' --arg author '${{ github.event.head_commit.author.name }}' '{
-            content: "**Новый коммит в репозитории!**",
-            embeds: [{
-              title: $repo,
-              description: $msg,
-              url: $url,
-              timestamp: $time,
-              footer: { text: $author },
-              color: 5814783
-            }]
-          }')" ${{ secrets.DISCORD_WEBHOOK }}
+          $repo = "${{ github.repository }}"
+          $msg = "${{ github.event.head_commit.message }}"
+          $url = "${{ github.event.head_commit.url }}"
+          $time = "${{ github.event.head_commit.timestamp }}"
+          $author = "${{ github.event.head_commit.author.name }}"
+
+          $payload = @{
+            content = "**Новый коммит в репозитории!**"
+            embeds = @(@{
+              title = $repo
+              description = $msg
+              url = $url
+              timestamp = $time
+              footer = @{ text = $author }
+              color = 5814783
+            })
+          } | ConvertTo-Json -Depth 10
+
+          Invoke-RestMethod -Uri "${{ secrets.DISCORD_WEBHOOK }}" -Method POST -ContentType "application/json" -Body $payload
+        shell: pwsh
 
 
       - name: Checkout code

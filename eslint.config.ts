@@ -38,7 +38,7 @@ export default [
   prettier,
   biome,
   {
-    files: ["apps/**/src/**/*.ts", "packages/**/src/**/*.ts", "*/src/**/*.ts"],
+    files: ["apps/**/src/**/*.ts", "packages/**/src/**/*.ts", "packages/**/src/**/*.d.ts", "*/src/**/*.ts", "*/src/**/*.d.ts"],
     languageOptions: {
       ecmaVersion: 2025,
       globals: {

@@ -69,9 +69,7 @@ export interface ContainerConfig<T> {
   modules?: Constructor<T>[];
 }
 
-export function forwardRef<T>(fn: () => Constructor<T>): Constructor<T> {
-  return fn();
-}
+export function forwardRef<T>(fn: () => Constructor<T>): Constructor<T>;
 
 export interface ResolveOptions {
   name?: string;
