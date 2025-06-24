@@ -23,7 +23,7 @@ import type { ClassWithValidator } from "../types";
  * ```
  */
 export function validateFileOperation<T extends ClassWithValidator>() {
-  return (target: T, propertyKey: string, descriptor: PropertyDescriptor) => {
+  return (target: T, _propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
     descriptor.value = async function (...args: [string, ...unknown[]]) {
       const filePath = resolve(args[0]);
@@ -35,8 +35,8 @@ export function validateFileOperation<T extends ClassWithValidator>() {
           "InternalError"
         );
 
-      const validation = await target.fileValidator.validateFileOperation(filePath);
-      //FIXME: RXJS POWAR
+      const _validation = await target.fileValidator.validateFileOperation(filePath);
+      //FIXME: RXJS POWER
       //if (!validation.success) return validation;
 
       return await originalMethod.apply(this, args);

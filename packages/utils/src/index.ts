@@ -1,10 +1,10 @@
 export * as Components from "./components/barrel";
+export * as Config from "./config";
 export * as Core from "./core/barrel";
 export * as Format from "./format/barrel";
-export * as Message from "./message/barrel";
-export * as Validate from "./validate";
 export * as Helpers from "./helpers/barrel";
-export * as Manages from "./managers/barrel";
-export * as Transforms from "./transform/barrel";
 export * as JSONs from "./json/barrel";
-export * as Config from "./config";
+export * as Manages from "./managers/barrel";
+export * as Message from "./message/barrel";
+export * as Transforms from "./transform/barrel";
+export * as Validate from "./validate";

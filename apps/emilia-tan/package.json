@@ -18,20 +18,20 @@
   "dependencies": {
     "@emilia-tan/core": "workspace:^",
     "@emilia-tan/types": "workspace:^",
-    "discord.js": "^14.19.3",
+    "discord.js": "^14.20.0",
     "dotenv": "^16.5.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "@types/node": "^24.0.1",
-    "eslint": "^9.28.0",
+    "@biomejs/biome": "^2.0.5",
+    "@types/node": "^24.0.4",
+    "eslint": "^9.29.0",
     "eslint-config-biome": "^1.9.4",
     "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-prettier": "^5.4.1",
+    "eslint-plugin-prettier": "^5.5.0",
     "inversify": "^7.5.2",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.0",
     "typedoc": "^0.28.5",
     "typescript": "^5.8.3"
   }

@@ -7,8 +7,8 @@ import type {
   FormattedLogText,
   FormatterLogOption,
   FormattingConsoleOptions,
-  Result,
   formatterTypeOption,
+  Result,
 } from "../types";
 import { dateAndTime, time } from "./timeAndDate.js";
 

@@ -1,65 +1,53 @@
 import "./logger/pino-roll";
 
 /**
- * Type for array with limited length and that cannot be empty.
+ * Represents an array with a fixed length, ensuring it is not empty if length > 0.
+ * @template T - The type of elements in the array.
+ * @template N - The fixed length of the array (must be a positive number).
  * @example
  * ```ts
- * const arr: LimitedArray<string, 2> = ["a", "b"]; // [string, string]
- * const arr2: LimitedArray<string, 3> = ["a", "b", "c"]; // [string, string, string]
- * const arr3: LimitedArray<string, 2 | 3> = ["a", "b"]; // [string, string, (string | undefined)]
+ * const arr: LimitedArray<string, 2> = ["a", "b"]; // Valid: ["string", "string"]
+ * const arr2: LimitedArray<string, 3> = ["a", "b", "c"]; // Valid: ["string", "string", "string"]
+ * const arr3: LimitedArray<string, 0> = []; // Valid: []
  * ```
  */
-export type ArrayPathLimit = LimitedArray<ArrayNotEmpty<string>, string, 2>;
+export type LimitedArray<T, N extends number> = N extends 0 ? [] : Tuple<T, N>;
 
 /**
- * Utility types for array handling.
+ * Creates a tuple of fixed length using recursion.
+ * @template T - The type of elements in the tuple.
+ * @template N - The desired length (must be a non-negative number).
+ * @returns A tuple of type [T, T, ..., T] with length N.
+ * @example
+ * ```ts
+ * type SomeArrayType = Tuple<string, 3>; // -> ["string", "string", "string"]
+ * ```
  */
+type Tuple<T, N extends number, R extends unknown[] = []> = R["length"] extends N
+  ? R
+  : Tuple<T, N, [...R, T]>;
 
 /**
- * Maybe this array is empty
- *
- * @template T - The type of the elements in the array
+ * An array that may be empty.
+ * @template T - The type of elements in the array.
  */
 export type ArrayMaybeEmpty<T> = T[] | [];
 
 /**
- * This array should have at least 1 Element
- *
- * @template T - The type of the elements in the array
+ * An array that must contain at least one element.
+ * @template T - The type of elements in the array.
  */
-export type ArrayNotEmpty<T> = [T, ...T[]] | [T];
+export type ArrayNotEmpty<T> = [T, ...T[]];
 
 /**
- * It's a limit array that doesn't give you a whine than you pointed in the type
- *
- * @template T - The type of the elements in the array
- * @template K - The type of the elements in the array
- * @template TLength - The length of the array (default: 1)
- */
-export type LimitedArray<
-  T extends ArrayMaybeEmpty<K> | ArrayNotEmpty<K> | Array<K>,
-  K,
-  TLength extends number = 1,
-> = Tuple<T[number], TLength>;
-
-/**
- * Create a tuple
- *
- * @template T - The type of the elements in the tuple
- * @template N - The length of the tuple
- * @template R - The tuple
- *
- * @returns {R}
- *
+ * A specific use case for a limited array of non-empty string paths with at least 2 elements.
  * @example
  * ```ts
- * type SomeArrayType = Tuple<string, 3>;
- * // -> ['string', 'string', 'string']
+ * const path: ArrayPathLimit = ["user", "profile"]; // Valid
+ * const invalidPath: ArrayPathLimit = ["user"]; // Error: too short
  * ```
  */
-type Tuple<T, N extends number, R extends T[] = []> = R["length"] extends N
-  ? R
-  : Tuple<T, N, [...R, T]>;
+export type ArrayPathLimit = LimitedArray<ArrayNotEmpty<string>, 2>;
 
 /**
  * Type for a key of an object

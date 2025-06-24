@@ -1,7 +1,7 @@
 import type { Scope } from "../core/scope";
 import type { InjectionToken } from "../types";
 
-export function Injectable(options?: {
+export function Injectable(_options?: {
   scope?: Scope;
   token?: InjectionToken<unknown>;
 }): ClassDecorator {
@@ -10,25 +10,25 @@ export function Injectable(options?: {
   };
 }
 
-export function AutoBind(options?: {
+export function AutoBind(_options?: {
   scope?: Scope;
   token?: InjectionToken<unknown>;
 }): ClassDecorator {
-  return (target: unknown) => {};
+  return (_target: unknown) => {};
 }
-export function AutoBindFactory(options?: {
+export function AutoBindFactory(_options?: {
   scope?: Scope;
   token?: InjectionToken<unknown>;
 }): ClassDecorator {
-  return (target: unknown) => {};
+  return (_target: unknown) => {};
 }
 export function postConstruct(): MethodDecorator {
-  return (...args: unknown[]) => {
+  return (..._args: unknown[]) => {
     return {} as any;
   };
 }
 export function preDestroy(): MethodDecorator {
-  return (...args: unknown[]) => {
+  return (..._args: unknown[]) => {
     return {} as any;
   };
 }

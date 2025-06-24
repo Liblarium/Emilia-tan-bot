@@ -1,38 +1,48 @@
 import type { InjectionToken, InterceptorContext } from "../types";
 
-export function Inject<T>(token: InjectionToken<T>): ParameterDecorator {
-  return (target: any, propertyKey: string | symbol | undefined, parameterIndex: number) => target;
+export function Inject<T>(_token: InjectionToken<T>): ParameterDecorator {
+  return (target: any, _propertyKey: string | symbol | undefined, _parameterIndex: number) =>
+    target;
 }
 export function Optional(): ParameterDecorator {
-  return (target: any, propertyKey: string | symbol | undefined, parameterIndex: number) => target;
+  return (target: any, _propertyKey: string | symbol | undefined, _parameterIndex: number) =>
+    target;
 }
 export function Lazy(): ParameterDecorator {
-  return (target: any, propertyKey: string | symbol | undefined, parameterIndex: number) => target;
+  return (target: any, _propertyKey: string | symbol | undefined, _parameterIndex: number) =>
+    target;
 }
 export function SkipSelf(): ParameterDecorator {
-  return (target: any, propertyKey: string | symbol | undefined, parameterIndex: number) => target;
+  return (target: any, _propertyKey: string | symbol | undefined, _parameterIndex: number) =>
+    target;
 }
 export function Self(): ParameterDecorator {
-  return (target: any, propertyKey: string | symbol | undefined, parameterIndex: number) => target;
+  return (target: any, _propertyKey: string | symbol | undefined, _parameterIndex: number) =>
+    target;
 }
-function Tag(tag: string | symbol, value?: unknown): ParameterDecorator {
-  return (target: any, propertyKey: string | symbol | undefined, parameterIndex: number) => target;
+export function Tag(_tag: string | symbol, _value?: unknown): ParameterDecorator {
+  return (target: any, _propertyKey: string | symbol | undefined, _parameterIndex: number) =>
+    target;
 }
-export function Named(name: string): ParameterDecorator {
-  return (target: any, propertyKey: string | symbol | undefined, parameterIndex: number) => target;
+export function Named(_name: string): ParameterDecorator {
+  return (target: any, _propertyKey: string | symbol | undefined, _parameterIndex: number) =>
+    target;
 }
-export function Before(method: string, handler: (...args: unknown[]) => unknown): MethodDecorator {
-  return (...args: any[]) => {
+export function Before(
+  _method: string,
+  _handler: (...args: unknown[]) => unknown
+): MethodDecorator {
+  return (..._args: any[]) => {
     return {} as any;
   };
 }
-export function After(method: string, handler: (...args: unknown[]) => unknown): MethodDecorator {
-  return (...args: any[]) => {
+export function After(_method: string, _handler: (...args: unknown[]) => unknown): MethodDecorator {
+  return (..._args: any[]) => {
     return {} as any;
   };
 }
-export function Intercept(interceptor: (context: InterceptorContext) => unknown): MethodDecorator {
-  return (...args: any[]) => {
+export function Intercept(_interceptor: (context: InterceptorContext) => unknown): MethodDecorator {
+  return (..._args: any[]) => {
     return {} as any;
   };
 }

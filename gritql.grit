@@ -1,0 +1,32 @@
+language: typescript
+
+patterns:
+  - name: forbid_foreach
+    body: |
+      $array.forEach($fn)
+
+  - name: duplicate_imports
+    body: |
+      import $x from "$mod"
+      import $y from "$mod"
+
+  - name: deprecated_imports
+    body: |
+      import $_ from $mod
+      where {
+        $mod matches "**/deprecated/**"
+      }
+
+  - name: empty_functions
+    body: |
+      function $name($params) {}
+      where {
+        $name not in ["constructor"]
+      }
+
+  - name: console_log_outside_production
+    body: |
+      `console.log($msg)`
+      where {
+        path not matches "src/production/**"
+      }

@@ -21,15 +21,15 @@
   "dependencies": {
     "mongodb": "^6.17.0",
     "mysql2": "^3.14.1",
-    "pg": "^8.16.0",
-    "prisma": "^6.9.0"
+    "pg": "^8.16.2",
+    "prisma": "^6.10.1"
   },
   "devDependencies": {
-    "@typegoose/typegoose": "^12.16.0",
-    "@types/node": "^24.0.1",
-    "eslint": "^9.28.0",
-    "mongoose": "^8.15.1",
-    "prettier": "^3.5.3",
+    "@typegoose/typegoose": "^12.17.0",
+    "@types/node": "^24.0.4",
+    "eslint": "^9.29.0",
+    "mongoose": "^8.16.0",
+    "prettier": "^3.6.0",
     "typescript": "^5.8.3"
   }
 }

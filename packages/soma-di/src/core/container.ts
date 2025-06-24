@@ -15,7 +15,7 @@ import type {
 } from "../types";
 import { Binding } from "./binding";
 import type { ContainerMiddleware } from "./events";
-import { ProviderMap } from "./provider-map";
+import { ProviderMap } from "./providerMap";
 import type { Scope } from "./scope";
 
 export class Container {

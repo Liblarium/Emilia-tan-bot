@@ -55,7 +55,12 @@ export function Injectable<T>(options: InjectableOptions<T> = {}) {
           break;
 
         case !!options.useFactory:
-          bindUseFactory(container, { token, useFactory: options.useFactory, scope, debug });
+          bindUseFactory(container, {
+            token,
+            useFactory: options.useFactory,
+            scope,
+            debug,
+          });
           break;
 
         default:

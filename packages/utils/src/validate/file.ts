@@ -1,8 +1,8 @@
-import { constants, access, readFile } from "node:fs/promises";
+import { access, constants, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { ErrorCode } from "@emilia-tan/config";
 import type { ArrayNotEmpty } from "@emilia-tan/types";
-import { type Observable, combineLatest, from, lastValueFrom, of } from "rxjs";
+import { combineLatest, from, lastValueFrom, type Observable, of } from "rxjs";
 import { catchError, map, switchMap } from "rxjs/operators";
 import {
   ALLOWED_EXTENSIONS,
@@ -14,7 +14,7 @@ import {
 } from "../config";
 import { emiliaError } from "../core/emiliaError";
 import type { FolderCheckResult, IFileValidator, Result } from "../types";
-//FIXME: RXJS POWAR
+//FIXME: RXJS POWER
 export class ValidateFile implements IFileValidator {
   public logCategories: ArrayNotEmpty<string> = ["file_validator"];
 

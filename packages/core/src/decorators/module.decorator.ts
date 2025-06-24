@@ -1,6 +1,6 @@
-import { Container, type ResolutionContext, type ServiceIdentifier } from "inversify";
+import { Container, type ServiceIdentifier } from "inversify";
 import { container } from "../index";
-import type { ClassProvider, Constructor, ModuleOptions, ModuleProvider } from "../types";
+import type { Constructor, ModuleOptions, ModuleProvider } from "../types";
 import {
   bindUseClass,
   bindUseFactory,
@@ -144,7 +144,11 @@ async function register(
         debug,
       });
     else if ("useValue" in provider)
-      bindUseValue(moduleContainer, { token, useValue: provider.useValue, debug });
+      bindUseValue(moduleContainer, {
+        token,
+        useValue: provider.useValue,
+        debug,
+      });
     else if ("useFactory" in provider)
       await bindUseFactory(moduleContainer, {
         scope: provider.scope,

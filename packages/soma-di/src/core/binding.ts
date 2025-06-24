@@ -20,7 +20,7 @@ export class Binding<T> {
     conditions: [],
   };
 
-  constructor(token: InjectionToken<T>, container: Container) {}
+  constructor(_token: InjectionToken<T>, _container: Container) {}
 
   toClass(classType: Constructor<T>): this {
     const config = this.config;
@@ -28,26 +28,26 @@ export class Binding<T> {
 
     return this;
   }
-  toFactory(factory: (context: ResolutionContext) => T): this {
+  toFactory(_factory: (context: ResolutionContext) => T): this {
     return this;
   }
-  toAsyncFactory(factory: (context: ResolutionContext) => Promise<T>): this {
+  toAsyncFactory(_factory: (context: ResolutionContext) => Promise<T>): this {
     return this;
   }
-  toValue(value: T): this {
+  toValue(_value: T): this {
     return this;
   }
-  toProvider(provider: CustomProvider<T>): this {
+  toProvider(_provider: CustomProvider<T>): this {
     return this;
   }
 
-  inScope(scope: Scope | CustomScope): this {
+  inScope(_scope: Scope | CustomScope): this {
     return this;
   }
-  withTag(tag: string | symbol, value: any): this {
+  withTag(_tag: string | symbol, _value: any): this {
     return this;
   }
-  withName(name: string): this {
+  withName(_name: string): this {
     return this;
   }
   asPrimary(): this {
@@ -59,13 +59,13 @@ export class Binding<T> {
   asAutoBind(): this {
     return this;
   }
-  whenTargetTagged(tag: string, value: any): this {
+  whenTargetTagged(_tag: string, _value: any): this {
     return this;
   }
-  whenTargetNamed(name: string): this {
+  whenTargetNamed(_name: string): this {
     return this;
   }
-  when(condition: (context: ResolutionContext) => boolean): this {
+  when(_condition: (context: ResolutionContext) => boolean): this {
     return this;
   }
 }

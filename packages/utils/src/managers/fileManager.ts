@@ -1,8 +1,8 @@
-import { constants, access, appendFile, mkdir, unlink, writeFile } from "node:fs/promises";
+import { access, appendFile, constants, mkdir, unlink, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { ErrorCode } from "@emilia-tan/config";
 import type { ArrayNotEmpty } from "@emilia-tan/types";
-import { type Observable, catchError, from, map, of, switchMap } from "rxjs";
+import { catchError, from, map, type Observable, of, switchMap } from "rxjs";
 import { EmiliaAbstractError } from "../core/emiliaAbstractError";
 import { emiliaError } from "../core/emiliaError";
 import type { ClassWithValidator, FileManagerInterface, IFileValidator, Result } from "../types";
@@ -193,7 +193,7 @@ export class FileManager implements FileManagerInterface {
   @validateFileOperation<ClassWithValidator>()
   appendFile(fileName: string, data: string): Observable<Result<void>> {
     return from(
-      //FIXME: RXJS POWAR
+      //FIXME: RXJS POWER
       this.fileValidator.validateFileOperation(fileName) as unknown as Promise<Result<void>>
     ).pipe(
       switchMap((validation: Result<void>): Observable<Result<void>> => {

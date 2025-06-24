@@ -42,7 +42,7 @@ export interface ValidationResult {
   errors: ValidationError[];
 }
 
-interface CacheEntry {
+export interface CacheEntry {
   result: ValidationResult;
   timestamp: number;
 }

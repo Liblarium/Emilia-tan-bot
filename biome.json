@@ -7,25 +7,23 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "ignore": [
-      "dist/*",
-      "sandbox/*.js",
-      "infrastructure/*",
-      "package.json",
-      "pnpm-lock.yaml",
-      "node_modules/*",
-      "apps/**/node_modules/*",
-      "packages/**/node_modules/*",
-      "oldCode/*",
-      "biome.json"
-    ],
-    "include": [
-      "apps/**/src/**/*",
-      "packages/**/src/**/*",
-      "*/src/**/*",
-      "sandbox/*",
-      "*.md",
-      "docs/**/*.md"
+    "includes": [
+      "**/apps/**/src/**/*",
+      "**/packages/**/src/**/*",
+      "**/*/src/**/*",
+      "**/sandbox/**/*",
+      "**/*.md",
+      "**/docs/**/*.md",
+      "!**/dist/**/*",
+      "!**/sandbox/**/*.js",
+      "!**/infrastructure/**/*",
+      "!**/package.json",
+      "!**/pnpm-lock.yaml",
+      "!**/node_modules/**/*",
+      "!**/apps/**/node_modules/**/*",
+      "!**/packages/**/node_modules/**/*",
+      "!**/oldCode/**/*",
+      "!**/biome.json"
     ]
   },
   "javascript": {
@@ -35,25 +33,23 @@
   },
   "linter": {
     "enabled": true,
-    "ignore": [
-      "dist/*",
-      "sandbox/*.js",
-      "infrastructure/*",
-      "package.json",
-      "pnpm-lock.yaml",
-      "node_modules/*",
-      "apps/**/node_modules/*",
-      "packages/**/node_modules/*",
-      "oldCode/*",
-      "biome.json"
-    ],
-    "include": [
-      "apps/**/src/**/*",
-      "packages/**/src/**/*",
-      "*/src/**/*",
-      "sandbox/*",
-      "*.md",
-      "docs/**/*.md"
+    "includes": [
+      "**/apps/**/src/**/*",
+      "**/packages/**/src/**/*",
+      "**/*/src/**/*",
+      "**/sandbox/**/*",
+      "**/*.md",
+      "**/docs/**/*.md",
+      "!**/dist/**/*",
+      "!**/sandbox/**/*.js",
+      "!**/infrastructure/**/*",
+      "!**/package.json",
+      "!**/pnpm-lock.yaml",
+      "!**/node_modules/**/*",
+      "!**/apps/**/node_modules/**/*",
+      "!**/packages/**/node_modules/**/*",
+      "!**/oldCode/**/*",
+      "!**/biome.json"
     ],
     "rules": {
       "recommended": true,
@@ -62,50 +58,55 @@
         "noStaticOnlyClass": "off",
         "noThisInStatic": "off",
         "noUselessConstructor": "off",
-        "noBannedTypes": "off"
+        "noBannedTypes": "off",
+        "noCommaOperator": "off"
       },
       "correctness": {
-        "noVoidTypeReturn": "off"
+        "noVoidTypeReturn": "off",
+        "useValidTypeof": "off"
       },
       "style": {
-        "noCommaOperator": "off",
         "noParameterAssign": "off",
         "useDefaultParameterLast": "off",
         "useLiteralEnumMembers": "off",
         "noInferrableTypes": "off",
-        "useShorthandFunctionType": "off"
+        "useShorthandFunctionType": "off",
+        "useAsConstAssertion": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noUselessElse": "error"
       },
       "suspicious": {
         "noConfusingVoidType": "off",
         "noAssignInExpressions": "off",
         "noExplicitAny": "off",
-        "useValidTypeof": "off",
         "noShadowRestrictedNames": "off"
       }
     }
   },
   "formatter": {
     "enabled": true,
-    "ignore": [
-      "dist/*",
-      "sandbox/*.js",
-      "infrastructure/*",
-      "package.json",
-      "pnpm-lock.yaml",
-      "node_modules/*",
-      "apps/**/node_modules/*",
-      "packages/**/node_modules/*",
-      "*/node_modules/*",
-      "oldCode/*",
-      "biome.json"
-    ],
-    "include": [
-      "apps/**/src/**/*",
-      "packages/**/src/**/*",
-      "*/src/**/*",
-      "sandbox/*",
-      "*.md",
-      "docs/**/*.md"
+    "includes": [
+      "**/apps/**/src/**/*",
+      "**/packages/**/src/**/*",
+      "**/*/src/**/*",
+      "**/sandbox/**/*",
+      "**/*.md",
+      "**/docs/**/*.md",
+      "!**/dist/**/*",
+      "!**/sandbox/**/*.js",
+      "!**/infrastructure/**/*",
+      "!**/package.json",
+      "!**/pnpm-lock.yaml",
+      "!**/node_modules/**/*",
+      "!**/apps/**/node_modules/**/*",
+      "!**/packages/**/node_modules/**/*",
+      "!**/*/node_modules/**/*",
+      "!**/oldCode/**/*",
+      "!**/biome.json"
     ],
     "useEditorconfig": true,
     "indentStyle": "space",
@@ -113,7 +114,11 @@
     "bracketSpacing": true,
     "indentWidth": 2
   },
-  "organizeImports": {
-    "enabled": true
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   }
 }

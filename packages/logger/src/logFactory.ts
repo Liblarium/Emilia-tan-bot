@@ -1,5 +1,5 @@
-import type { LogFactoryOptionalOptions, LogFactoryOptions } from "@emilia-tan/types";
 import { LogType } from "@emilia-tan/config";
+import type { LogFactoryOptionalOptions, LogFactoryOptions } from "@emilia-tan/types";
 import { Subject } from "rxjs";
 import { filter, map } from "rxjs/operators";
 import { Log } from "./";
@@ -10,9 +10,8 @@ export class LogFactory {
   private static logStream = new Subject<LogFactoryOptions>();
 
   private static get getInstance(): Log {
-    if (!this.instance) {
-      this.instance = new Log(); // initialize logger
-    }
+    if (!this.instance) this.instance = new Log(); // initialize logger
+
     return this.instance;
   }
 

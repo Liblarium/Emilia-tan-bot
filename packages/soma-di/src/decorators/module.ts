@@ -1,7 +1,7 @@
 import type { Constructor, ModuleDescriptor } from "../types";
 
-export function Module(metadata: ModuleDescriptor): ClassDecorator {
-  return (target: any) => {};
+export function Module(_metadata: ModuleDescriptor): ClassDecorator {
+  return (_target: any) => {};
 }
 
 export function lazyRef<T>(fn: () => Constructor<T>): Constructor<T> {
