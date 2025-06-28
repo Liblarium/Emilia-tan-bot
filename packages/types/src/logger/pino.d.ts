@@ -1,4 +1,4 @@
-import type { LogEntry } from "./log";
+import type { LogEntry } from "./log.d.ts";
 
 export type LoggerData = Omit<LogEntry, "type">;
 

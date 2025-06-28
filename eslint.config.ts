@@ -1,6 +1,6 @@
 import pluginJs from "@eslint/js";
 import tsparser from "@typescript-eslint/parser";
-import biome from "eslint-config-biome";
+import biome from "@ctrl/eslint-config-biome";
 import prettier from "eslint-config-prettier/flat";
 import prettierPlugin from "eslint-plugin-prettier/recommended";
 import nx from "@nx/eslint";
@@ -36,7 +36,7 @@ export default [
   pluginJs.configs.recommended,
   prettierPlugin,
   prettier,
-  biome,
+  ...biome,
   {
     files: ["apps/**/src/**/*.ts", "packages/**/src/**/*.ts", "packages/**/src/**/*.d.ts", "*/src/**/*.ts", "*/src/**/*.d.ts"],
     languageOptions: {
@@ -65,6 +65,9 @@ export default [
         "endOfLine": "auto",
         "quoteProps": "as-needed"
       }],
+      "no-empty": "off",
+      "no-return-assign": "off",
+      "simple-import-sort/imports": "off",
       "comma-dangle": ["error", "only-multiline"],
       "@typescript-eslint/no-explicit-any": "off", // You... you know what you are doing
       "@typescript-eslint/no-unsafe-call": "off",
@@ -86,6 +89,7 @@ export default [
       "@typescript-eslint/require-await": "off",
       "@typescript-eslint/no-unused-expressions": "off",
       "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/switch-exhaustiveness-check": "off"
     }
-  }
+  },
 ];

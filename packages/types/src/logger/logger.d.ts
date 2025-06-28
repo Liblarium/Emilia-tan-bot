@@ -1,6 +1,6 @@
 import type { InlineType, LogType } from "@emilia-tan/config";
 import type { Observable } from "rxjs";
-import type { LogEntry } from "./log";
+import type { LogEntry } from "./log.d.ts";
 /**
  * Interface for a logger.
  */

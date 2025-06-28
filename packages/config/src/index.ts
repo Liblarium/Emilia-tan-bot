@@ -1,3 +1,5 @@
-export * from "./errorCode";
-export * from "./log";
-export * from "./validationEnums";
+import "dotenv/config";
+
+export * from "./errorCode.js";
+export * from "./log.js";
+export * from "./validationEnums.js";

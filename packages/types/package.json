@@ -19,6 +19,7 @@
     }
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.71",
     "discord.js": "^14.20.0"
   },
   "devDependencies": {

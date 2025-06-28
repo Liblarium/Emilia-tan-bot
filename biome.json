@@ -59,11 +59,57 @@
         "noThisInStatic": "off",
         "noUselessConstructor": "off",
         "noBannedTypes": "off",
-        "noCommaOperator": "off"
+        "noCommaOperator": "off",
+        "noExtraBooleanCast": "error",
+        "noUselessCatch": "error",
+        "noUselessEmptyExport": "error",
+        "noUselessFragments": "error",
+        "noUselessLabel": "error",
+        "noUselessLoneBlockStatements": "error",
+        "noUselessRename": "error",
+        "noUselessTernary": "error",
+        "noUselessThisAlias": "error",
+        "noUselessTypeConstraint": "error",
+        "noVoid": "error",
+        "useArrowFunction": "error",
+        "useFlatMap": "error",
+        "useLiteralKeys": "off",
+        "useOptionalChain": "error",
+        "useRegexLiterals": "error",
+        "noUselessStringConcat": "error",
+        "noAdjacentSpacesInRegex": "error",
+        "useNumericLiterals": "error",
+        "noArguments": "error"
       },
       "correctness": {
         "noVoidTypeReturn": "off",
-        "useValidTypeof": "off"
+        "useValidTypeof": "off",
+        "noChildrenProp": "error",
+        "noConstantCondition": "error",
+        "noConstAssign": "error",
+        "noConstructorReturn": "error",
+        "noEmptyCharacterClassInRegex": "error",
+        "noEmptyPattern": "error",
+        "noGlobalObjectCalls": "error",
+        "noInnerDeclarations": "error",
+        "noInvalidConstructorSuper": "error",
+        "noNonoctalDecimalEscape": "error",
+        "noPrecisionLoss": "error",
+        "noSelfAssign": "error",
+        "noSetterReturn": "error",
+        "noSwitchDeclarations": "error",
+        "noUnreachable": "error",
+        "noUnreachableSuper": "error",
+        "noUnsafeFinally": "error",
+        "noUnsafeOptionalChaining": "error",
+        "noUnusedLabels": "error",
+        "noVoidElementsWithChildren": "error",
+        "useExhaustiveDependencies": "error",
+        "useIsNan": "error",
+        "useJsxKeyInIterable": "error",
+        "useValidForDirection": "error",
+        "useYield": "error",
+        "noInvalidBuiltinInstantiation": "error"
       },
       "style": {
         "noParameterAssign": "off",
@@ -83,7 +129,44 @@
         "noConfusingVoidType": "off",
         "noAssignInExpressions": "off",
         "noExplicitAny": "off",
-        "noShadowRestrictedNames": "off"
+        "noShadowRestrictedNames": "off",
+        "noAsyncPromiseExecutor": "error",
+        "noFunctionAssign": "error",
+        "noArrayIndexKey": "error",
+        "noCatchAssign": "error",
+        "noClassAssign": "error",
+        "noCommentText": "error",
+        "noControlCharactersInRegex": "error",
+        "noDebugger": "error",
+        "noDuplicateJsxProps": "error",
+        "noDuplicateObjectKeys": "error",
+        "noExtraNonNullAssertion": "error",
+        "noFallthroughSwitchClause": "error",
+        "noGlobalAssign": "error",
+        "noImportAssign": "error",
+        "noMisleadingCharacterClass": "error",
+        "noPrototypeBuiltins": "error",
+        "noRedeclare": "error",
+        "noSelfCompare": "error",
+        "noUnsafeDeclarationMerging": "error",
+        "useDefaultSwitchClauseLast": "error",
+        "useGetterReturn": "error",
+        "useNamespaceKeyword": "error",
+        "noUnsafeNegation": "error",
+        "noDuplicateParameters": "error",
+        "noEmptyBlockStatements": "off",
+        "noEmptyInterface": "error",
+        "noCompareNegZero": "error",
+        "noConfusingLabels": "error",
+        "noSparseArray": "error",
+        "noDoubleEquals": "error",
+        "noDuplicateClassMembers": "error",
+        "noLabelVar": "error",
+        "noDuplicateCase": "error",
+        "noMisplacedAssertion": "error",
+        "useErrorMessage": "error",
+        "noWith": "error",
+        "noVar": "error"
       }
     }
   },
@@ -109,15 +192,22 @@
       "!**/biome.json"
     ],
     "useEditorconfig": true,
+    "formatWithErrors": true,
     "indentStyle": "space",
     "lineEnding": "crlf",
     "bracketSpacing": true,
+    "lineWidth": 100,
     "indentWidth": 2
   },
   "assist": {
     "actions": {
       "source": {
-        "organizeImports": "on"
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [["**"]]
+          }
+        }
       }
     }
   }

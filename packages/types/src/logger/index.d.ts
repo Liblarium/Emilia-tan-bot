@@ -1,5 +1,5 @@
-export * from "./log";
-export * from "./pino";
-export * from "./fileLogger";
-export * from "./logger";
-import "./pino-roll";
+export * from "./fileLogger.d.ts";
+export * from "./log.d.ts";
+export * from "./logger.d.ts";
+export * from "./pino.d.ts";
+import "./pino-roll.d.ts";

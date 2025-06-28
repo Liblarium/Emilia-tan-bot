@@ -3,8 +3,8 @@
   "version": "1.0.0", 
   "private": true,
   "type": "module",
-  "main": "src/index.js",
-  "types": "src/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build:module": "swc src -d dist --config-file ../../.swcrc",
     "build": "pnpm run build:module && pnpm run typecheck",
@@ -14,8 +14,20 @@
   },
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./errorCode": {
+      "import": "./dist/errorCode.js",
+      "types": "./dist/errorCode.d.ts"
+    },
+    "./log": {
+      "import": "./dist/log.js",
+      "types": "./dist/log.d.ts"
+    },
+    "./validationEnums": {
+      "import": "./dist/validationEnums.js",
+      "types": "./dist/validationEnums.d.ts"
     }
   },
   "dependencies": {

@@ -1,4 +1,4 @@
-import "./logger/pino-roll";
+import "./logger/pino-roll.d.ts";
 
 /**
  * Represents an array with a fixed length, ensuring it is not empty if length > 0.
@@ -63,4 +63,5 @@ export type ReadJSONFileResult<T extends object = object> = T | { error: string 
 
 export type LineType = { news: "" | "\n"; last: "" | "\n" };
 
-export * from "./logger";
+export * from "./logger/index.d.ts";
+export * from "./media/canvas.d.ts";

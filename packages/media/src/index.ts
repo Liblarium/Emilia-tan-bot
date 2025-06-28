@@ -1,12 +1,13 @@
 import { LogType } from "@emilia-tan/config";
-import type { LogEntry, LoggerData, LoggerType } from "@emilia-tan/types";
-import {
-  type CanvasTextAlign,
-  createCanvas,
-  GlobalFonts,
-  type SKRSContext2D,
+import type { LoggerData, LoggerType } from "@emilia-tan/types";
+import type {
+  // type CanvasTextAlign,
+  // createCanvas,
+  // GlobalFonts,
+  SKRSContext2D,
 } from "@napi-rs/canvas";
-import sharp from "sharp";
+
+//import sharp from "sharp";
 
 // W.I.P
 // --- Типи ---
@@ -62,6 +63,10 @@ class BaseDraw {
     //this.textService = new TextDrawingService(ctx);
   }
 
+  public get font(): string {
+    return this.ctx.font;
+  }
+
   /**
    * Sets the font for all drawing operations.
    *
@@ -94,10 +99,6 @@ class BaseDraw {
     this.ctx.font = fontParts;
   }
 
-  public get font(): string {
-    return this.ctx.font;
-  }
-
   public drawText(options: DrawTextOptions, debug = false) {
     //this.textService.drawText(options, debug);
     return this;
@@ -124,7 +125,7 @@ class TextLayout {
 
 interface WrapChunk {
   text: string;
-  width: number;
+  width?: number;
   isBreakable?: boolean;
   forceBreakAfter?: boolean;
   metadata?: Record<string, unknown>;
@@ -143,51 +144,33 @@ interface WrapResult {
 interface WrapOptions {
   maxWidth: number;
   lineHeight: number;
+  /** Hyphen char on line-breaks for long unbreakable chunks. Default: `-` */
+  hyphenChar?: string;
+  symbols?: WrapSymbols;
   measure(chunk: string): number;
   shouldBreak?(chunk: string): boolean;
   onLineBreak?(line: WrapLine): void;
-  symbols?: WrapSymbols;
 }
 
 interface WrapSymbols {
-  hyphen?: string; // зазвичай "-"
-  ellipsis?: string; // зазвичай "…"
+  hyphen?: string; // зазвичай | usually "-"
+  ellipsis?: string; // зазвичай | usually "…"
   nonBreakSpace?: string; // напр. "\u00A0"
 }
 
 class WrapEngine {
-  private measureCache = new Map<string, number>();
+  private readonly measureCache = new Map<string, number>();
 
   constructor(
-    private options: WrapOptions,
-    private logger?: LoggerType
+    private readonly options: WrapOptions,
+    private readonly logger?: LoggerType
   ) {}
-
-  private async log(message: LoggerData, type: LogType = LogType.Info) {
-    switch (type) {
-      case LogType.Info:
-        this.logger?.info(message) ?? console.info(message);
-        break;
-      case LogType.Error:
-        this.logger?.error(message) ?? console.error(message);
-        break;
-      case LogType.Debug:
-        this.logger?.debug(message) ?? console.debug(message);
-        break;
-      case LogType.Warning:
-        this.logger?.warning(message) ?? console.warn(message);
-        break;
-      default:
-        console.log(message);
-        break;
-    }
-  }
 
   public async debug(message: LoggerData) {
     await this.log(message, LogType.Debug);
   }
 
-  // Основний метод для обгортання тексту
+  // Основний метод для обгортання тексту | Basic method for wrapping text
   public wrapText(chunks: WrapChunk[]): WrapResult {
     const lines: WrapLine[] = [];
     const currentLine: WrapLine = { chunks: [], totalWidth: 0 };
@@ -214,109 +197,40 @@ class WrapEngine {
     };
   }
 
-  private addChunkToLine(chunk: WrapChunk, lines: WrapLine[], currentLine: WrapLine): void {
-    const cWidth = this.getChunkWidth(chunk);
-
-    if (currentLine.totalWidth + cWidth > this.options.maxWidth) {
-      this.options.onLineBreak?.(currentLine);
-      lines.push(currentLine);
-      currentLine.chunks = [];
-      currentLine.totalWidth = 0;
-    }
-
-    currentLine.chunks.push(chunk);
-    currentLine.totalWidth += cWidth;
-
-    if (!chunk.forceBreakAfter) return;
-
-    this.options.onLineBreak?.(currentLine);
-    lines.push(currentLine);
-    currentLine.chunks = [];
-    currentLine.totalWidth = 0;
-  }
-
-  // public wrapText(chunks: WrapChunk[]): WrapResult {
-  //   const lines: WrapLine[] = [];
-  //   let currentLine: WrapLine = { chunks: [], totalWidth: 0 };
-
-  //   for (const chunk of chunks) {
-  //     const chunkWidth = this.getChunkWidth(chunk);
-
-  //     // Якщо довгий не-breakable chunk — розбиваємо
-  //     const chunksToAdd =
-  //       chunkWidth > this.options.maxWidth && !chunk.isBreakable ? this.breakChunk(chunk) : [chunk];
-
-  //     for (const c of chunksToAdd) {
-  //       const cWidth = this.getChunkWidth(c);
-
-  //       if (currentLine.totalWidth + cWidth > this.options.maxWidth) {
-  //         this.options.onLineBreak?.(currentLine);
-  //         lines.push(currentLine);
-  //         currentLine = { chunks: [], totalWidth: 0 };
-  //       }
-
-  //       currentLine.chunks.push(c);
-  //       currentLine.totalWidth += cWidth;
-
-  //       if (c.forceBreakAfter) {
-  //         this.options.onLineBreak?.(currentLine);
-  //         lines.push(currentLine);
-  //         currentLine = { chunks: [], totalWidth: 0 };
-  //       }
-  //     }
-  //   }
-
-  //   if (currentLine.chunks.length > 0) {
-  //     this.options.onLineBreak?.(currentLine);
-  //     lines.push(currentLine);
-  //   }
-
-  //   return {
-  //     lines,
-  //     totalHeight: lines.length * this.options.lineHeight,
-  //   };
-  // }
-
-  // Отримуємо ширину з кешем
-  private getChunkWidth(chunk: Omit<WrapChunk, "width"> & { width?: number }): number {
-    if (chunk.width !== undefined) return chunk.width;
-
-    if (this.measureCache.has(chunk.text)) {
-      return this.measureCache.get(chunk.text) as number;
-    }
-
-    const width = this.options.measure(chunk.text);
-    this.measureCache.set(chunk.text, width);
-    return width;
-  }
-
-  // Розбиваємо довгий chunk по символах з fallback-гіфенізацією
+  // Розбиваємо довгий chunk по символах з fallback-гіфенізацією | Breaking down a long chunk by characters with fallback hyphenation
   public breakChunk(chunk: WrapChunk): WrapChunk[] {
     if (chunk.text === "") return [];
 
-    const maxWidth = this.options.maxWidth;
     const result: WrapChunk[] = [];
+    const hyphen = this.options.hyphenChar ?? "-";
+    const { maxWidth } = this.options;
+
     let currentText = "";
     let currentWidth = 0;
 
-    for (const char of chunk.text) {
-      const charWidth = this.getChunkWidth({ text: char, width: undefined });
+    for (let i = 0; i < chunk.text.length; i++) {
+      const char = chunk.text[i];
+      const charWidth = this.getChunkWidth({ text: char });
 
       if (currentWidth + charWidth > maxWidth) {
-        // Додаємо гіфен, якщо хочеш
+        // пушимо накопичене + гіфен
         result.push({
-          text: `${currentText}-`,
+          text: currentText + hyphen,
           width: currentWidth,
           isBreakable: true,
         });
-        currentText = char;
-        currentWidth = charWidth;
-      } else {
-        currentText += char;
-        currentWidth += charWidth;
+        // !!! повторюємо цей символ заново
+        currentText = "";
+        currentWidth = 0;
+        i--; // retry current char
+        continue;
       }
+
+      currentText += char;
+      currentWidth += charWidth;
     }
 
+    // фінальний шматок без гіфена
     if (currentText.length > 0) {
       result.push({
         text: currentText,
@@ -327,6 +241,85 @@ class WrapEngine {
 
     return result;
   }
+
+  private async log(message: LoggerData, type: LogType = LogType.Info) {
+    switch (type) {
+      case LogType.Info:
+        (await this.logger?.info(message)) ?? console.info(message);
+        break;
+      case LogType.Error:
+        (await this.logger?.error(message)) ?? console.error(message);
+        break;
+      case LogType.Debug:
+        (await this.logger?.debug(message)) ?? console.debug(message);
+        break;
+      case LogType.Warning:
+        (await this.logger?.warning(message)) ?? console.warn(message);
+        break;
+      default:
+        console.log(message);
+    }
+  }
+
+  private addChunkToLine(chunk: WrapChunk, lines: WrapLine[], currentLine: WrapLine): void {
+    const cWidth = this.getChunkWidth(chunk);
+
+    if (currentLine.totalWidth + cWidth > this.options.maxWidth)
+      this.finalizeLine(lines, currentLine);
+
+    currentLine.chunks.push(chunk);
+    currentLine.totalWidth += cWidth;
+
+    if (chunk.forceBreakAfter) this.finalizeLine(lines, currentLine);
+  }
+
+  private finalizeLine(lines: WrapLine[], currentLine: WrapLine): void {
+    this.options.onLineBreak?.(currentLine);
+
+    lines.push({ ...currentLine });
+    currentLine.chunks.length = 0;
+    currentLine.totalWidth = 0;
+  }
+
+  // Отримуємо ширину з кешем | Getting the width with the cache
+  private getChunkWidth(chunk: Omit<WrapChunk, "width"> & { width?: number }): number {
+    if (chunk.width !== undefined) return chunk.width;
+
+    if (this.measureCache.has(chunk.text)) return this.measureCache.get(chunk.text) ?? -1;
+
+    const width = this.options.measure(chunk.text);
+    this.measureCache.set(chunk.text, width);
+
+    return width;
+  }
+}
+
+// грубий тест без канвасу, чисто wrap
+
+const engine = new WrapEngine({
+  maxWidth: 50,
+  lineHeight: 20,
+  measure: (str) => str.length * 8, // наприклад 8px на символ
+  hyphenChar: "~",
+  onLineBreak: (line) => console.log("Line break:", line),
+});
+
+const text = "Це_дуже_велике_слово_що_я_не_буду_розбивати_на_пробели_чи_коми";
+
+const chunks: WrapChunk[] = [
+  {
+    text,
+    width: undefined,
+    isBreakable: false,
+  },
+];
+
+const result = engine.wrapText(chunks);
+
+console.log("== WRAP RESULT ==");
+
+for (const line of result.lines) {
+  console.log(line.chunks.map((c) => c.text).join(""), "| width:", line.totalWidth);
 }
 
 //

@@ -1,8 +1,8 @@
 import type { ErrorCode, InlineType, LogType } from "@emilia-tan/config";
-import type { ArrayNotEmpty } from "../index.type";
-import type { FileLoggerOptions } from "./fileLogger";
-import type { LoggerType } from "./logger";
-import type { PinoLoggerOptions } from "./pino";
+import type { ArrayNotEmpty } from "../index.type.d.ts";
+import type { FileLoggerOptions } from "./fileLogger.d.ts";
+import type { LoggerType } from "./logger.d.ts";
+import type { PinoLoggerOptions } from "./pino.d.ts";
 
 /**
  * Options for Log class
