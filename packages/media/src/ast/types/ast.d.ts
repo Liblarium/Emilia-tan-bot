@@ -56,7 +56,7 @@ export type LineVisualStyle = Omit<VisualStyle, keyof FillStyle>;
 
 type LineNodeBase = WrapAstNodeBase & LineSegment & LineVisualStyle;
 
-type RectDebugKind = "rect" | "container" | "emoji";
+type RectDebugKind = "rect" | "container" | "emoji" | "image" | "link";
 
 export type AnyDebugShape = 
   | DebugShape<"circle" | RectDebugKind>
@@ -105,7 +105,7 @@ export interface SpecialNode extends WrapAstNode {
 export interface StyleNode extends WrapAstNode {
   type: "style";
   style: StyleNodeStyle;
-  children: WrapAstNode[];
+  children: AnyWrapAstNode[];
 }
 
 export interface StyleNodeStyle {
@@ -147,13 +147,13 @@ export interface EmojiNode extends WrapAstNode {
 export interface LinkNode extends WrapAstNode {
   type: "link";
   href: string;
-  children: WrapAstNode[];
+  children: AnyWrapAstNode[];
 }
 
 /** Node for the image */
 export interface ImageNode extends WrapAstNode {
   type: "image";
-  src: string;
+  imagePath: string;
   width?: number;
   height?: number;
   wrapText?: "left" | "right" | "none";
@@ -239,7 +239,7 @@ export interface FallbackOptions extends OpacityOptions {
 
 export interface DrawImageOptions extends Point, NodeWithSize {
   imagePath?: string;
-  value: string;
+  value?: string;
   fallbackOptions: FallbackOptions;
 }
 

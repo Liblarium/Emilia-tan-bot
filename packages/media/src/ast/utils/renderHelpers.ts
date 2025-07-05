@@ -28,38 +28,85 @@ function hasShadowOptions(obj: unknown): obj is ShadowOptions {
   );
 }
 
+/**
+ * Applies the given opacity to the canvas context.
+ *
+ * @remarks
+ * If the `alpha` parameter is not provided, no changes are made to the context's opacity.
+ *
+ * @param ctx - The canvas context to apply the opacity to.
+ * @param alpha - The opacity to apply, if provided.
+ */
 export function applyOpacity(ctx: CanvasCtx, alpha?: number) {
   if (alpha !== undefined) ctx.globalAlpha = alpha;
 }
 
+/**
+ * Draws an image or renders a fallback text on the canvas context depending on the given DrawImageOptions.
+ *
+ * If the `imagePath` is provided, it will be rendered on the canvas context.
+ *
+ * If the `imagePath` is not provided but the `value` is, it will be rendered as a text on the canvas context.
+ *
+ * If both `imagePath` and `value` are not provided, a fallback text will be rendered on the canvas context.
+ *
+ * @param ctx - The canvas context to draw the image or render the fallback text on.
+ * @param node - The DrawImageOptions to draw the image or render the fallback text with.
+ * @returns A promise that resolves when the image has been drawn or the fallback text has been rendered.
+ */
 export async function drawImageOrFallbackText(ctx: CanvasCtx, node: DrawImageOptions) {
   try {
-    if (isHTML2DCanvas(ctx) && node.imagePath) {
-      const image = new Image();
-      image.src = node.imagePath;
+    const { imagePath, value, x, y, width, height } = node;
 
-      await new Promise((resolve) => {
-        image.onload = () => {
-          ctx.drawImage(image, node.x, node.y, node.width, node.height);
+    switch (true) {
+      // render emoji (ASCII)
+      case !imagePath && value !== undefined:
+        ctx.fillText(value, x, y);
+        break;
 
-          resolve(null);
-        };
+      // render image/emoji from path on browser (html canvas)
+      case isHTML2DCanvas(ctx) && imagePath !== undefined:
+        {
+          const image = new Image();
+          await new Promise((resolve) => {
+            image.onload = () => {
+              ctx.drawImage(image, x, y, width, height);
 
-        image.onerror = () => {
-          renderFallback();
-          resolve(null);
-        };
-      });
-    } else if (!isHTML2DCanvas(ctx) && node.imagePath) {
-      const img = await loadImage(node.imagePath);
+              resolve(null);
+            };
 
-      ctx.drawImage(img, node.x, node.y, node.width, node.height);
-    } else renderFallback();
+            image.onerror = () => {
+              renderFallback();
+              resolve(null);
+            };
+
+            image.src = imagePath;
+          });
+        }
+        break;
+
+      // render image/emoji on @napi-rs/canvas
+      case !isHTML2DCanvas(ctx) && imagePath !== undefined:
+        {
+          const img = await loadImage(imagePath);
+
+          ctx.drawImage(img, x, y, width, height);
+        }
+        break;
+
+      // if imagePath and value are both undefined, render fallback
+      default:
+        renderFallback();
+    }
   } catch (err) {
     console.warn(`drawImageOrFallbackText failed for ${node.imagePath}`, err);
     renderFallback();
   }
 
+  /**
+   * Renders a fallback text on the canvas context if the given node image could not be rendered.
+   * @param node The node with the fallback options.
+   */
   function renderFallback() {
     ctx.save();
     const { opacity, font, text } = node.fallbackOptions;
@@ -72,6 +119,11 @@ export async function drawImageOrFallbackText(ctx: CanvasCtx, node: DrawImageOpt
   }
 }
 
+/**
+ * Checks if given canvas is a HTML Canvas 2D rendering context.
+ * @param canvas The canvas to check.
+ * @returns True if the canvas is a HTML Canvas 2D rendering context, false otherwise.
+ */
 function isHTML2DCanvas(canvas: unknown): canvas is CanvasRenderingContext2D {
   return (
     typeof CanvasRenderingContext2D !== "undefined" && canvas instanceof CanvasRenderingContext2D

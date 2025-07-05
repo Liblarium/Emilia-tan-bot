@@ -2,7 +2,7 @@ import type { CanvasCtx } from "@emilia-tan/types";
 import type { ContainerNode } from "../types/ast.js";
 import { debugRect, isDebug } from "../utils/debug.js";
 import { hasSize } from "../utils/renderHelpers.js";
-import { renderNode } from "./renderNode.js";
+import { renderAst, renderNode } from "./barrel.js";
 
 export function renderContainerNode(node: ContainerNode, ctx: CanvasCtx) {
   ctx.save();
@@ -21,13 +21,13 @@ export function renderContainerNode(node: ContainerNode, ctx: CanvasCtx) {
 
   const padding = node.padding ?? 0;
 
-  // Зрушуємо контекст на позицію контейнера + паддінг
+  // Moving the context to the container + padding position
   ctx.translate(x + padding, y + padding);
 
   if (node.layout === "grid" && node.gridTemplate) {
     const { columns, rows } = node.gridTemplate;
 
-    // Обчислюємо ширину та висоту клітинки сітки
+    // Calculating the width and height of a grid cell
     const cellWidth = (width - padding * 2) / columns;
     const cellHeight = (height - padding * 2) / rows;
 
@@ -36,7 +36,7 @@ export function renderContainerNode(node: ContainerNode, ctx: CanvasCtx) {
       const row = Math.floor(index / columns);
 
       ctx.save();
-      // Позиціонуємо контекст на клітинку сітки
+      // Positioning the context on a grid cell
       ctx.translate(col * cellWidth, row * cellHeight);
 
       if (hasSize(child)) {
@@ -48,12 +48,9 @@ export function renderContainerNode(node: ContainerNode, ctx: CanvasCtx) {
 
       ctx.restore();
     });
-  } else {
-    // Якщо layout не grid — просто рендеримо дітей з поточним зсувом
-    for (const child of node.children) {
-      renderNode(child, ctx);
-    }
-  }
+
+    // If layout is not grid, just render the children with the current shift
+  } else renderAst({ children: node.children, type: "root" }, ctx);
 
   ctx.restore();
 }

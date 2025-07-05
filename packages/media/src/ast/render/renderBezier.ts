@@ -25,5 +25,6 @@ export function renderBezierCurveNode(node: BezierCurveNode, ctx: CanvasCtx) {
 
   // debug
   if (isDebug()) debugBezierCurve(ctx, { nodeType: node.type, box: points });
+
   ctx.restore();
 }

@@ -8,7 +8,7 @@ export async function renderEmojiNode(node: EmojiNode, ctx: CanvasCtx) {
 
   const x = node.x ?? 0;
   const y = node.y ?? 0;
-  const size = node.size ?? 24; // стандартний розмір емодзі
+  const size = node.size ?? 24; // standard emoji size
 
   ctx.textBaseline = "top";
   ctx.font = `${size}px ${node.font ?? "serif"}`;
