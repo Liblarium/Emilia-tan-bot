@@ -19,14 +19,14 @@
     }
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.71",
-    "discord.js": "^14.20.0"
+    "@napi-rs/canvas": "^0.1.73",
+    "discord.js": "^14.21.0"
   },
   "devDependencies": {
     "@emilia-tan/config": "workspace:*",
-    "@types/node": "^24.0.4",
-    "eslint": "^9.29.0",
-    "prettier": "^3.6.0",
+    "@types/node": "^24.0.13",
+    "eslint": "^9.30.1",
+    "prettier": "^3.6.2",
     "rxjs": "^7.8.2",
     "typescript": "^5.8.3"
   }

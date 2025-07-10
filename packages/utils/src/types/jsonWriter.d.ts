@@ -9,7 +9,7 @@ export interface IJSONAppendLine {
   appendLine<T extends object>(
     filePath: string,
     data: T,
-    delimiter: string
+    delimiter: string,
   ): Observable<Result<void>>;
 }
 

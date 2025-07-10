@@ -1,46 +1,49 @@
 import type { CanvasCtx } from "@emilia-tan/types";
-import type { CircleNode } from "../types/ast.js";
+import type { CircleNode, KeysAsArray, Point } from "../types/ast.js";
 import { debugCircle, isDebug } from "../utils/debug.js";
-import { applyOpacity, applyShadow } from "../utils/renderHelpers.js";
+import { applyOpacity, applyShadow, hasKeys, withCanvasContext } from "../utils/renderHelpers.js";
 export function renderCircleNode(node: CircleNode, ctx: CanvasCtx) {
-  ctx.save();
+  return withCanvasContext(ctx, () => {
+    if (node.radius <= 0) return console.warn(`CircleNode has invalid radius: ${node.radius}`);
 
-  // position
-  const x = node.x ?? 0;
-  const y = node.y ?? 0;
+    if (!hasKeys<CircleNode, KeysAsArray<Point>>(node, ["x", "y"]))
+      console.warn(`CircleNode has invalid position: "circle"`);
 
-  // angle
-  const start = node.angle?.start ?? 0;
-  const end = node.angle?.end ?? Math.PI * 2;
-  const counterclockwise = node.angle?.anticlockwise ?? false;
+    // position
+    const x = node.x ?? 0;
+    const y = node.y ?? 0;
 
-  // opacity and shadow
-  applyOpacity(ctx, node.opacity);
-  applyShadow(ctx, node);
+    // angle
+    const start = node.angle?.start ?? 0;
+    const end = node.angle?.end ?? Math.PI * 2;
+    const counterclockwise = node.angle?.anticlockwise ?? false;
 
-  // color
-  if (node.fillColor) ctx.fillStyle = node.fillColor;
+    // opacity and shadow
+    applyOpacity(ctx, node.opacity);
+    applyShadow(ctx, node);
 
-  // outline
-  if (node.strokeColor && node.strokeWidth) {
-    ctx.strokeStyle = node.strokeColor;
-    ctx.lineWidth = node.strokeWidth;
-  }
+    // color
+    if (node.fillColor) ctx.fillStyle = node.fillColor;
 
-  ctx.beginPath();
-  ctx.arc(x, y, node.radius, start, end, counterclockwise);
+    // outline
+    if (node.strokeColor && node.strokeWidth) {
+      ctx.strokeStyle = node.strokeColor;
+      ctx.lineWidth = node.strokeWidth;
+    }
 
-  if (node.fillColor) ctx.fill();
-  if (node.strokeColor && node.strokeWidth) ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, y, node.radius, start, end, counterclockwise);
 
-  // debug
-  if (isDebug())
-    debugCircle(ctx, {
-      nodeType: node.type,
-      radius: node.radius,
-      angle: { start, end, anticlockwise: counterclockwise },
-      box: { x, y, w: node.radius * 2, h: node.radius * 2 },
-    });
+    if (node.fillColor) ctx.fill();
+    if (node.strokeColor && node.strokeWidth) ctx.stroke();
 
-  ctx.restore();
+    // debug
+    if (isDebug())
+      debugCircle(ctx, {
+        nodeType: node.type,
+        radius: node.radius,
+        angle: { start, end, anticlockwise: counterclockwise },
+        box: { x, y, w: node.radius * 2, h: node.radius * 2 },
+      });
+  });
 }

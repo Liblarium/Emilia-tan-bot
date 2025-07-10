@@ -9,8 +9,9 @@ export type Constructor<T = unknown, Args extends any[] = any[]> = new (...args:
 /**
  * Represents the arguments of a class constructor
  */
-export type ConstructorArgs<T extends Constructor> =
-  T extends Constructor<any, infer P> ? P : never;
+export type ConstructorArgs<T extends Constructor> = T extends Constructor<any, infer P>
+  ? P
+  : never;
 
 export type CommandType = "command" | "slash" | "both";
 

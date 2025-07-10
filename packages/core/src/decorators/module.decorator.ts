@@ -74,7 +74,7 @@ export async function initModule<T>(constructor: Constructor<T>): Promise<void> 
 
     await Promise.all(
       items.map((provider) =>
-        register(provider, !!options.debug, moduleContainer).catch((e) => {
+        register(provider, Boolean(options.debug), moduleContainer).catch((e) => {
           errors.push(e as Error);
         })
       )

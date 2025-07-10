@@ -32,9 +32,9 @@ export async function reply(
   options?: ReplyOptions
 ): Promise<Message | InteractionResponse> {
   if (context instanceof Message) {
-    if (!options?.flags) return await context.reply(content);
+    if (!options?.flags) return context.reply(content);
 
-    return await context.reply({ ...content, flags: options.flags });
+    return context.reply({ ...content, flags: options.flags });
   }
 
   if (
@@ -45,7 +45,7 @@ export async function reply(
 
     if (options?.ephemeral) flags.add(MessageFlags.Ephemeral);
 
-    return await context.reply({ ...content, flags: flags.toJSON() });
+    return context.reply({ ...content, flags: flags.toJSON() });
   }
 
   throw new Error(

@@ -2,7 +2,7 @@ import type { CustomScope, InjectionToken, Provider } from "../types";
 import type { Scope } from "./scope";
 
 export class ProviderMap extends Map<InjectionToken<any>, Provider<any>[]> {
-  private multiProviders = new Set<InjectionToken<unknown>>();
+  private readonly multiProviders = new Set<InjectionToken<unknown>>();
 
   constructor(entries?: Iterable<[InjectionToken<any>, Provider<any>[]]>) {
     super(entries);
@@ -64,9 +64,7 @@ export class ProviderMap extends Map<InjectionToken<any>, Provider<any>[]> {
     return this.isMulti<T>(token) ? providers : providers.slice(0, 1);
   }
 
-  getWithName<T>(_name: string, _token: InjectionToken<T>): Provider<T>[] | undefined {
-    return;
-  }
+  getWithName<T>(_name: string, _token: InjectionToken<T>): Provider<T>[] | undefined {}
   getAllByScope(_scope: Scope): Provider<any>[] {
     return [];
   }

@@ -25,7 +25,7 @@ export function toAsyncIterable<T>(observable: Observable<T>): AsyncIterable<T> 
         const values: T[] = [];
         const subscription = subject.subscribe({
           next: (value) => values.push(value),
-          error: (err) => {
+          error(err) {
             throw err;
           },
         });

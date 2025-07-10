@@ -46,10 +46,6 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Add pnpm in PATH
-        run: echo "PATH=$env:Path;C:\Users\${{ secrets.USERNAME }}\AppData\Roaming\pnpm" >> $GITHUB_ENV
-        shell: pwsh
-
       - name: Install dependencies
         run: pnpm install
           
@@ -60,9 +56,6 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }} 
           restore-keys: | 
             ${{ runner.os }}-pnpm-
-
-      - name: Install dependencies
-        run: pnpm install
 
       - name: Run biome check
         run: npx biome check . --write

@@ -23,7 +23,7 @@ const INJECTABLE_METADATA_KEY = Symbol("injectable:options");
  */
 export function Injectable<T>(options: InjectableOptions<T> = {}) {
   return (target?: Constructor<T>): void => {
-    const debug = options.debug;
+    const { debug } = options;
     const token = options.token || target;
 
     if (!token) throw new Error("No token provided for injectable");
@@ -43,10 +43,10 @@ export function Injectable<T>(options: InjectableOptions<T> = {}) {
         return debugLog(debug, `Global injectable already registered: ${String(token)}`);
 
       const useClass = options.useClass || target;
-      const scope = options.scope;
+      const { scope } = options;
 
       switch (true) {
-        case !!useClass:
+        case Boolean(useClass):
           bindUseClass(container, { token, useClass, scope, debug });
           break;
 
@@ -54,7 +54,7 @@ export function Injectable<T>(options: InjectableOptions<T> = {}) {
           bindUseValue(container, { token, useValue: options.useValue, debug });
           break;
 
-        case !!options.useFactory:
+        case Boolean(options.useFactory):
           bindUseFactory(container, {
             token,
             useFactory: options.useFactory,

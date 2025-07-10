@@ -10,7 +10,7 @@ import type { Container } from "./container";
 import type { Scope } from "./scope";
 
 export class Binding<T> {
-  private config: {
+  private readonly config: {
     provider?: Provider<T>;
     scope?: Scope | CustomScope;
     tags: Map<string | symbol, any>;
@@ -23,7 +23,7 @@ export class Binding<T> {
   constructor(_token: InjectionToken<T>, _container: Container) {}
 
   toClass(classType: Constructor<T>): this {
-    const config = this.config;
+    const { config } = this;
     if ("provider" in config) config.provider = { useClass: classType, provide: classType };
 
     return this;

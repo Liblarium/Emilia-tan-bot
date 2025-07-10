@@ -5,6 +5,7 @@ import type {
   DebugLineShape,
   DebugPolygonShape,
   DebugShape,
+  DebugShapeError,
   RectDebugKind,
   WrapAstNodeKind,
 } from "../types/ast.js";
@@ -58,6 +59,7 @@ export function debugCircle(ctx: CanvasCtx, options: DebugShape<"circle">) {
 export function debugPolygon(ctx: CanvasCtx, options: DebugPolygonShape) {
   const { x, y } = options.box;
   let { points } = options;
+
   let x0 = x ?? 0;
   let y0 = y ?? 0;
 
@@ -108,30 +110,41 @@ function debugLog(options: AnyDebugShape) {
   let text = `[debug][${options.nodeType}]: Box: ${JSON.stringify(options.box)}`;
 
   switch (options.nodeType) {
-    case "circle":
-      {
-        if (!isDebugShape<DebugShape<"circle">>(options, "circle")) return;
+    case "circle": {
+      if (!isDebugShape<DebugShape<"circle">>(options, "circle")) return;
 
-        text += ` Radius: ${JSON.stringify(options.radius)}, Angle: ${JSON.stringify(options.angle)}`;
-      }
-      break;
-    case "polygon":
-      {
-        if (!isDebugShape<DebugPolygonShape>(options, "circle")) return;
+      text += ` Radius: ${JSON.stringify(options.radius)}, Angle: ${JSON.stringify(options.angle)}`;
 
-        text += ` Points: ${JSON.stringify(options.points)}`;
-      }
       break;
-    case "bezier":
-      {
-        if (!isDebugShape<DebugBezierCurveShape>(options, "bezier")) return;
+    }
 
-        text += ` Controls: ${JSON.stringify({
-          control1: options.box.control1,
-          control2: options.box.control2,
-        })}`;
-      }
+    case "polygon": {
+      if (!isDebugShape<DebugPolygonShape>(options, "polygon")) return;
+
+      text += ` Points: ${JSON.stringify(options.points)}`;
+
       break;
+    }
+
+    case "bezier": {
+      if (!isDebugShape<DebugBezierCurveShape>(options, "bezier")) return;
+
+      text += ` Controls: ${JSON.stringify({
+        control1: options.box.control1,
+        control2: options.box.control2,
+      })}`;
+
+      break;
+    }
+
+    case "error": {
+      if (!isDebugShape<DebugShapeError>(options, "error")) return;
+
+      text += ` Message: ${options.message}`;
+
+      break;
+    }
+
     default:
       break;
   }

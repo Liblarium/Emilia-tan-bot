@@ -220,7 +220,7 @@ export class JSONReader implements IJSONReader {
       throw emiliaError(error.message, error.code, "TypeError");
     }
 
-    const isDelimiter = jsonParse.indexOf(DELIMITER_LOG_FILE) !== -1;
+    const isDelimiter = jsonParse.includes(DELIMITER_LOG_FILE);
 
     // If the delimiter is not found, return a single result
     if (!isDelimiter) return [this.parse<T>(jsonParse)];

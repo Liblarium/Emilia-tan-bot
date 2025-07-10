@@ -7,7 +7,7 @@ import { FileLogger, PinoLogger } from "./barrel";
 
 export class LogFactory {
   private static instance: Log;
-  private static logStream = new Subject<LogFactoryOptions>();
+  private static readonly logStream = new Subject<LogFactoryOptions>();
 
   private static get getInstance(): Log {
     if (!this.instance) this.instance = new Log(); // initialize logger

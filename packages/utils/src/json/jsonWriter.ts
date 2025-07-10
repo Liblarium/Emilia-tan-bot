@@ -85,11 +85,11 @@ export class JSONWriter implements IJSONWriter {
 
         // for .json: overwrite the entire file
         this.fileManager.writeFile(filePath, jsonData.data).subscribe({
-          next: () => {
+          next() {
             observer.next({ success: true, data: undefined });
             observer.complete();
           },
-          error: (error) => {
+          error(error) {
             observer.next({ success: false, error });
             observer.complete();
           },
@@ -109,11 +109,11 @@ export class JSONWriter implements IJSONWriter {
       }
 
       this.fileManager.appendFile(filePath, jsonData.data + separator).subscribe({
-        next: () => {
+        next() {
           observer.next({ success: true, data: undefined });
           observer.complete();
         },
-        error: (error) => {
+        error(error) {
           observer.next({ success: false, error });
           observer.complete();
         },

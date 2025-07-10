@@ -19,9 +19,9 @@ import { ProviderMap } from "./providerMap";
 import type { Scope } from "./scope";
 
 export class Container {
-  private providers: ProviderMap = new ProviderMap();
-  private cache = new Map<InjectionToken<unknown>, unknown>();
-  private debug: boolean = false;
+  private readonly providers: ProviderMap = new ProviderMap();
+  private readonly cache = new Map<InjectionToken<unknown>, unknown>();
+  private readonly debug: boolean = false;
 
   constructor(parent?: Container) {}
 
@@ -100,7 +100,7 @@ export class Container {
   registerCustomScope(name: string, scope: CustomScope): this {
     return this;
   }
-  createChildScope(name?: string, context?: ResolutionContext): Container {
+  createChildScope(name?: string, context?: ResolutionContext): this {
     return this;
   }
   dispose(scope?: string): Promise<void> {
@@ -119,9 +119,7 @@ export class Container {
   has(token: InjectionToken<any>): boolean {
     return false;
   }
-  getProvider<T>(token: InjectionToken<T>): Provider<T>[] | undefined {
-    return;
-  }
+  getProvider<T>(token: InjectionToken<T>): Provider<T>[] | undefined {}
   remove(token: InjectionToken<any>): this {
     return this;
   }
